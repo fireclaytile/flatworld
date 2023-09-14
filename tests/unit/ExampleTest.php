@@ -15,17 +15,17 @@ use UnitTester;
 use Codeception\Test\Unit;
 
 class ExampleTest extends Unit {
-	/**
-	 * @var UnitTester
-	 */
-	protected UnitTester $tester;
+    /**
+     * @var UnitTester
+     */
+    protected UnitTester $tester;
 
-	/**
-	 * @return void
-	 */
-	public function testExample() {
-		Craft::$app->setEdition(Craft::Pro);
+    /**
+     * @return void
+     */
+    public function testExample() {
+        Craft::$app->setEdition(Craft::Pro);
 
-		$this->assertSame(Craft::Pro, Craft::$app->getEdition());
-	}
+        $this->assertSame(Craft::Pro, Craft::$app->getEdition());
+    }
 }

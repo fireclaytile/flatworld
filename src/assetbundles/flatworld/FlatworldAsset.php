@@ -18,21 +18,21 @@ use craft\web\assets\cp\CpAsset;
  * @package   fireclaytile\flatworld\assetbundles\flatworld
  */
 class FlatworldAsset extends AssetBundle {
-	public function init() {
-		$this->sourcePath = '@fireclaytile/flatworld/assetbundles/flatworld/dist';
+    public function init() {
+        $this->sourcePath = '@fireclaytile/flatworld/assetbundles/flatworld/dist';
 
-		$this->depends = [
-			CpAsset::class,
-		];
+        $this->depends = [
+            CpAsset::class,
+        ];
 
-		$this->js = [
-			'js/Flatworld.js',
-		];
+        $this->js = [
+            'js/Flatworld.js',
+        ];
 
-		$this->css = [
-			'css/Flatworld.css',
-		];
+        $this->css = [
+            'css/Flatworld.css',
+        ];
 
-		parent::init();
-	}
+        parent::init();
+    }
 }

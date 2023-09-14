@@ -7,19 +7,19 @@
 {% set productTypes = [] %}
 
 {% for productType in craft.commerce.productTypes.allProductTypes %}
-	{% set productTypes = productTypes|merge([{
-		label: productType.name,
-		value: productType.handle
-	}]) %}
+    {% set productTypes = productTypes|merge([{
+        label: productType.name,
+        value: productType.handle
+    }]) %}
 {% endfor %}
 
 {% set productLines = [{ label: 'N/A', value: ''}] %}
 
 {% for productLine in craft.categories().group('productLines').all() %}
-	{% set productLines = productLines|merge([{
-		label: productLine.title,
-		value: productLine.slug
-	}]) %}
+    {% set productLines = productLines|merge([{
+        label: productLine.title,
+        value: productLine.slug
+    }]) %}
 {% endfor %}
 
 {{ forms.autosuggestField({
@@ -34,14 +34,14 @@
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'Username' | t('postie'),
-	instructions: 'Enter your {name} Username here.' | t('postie', { name: provider.displayName() }),
-	id: 'username',
-	name: 'username',
-	value: provider.settings.username ?? '',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.username', 'postie'),
+    label: 'Username' | t('postie'),
+    instructions: 'Enter your {name} Username here.' | t('postie', { name: provider.displayName() }),
+    id: 'username',
+    name: 'username',
+    value: provider.settings.username ?? '',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.username', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
@@ -56,14 +56,14 @@
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'License Key' | t('postie'),
-	instructions: 'Enter your {name} License Key here.' | t('postie', { name: provider.displayName() }),
-	id: 'licenseKey',
-	name: 'licenseKey',
-	value: provider.settings.licenseKey ?? '',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.licenseKey', 'postie'),
+    label: 'License Key' | t('postie'),
+    instructions: 'Enter your {name} License Key here.' | t('postie', { name: provider.displayName() }),
+    id: 'licenseKey',
+    name: 'licenseKey',
+    value: provider.settings.licenseKey ?? '',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.licenseKey', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
@@ -78,90 +78,90 @@
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'Total Max Weight' | t('postie'),
-	instructions: 'Enter the total max weight in lbs here.' | t('postie', { name: provider.displayName() }),
-	id: 'totalMaxWeight',
-	name: 'totalMaxWeight',
-	value: provider.settings.totalMaxWeight ?? '',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.totalMaxWeight', 'postie'),
+    label: 'Total Max Weight' | t('postie'),
+    instructions: 'Enter the total max weight in lbs here.' | t('postie', { name: provider.displayName() }),
+    id: 'totalMaxWeight',
+    name: 'totalMaxWeight',
+    value: provider.settings.totalMaxWeight ?? '',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.totalMaxWeight', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'Weight Threshold' | t('postie'),
-	instructions: 'Enter the weight threshold here. This value is used to determine whether a single box or pallet is used as the packing method.' | t('postie', { name: provider.displayName() }),
-	id: 'weightThreshold',
-	name: 'weightThreshold',
-	value: provider.settings.weightThreshold ?? '',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightThreshold', 'postie'),
+    label: 'Weight Threshold' | t('postie'),
+    instructions: 'Enter the weight threshold here. This value is used to determine whether a single box or pallet is used as the packing method.' | t('postie', { name: provider.displayName() }),
+    id: 'weightThreshold',
+    name: 'weightThreshold',
+    value: provider.settings.weightThreshold ?? '',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightThreshold', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'Weight Limit Message' | t('postie'),
-	instructions: 'Enter the weight limit message here.' | t('postie', { name: provider.displayName() }),
-	id: 'weightLimitMessage',
-	name: 'weightLimitMessage',
-	value: provider.settings.weightLimitMessage ?? 'Shipping weight limit reached.',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightLimitMessage', 'postie'),
+    label: 'Weight Limit Message' | t('postie'),
+    instructions: 'Enter the weight limit message here.' | t('postie', { name: provider.displayName() }),
+    id: 'weightLimitMessage',
+    name: 'weightLimitMessage',
+    value: provider.settings.weightLimitMessage ?? 'Shipping weight limit reached.',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightLimitMessage', 'postie'),
 }) }}
 
 {{ forms.editableTableField({
-	label: 'Weight Per Square Foot' | t('postie'),
-	instructions: 'Enter each product type and its weight per square foot here.' | t('postie', { name: provider.displayName() }),
-	id: 'weightPerSquareFoot',
-	name: 'weightPerSquareFoot',
-	cols: [
-		{
-			heading : 'Product Type',
-			type: 'select',
-			options: productTypes
-		}, {
-			heading : 'Product Line',
-			type: 'select',
-			options: productLines
-		}, {
-			heading : 'Weight Per Square Foot',
-			type: 'singleline'
-		},
-	],
-	rows: provider.settings.weightPerSquareFoot ?? [],
-	required: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightPerSquareFoot', 'postie'),
+    label: 'Weight Per Square Foot' | t('postie'),
+    instructions: 'Enter each product type and its weight per square foot here.' | t('postie', { name: provider.displayName() }),
+    id: 'weightPerSquareFoot',
+    name: 'weightPerSquareFoot',
+    cols: [
+        {
+            heading : 'Product Type',
+            type: 'select',
+            options: productTypes
+        }, {
+            heading : 'Product Line',
+            type: 'select',
+            options: productLines
+        }, {
+            heading : 'Weight Per Square Foot',
+            type: 'singleline'
+        },
+    ],
+    rows: provider.settings.weightPerSquareFoot ?? [],
+    required: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightPerSquareFoot', 'postie'),
 }) }}
 
 {{ forms.lightswitchField({
-	label: 'Display Debug Messages' | t('postie'),
-	instructions: 'Whether logging debug messages should be enabled.' | t('postie', { name: provider.displayName() }),
-	id: 'displayDebugMessages',
-	name: 'displayDebugMessages',
-	on: provider.settings.displayDebugMessages ?? false,
-	required: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.displayDebugMessages', 'postie'),
+    label: 'Display Debug Messages' | t('postie'),
+    instructions: 'Whether logging debug messages should be enabled.' | t('postie', { name: provider.displayName() }),
+    id: 'displayDebugMessages',
+    name: 'displayDebugMessages',
+    on: provider.settings.displayDebugMessages ?? false,
+    required: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.displayDebugMessages', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'Flat Rate Carrier Name' | t('postie'),
-	instructions: 'Enter the Flat Rate Carrier Name here.' | t('postie', { name: provider.displayName() }),
-	id: 'flatRateCarrierName',
-	name: 'flatRateCarrierName',
-	value: provider.settings.flatRateCarrierName ?? '',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.flatRateCarrierName', 'postie'),
+    label: 'Flat Rate Carrier Name' | t('postie'),
+    instructions: 'Enter the Flat Rate Carrier Name here.' | t('postie', { name: provider.displayName() }),
+    id: 'flatRateCarrierName',
+    name: 'flatRateCarrierName',
+    value: provider.settings.flatRateCarrierName ?? '',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.flatRateCarrierName', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-	label: 'Flat Rate Carrier Cost' | t('postie'),
-	instructions: 'Enter the Flat Rate Carrier Cost here.' | t('postie', { name: provider.displayName() }),
-	id: 'flatRateCarrierCost',
-	name: 'flatRateCarrierCost',
-	value: provider.settings.flatRateCarrierCost ?? '',
-	required: true,
-	suggestEnvVars: true,
-	warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.flatRateCarrierCost', 'postie'),
+    label: 'Flat Rate Carrier Cost' | t('postie'),
+    instructions: 'Enter the Flat Rate Carrier Cost here.' | t('postie', { name: provider.displayName() }),
+    id: 'flatRateCarrierCost',
+    name: 'flatRateCarrierCost',
+    value: provider.settings.flatRateCarrierCost ?? '',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.flatRateCarrierCost', 'postie'),
 }) }}

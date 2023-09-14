@@ -22,34 +22,34 @@ use craft\commerce\elements\Order;
  */
 class FlatworldVariable {
     /**
-	 * @param $orderId
-	 * @return array
-	 */
-	public function getRates($orderId): array {
-		$flatworld = Postie::getInstance()->getProviders()->getProviderByHandle('flatworld');
+     * @param $orderId
+     * @return array
+     */
+    public function getRates($orderId): array {
+        $flatworld = Postie::getInstance()->getProviders()->getProviderByHandle('flatworld');
 
-		$flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Order ID: '.$orderId);
+        $flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Order ID: '.$orderId);
 
-		$order = Order::find()->id($orderId)->one();
+        $order = Order::find()->id($orderId)->one();
 
-		if (! empty($order)) {
-			$flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Found an order');
+        if (! empty($order)) {
+            $flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Found an order');
 
-			$rates = $flatworld->fetchShippingRates($order);
+            $rates = $flatworld->fetchShippingRates($order);
 
-			if ($rates) {
-				$flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Rates: '.Json::encode($rates));
+            if ($rates) {
+                $flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Rates: '.Json::encode($rates));
 
-				return $rates;
-			}
+                return $rates;
+            }
 
-			$flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Rates were empty');
+            $flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Rates were empty');
 
-			return [];
-		}
+            return [];
+        }
 
-		$flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Order was empty');
+        $flatworld->displayDebugMessage('FlatworldVariable.php :: getRates :: Order was empty');
 
-		return [];
-	}
+        return [];
+    }
 }
