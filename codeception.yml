@@ -1,0 +1,37 @@
+actor: Tester
+actor_suffix: Tester
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
+paths:
+    tests: tests
+    output: tests/_output
+    data: tests/_data
+    support: tests/_support
+    envs: tests/_envs
+bootstrap: _bootstrap.php
+settings:
+    colors: true
+    memory_limit: 2048M
+params:
+    - tests/.env
+modules:
+    config:
+        \craft\test\Craft:
+            configFile: 'tests/_craft/config/test.php'
+            entryUrl: 'https://flatworld.test/index.php'
+            projectConfig: {}
+            migrations: []
+            plugins:
+                commerce:
+                    class: '\craft\commerce\Plugin'
+                    handle: commerce
+                postie:
+                    class: '\verbb\postie\Postie'
+                    handle: postie
+                flatworld:
+                    class: '\fireclaytile\flatworld\Flatworld'
+                    handle: flatworld
+            cleanup: true
+            transaction: true
+            dbSetup: { clean: true, setupCraft: true }

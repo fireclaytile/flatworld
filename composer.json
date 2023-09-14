@@ -1,0 +1,65 @@
+{
+    "name": "fireclaytile/flatworld",
+    "description": "Craft Commerce plugin to provide Postie with an additional shipping provider.",
+    "type": "craft-plugin",
+    "version": "0.8.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "fireclaytile",
+        "commerce",
+        "provider",
+        "postie",
+        "flatworld"
+    ],
+    "support": {
+        "issues": "https://github.com/fireclaytile/flatworld/issues",
+        "docs": "https://github.com/fireclaytile/flatworld/blob/master/README.md"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fireclay Tile",
+            "homepage": "https://github.com/fireclaytile"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "verbb/postie": "^2.4",
+        "craftcms/commerce": "^3.4.0",
+        "craftcms/cms": "^3.7.0",
+        "putyourlightson/craft-log-to-file": "^1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "fireclaytile\\flatworld\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Flatworld",
+        "handle": "flatworld",
+        "developer": "Fireclay Tile",
+        "developerUrl": "https://github.com/fireclaytile",
+        "class": "fireclaytile\\flatworld\\Flatworld",
+        "changelogUrl": "https://raw.githubusercontent.com/fireclaytile/flatworld/master/CHANGELOG.md"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0"
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    },
+    "require-dev": {
+        "codeception/codeception": "^4.1",
+        "codeception/module-phpbrowser": "^1.0.0",
+        "codeception/module-asserts": "^1.0.0",
+        "vlucas/phpdotenv": "^5.4",
+        "codeception/module-yii2": "^1.1"
+    }
+}
