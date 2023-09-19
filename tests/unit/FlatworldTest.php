@@ -1309,19 +1309,16 @@ class FlatworldProviderTest extends Unit {
 
         $rates = $this->flatworld->responseRates();
 
-        $flatRateHandle = $this->flatworld->getFlatRateHandle();
         $flatRateAmount = $this->flatworld->getFlatRateAmount();
 
         $this->assertIsArray($rates);
-        $this->assertArrayHasKey($flatRateHandle, $rates);
-        $this->assertArrayHasKey('amount', $rates[$flatRateHandle]);
-        $this->assertSame($flatRateAmount, $rates[$flatRateHandle]['amount']);
 
-        // Asserts that the flat rate carrier is the first element
+        // Asserts that the first element has the flat rate amount
         $firstCarrier = array_slice($rates, 0, 1);
         $firstCarrierHandle = key($firstCarrier);
 
-        $this->assertSame($flatRateHandle, $firstCarrierHandle);
+        $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
+        $this->assertSame($flatRateAmount, $rates[$firstCarrierHandle]['amount']);
 
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
     }
@@ -1573,12 +1570,14 @@ class FlatworldProviderTest extends Unit {
 
         $rates = $this->flatworld->responseRates();
 
-        // $firstCarrier = array_slice($rates, 0, 1);
-        // $firstCarrierHandle = key($firstCarrier);
-
         $this->assertIsArray($rates);
-        $this->assertArrayHasKey('amount', $rates);
-        $this->assertEquals(0, $rates['amount']);
+
+        // Asserts that the first element has the flat rate amount
+        $firstCarrier = array_slice($rates, 0, 1);
+        $firstCarrierHandle = key($firstCarrier);
+
+        $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
+        $this->assertSame(0, $rates[$firstCarrierHandle]['amount']);
 
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
     }
@@ -1615,12 +1614,14 @@ class FlatworldProviderTest extends Unit {
 
         $rates = $this->flatworld->responseRates();
 
-        // $firstCarrier = array_slice($rates, 0, 1);
-        // $firstCarrierHandle = key($firstCarrier);
-
         $this->assertIsArray($rates);
-        $this->assertArrayHasKey('amount', $rates);
-        $this->assertNotEquals(0, $rates['amount']);
+
+        // Asserts that the first element has the flat rate amount
+        $firstCarrier = array_slice($rates, 0, 1);
+        $firstCarrierHandle = key($firstCarrier);
+
+        $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
+        $this->assertNotEquals(0, $rates[$firstCarrierHandle]['amount']);
 
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
     }
@@ -1659,12 +1660,14 @@ class FlatworldProviderTest extends Unit {
 
         $rates = $this->flatworld->responseRates();
 
-        // $firstCarrier = array_slice($rates, 0, 1);
-        // $firstCarrierHandle = key($firstCarrier);
-
         $this->assertIsArray($rates);
-        $this->assertArrayHasKey('amount', $rates);
-        $this->assertNotEquals(0, $rates['amount']);
+
+        // Asserts that the first element has the flat rate amount
+        $firstCarrier = array_slice($rates, 0, 1);
+        $firstCarrierHandle = key($firstCarrier);
+
+        $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
+        $this->assertNotEquals(0, $rates[$firstCarrierHandle]['amount']);
 
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
     }
