@@ -10,15 +10,15 @@ This plugin requires Craft CMS 3.x or later, Craft Commerce 3.x, and the Postie 
 
 To install the plugin, follow these instructions.
 
-1. Open your terminal and go to your Craft project:
+1.  Open your terminal and go to your Craft project:
 
         cd /path/to/project
 
-2. Then tell Composer to load the plugin:
+2.  Then tell Composer to load the plugin:
 
         composer require fireclaytile/flatworld
 
-3. In the Control Panel, go to Settings → Plugins and click the "Install" button for Flatworld.
+3.  In the Control Panel, go to Settings → Plugins and click the "Install" button for Flatworld.
 
 ## Overview
 
@@ -100,7 +100,7 @@ return [
 ## Unit Testing
 
 Unit testing is mainly focused on testing functionality of the Provider.
-For best results, since this is a Craft CMS plugin, why not set up a ddev environment and run the tests there? 
+For best results, since this is a Craft CMS plugin, why not set up a ddev environment and run the tests there?
 Don't worry, the .ddev folder is set to be ignored by git within this project.
 
 ```

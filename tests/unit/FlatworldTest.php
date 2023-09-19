@@ -80,7 +80,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testConfigOptionsSpecificToFlatworldAreValidAndCorrect(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $config = Craft::$app->getConfig()->getConfigFromFile('postie');
 
         $this->assertIsArray($config);
@@ -107,7 +107,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testSettingsSpecificToFlatworldAreValidAndCorrect(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $this->assertNotEmpty($this->flatworld->getSetting('username'));
         $this->assertSame('Fireclay', $this->flatworld->getSetting('username'));
 
@@ -166,7 +166,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testSettingsTemplateHasFlatworldSpecificFields(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $settingsHtml = $this->flatworld->getSettingsHtml();
 
         $this->assertNotEmpty($settingsHtml);
@@ -192,7 +192,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testDisplayNameReturnsAValidString(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $displayName = $this->flatworld->displayName();
 
         $this->assertNotEmpty($displayName);
@@ -206,7 +206,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testIconUrlReturnsAValidString(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $iconUrl = $this->flatworld->getIconUrl();
 
         $this->assertNotEmpty($iconUrl);
@@ -220,7 +220,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testServiceListReturnsAValidArrayOfServices(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $serviceList = $this->flatworld->getServiceList();
 
         $this->assertIsArray($serviceList);
@@ -278,7 +278,7 @@ class FlatworldProviderTest extends Unit {
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setResponse($this->mockApiParcelResponse);
 
-        
+
         $rates = $this->flatworld->responseRates();
 
         $this->assertIsArray($rates);
@@ -689,7 +689,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testCheckTotalWeightReturnsTrueWhenAnOrderWeightIsGreaterThanZero(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $mockOrder = $this->createMockOrder();
 
         $this->flatworld->setOrder($mockOrder);
@@ -1545,7 +1545,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testOrderContainsSampleProductsOnlyReturnsFirstCarrierWithZeroCostForCustomersTrade15Group(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $mockOrder = $this->createMockOrder();
 
         $userGroup15 = new MockUserGroup();
@@ -1589,7 +1589,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testOrderContainsMixedProductsDoesNotReturnsFirstCarrierWithZeroCostForCustomersTrade15Group(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $mockOrder = $this->createMockOrder();
 
         $userGroup15 = new MockUserGroup();
@@ -1631,7 +1631,7 @@ class FlatworldProviderTest extends Unit {
      */
     public function testOrderContainsSampleProductsOnlyDoesNotReturnCarrierWithZeroAmountForNonCustomersTrade15Group(): void {
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
-        
+
         $mockOrder = $this->createMockOrder();
 
         $userGroup3 = new MockUserGroup();
@@ -1706,7 +1706,7 @@ class FlatworldProviderTest extends Unit {
         $this->flatworld->setRatesCache($rates);
 
         $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
-        
+
         return $rates;
     }
 

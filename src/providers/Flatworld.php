@@ -3,7 +3,7 @@
  * Flatworld plugin for Craft CMS 3.x
  *
  * Craft Commerce plugin to provide Postie with an additional shipping provider.
- * 
+ *
  * We don't actually interface directly with Flatworld, but instead use
  * SalesForce's connection to Flatworld via API endpoints in SF.
  *
@@ -52,7 +52,7 @@ class Flatworld extends Provider {
 
     /**
      * The Commerce order object.
-     * 
+     *
      * @var mixed
      */
     private $_order;
@@ -69,16 +69,16 @@ class Flatworld extends Provider {
 
     /**
      * The response from the API call for rates.
-     * 
+     *
      * @var mixed
      */
     private $_response;
 
     /**
      * Array of package details.
-     * 
+     *
      * TODO: Determine if this is still needed. It's a holdover from the Pacejet plugin
-     * 
+     *
      * @var array
      */
     private array $_packageDetailsList;
@@ -128,7 +128,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the plugin's display name.
-     * 
+     *
      * @return string
      */
     public static function displayName(): string {
@@ -139,7 +139,7 @@ class Flatworld extends Provider {
 
     /**
      * Renders the settings template.
-     * 
+     *
      * @return string
      * @throws LoaderError
      * @throws RuntimeError
@@ -154,7 +154,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the plugin's icon URL.
-     * 
+     *
      * @return string
      */
     public function getIconUrl(): string {
@@ -163,7 +163,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the carrierClassOfServices setting.
-     * 
+     *
      * @return array
      */
     public function getServiceList(): array {
@@ -172,7 +172,7 @@ class Flatworld extends Provider {
 
     /**
      * Logs a debug message to the log file.
-     * 
+     *
      * @param string $message
      * @return bool
      */
@@ -192,7 +192,7 @@ class Flatworld extends Provider {
 
     /**
      * Fetches an array of shipping rates.
-     * 
+     *
      * @param mixed $order
      * @return array
      * @throws Exception
@@ -289,7 +289,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _order property.
-     * 
+     *
      * @param $order
      * @return void
      */
@@ -299,7 +299,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _order property.
-     * 
+     *
      * @return mixed
      */
     public function getOrder() {
@@ -308,7 +308,7 @@ class Flatworld extends Provider {
 
     /**
      * Checks for presence of line items on the order.
-     * 
+     *
      * @return bool
      */
     public function checkLineItems(): bool {
@@ -325,7 +325,7 @@ class Flatworld extends Provider {
 
     /**
      * Checks for presence of required fields on the line items. If any are missing, an email is sent to the admin.
-     * 
+     *
      * @return bool
      */
     public function checkLineItemRequiredFields(): bool {
@@ -368,7 +368,7 @@ class Flatworld extends Provider {
 
     /**
      * Checks to see if the order has a shipping address.
-     * 
+     *
      * @return bool
      */
     public function checkShippingAddress(): bool {
@@ -385,7 +385,7 @@ class Flatworld extends Provider {
 
     /**
      * Filters out addons from the order's lineItems.
-     * 
+     *
      * @return void
      */
     public function filterOutAddons(): void {
@@ -433,7 +433,7 @@ class Flatworld extends Provider {
 
     /**
      * Determines how many of each product type are in the order.
-     * 
+     *
      * @return void
      */
     public function countProductTypes(): void {
@@ -483,7 +483,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _orderContainsStandardProducts property.
-     * 
+     *
      * @param bool $orderContainsStandardProducts
      * @return void
      */
@@ -493,7 +493,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _orderContainsStandardProducts property.
-     * 
+     *
      * @return bool
      */
     public function orderContainsStandardProducts(): bool {
@@ -502,7 +502,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _orderContainsSampleProducts property.
-     * 
+     *
      * @param $orderContainsSampleProducts
      * @return void
      */
@@ -512,7 +512,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _orderContainsSampleProducts property.
-     * 
+     *
      * @return bool
      */
     public function orderContainsSampleProducts(): bool {
@@ -521,7 +521,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _orderContainsMerchandise property.
-     * 
+     *
      * @param $orderContainsMerchandise
      * @return void
      */
@@ -531,7 +531,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _orderContainsMerchandise property.
-     * 
+     *
      * @return bool
      */
     public function orderContainsMerchandise(): bool {
@@ -540,7 +540,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _pieces property which is used to calculate total weight.
-     * 
+     *
      * @return void
      */
     public function setPieces(): void {
@@ -635,7 +635,7 @@ class Flatworld extends Provider {
 
     /**
      * Calculates the number of pieces for a given line item based on qty (sq ft) and variant weight.
-     * 
+     *
      * Example: (4.5 / 0.69) * 25 = 163 (breakdown equals weight per sq ft / variant weight) * sq ft = number of pieces
      *
      * @param $weightPerSquareFoot
@@ -649,7 +649,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _pieces property.
-     * 
+     *
      * @return array
      */
     public function getPieces(): array {
@@ -658,7 +658,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _totalWeight property.
-     * 
+     *
      * @param float $totalWeight
      * @return void
      */
@@ -703,7 +703,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _totalWeight property.
-     * 
+     *
      * @return float
      */
     public function getTotalWeight(): float {
@@ -743,7 +743,7 @@ class Flatworld extends Provider {
     /**
      * Calculates id the total weight of the order exceeds the weight limit.
      * Returns true if it does, false if it does not.
-     * 
+     *
      * @return bool
      */
     public function weightLimitReached(): bool {
@@ -789,7 +789,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _packageDetailsList property.
-     * 
+     *
      * @return array
      */
     public function getPackageDetailsList(): array {
@@ -798,7 +798,7 @@ class Flatworld extends Provider {
 
     /**
      * Determines if the Total Weight of the order is under the weight threshold.
-     * 
+     *
      * @return bool
      */
     public function underWeightThreshold(): bool {
@@ -874,7 +874,7 @@ class Flatworld extends Provider {
 
     /**
      * Make a request to the API for Rates.
-     * 
+     *
      * @return void
      * @throws GuzzleException
      */
@@ -899,7 +899,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the _response property.
-     * 
+     *
      * @param $response
      * @return void
      */
@@ -910,7 +910,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the _response property.
-     * 
+     *
      * @return mixed
      */
     public function getResponse() {
@@ -993,7 +993,7 @@ class Flatworld extends Provider {
             $amount = array_column($rates, 'amount');
             array_multisort($amount, SORT_ASC, $rates);
 
-            // Shipping for samples only orders for trade is $0 and $8 for everyone else 
+            // Shipping for samples only orders for trade is $0 and $8 for everyone else
             // (We set this on the lowest cost carrier which also overrides flat rate cost)
             if (! $this->orderContainsStandardProducts() && ! $this->orderContainsMerchandise() && $this->orderContainsSampleProducts()) {
                 $firstCarrier = array_slice($rates, 0, 1);
@@ -1179,7 +1179,7 @@ class Flatworld extends Provider {
 
     /**
      * Returns a string of the estimated arrival time based on the transit time.
-     * 
+     *
      * @param string $transitTime
      * @return string
      */
@@ -1204,7 +1204,7 @@ class Flatworld extends Provider {
 
     /**
      * Sets the flat-rate shipping price on rates.
-     * 
+     *
      * @param array $rates
      * @return array
      */
@@ -1235,7 +1235,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the flat rate carrier name from the plugin settings.
-     * 
+     *
      * @return string
      */
     public function getFlatRateHandle(): string {
@@ -1244,7 +1244,7 @@ class Flatworld extends Provider {
 
     /**
      * Gets the flat rate amount from the plugin settings.
-     * 
+     *
      * @return float
      */
     public function getFlatRateAmount(): float {
@@ -1276,7 +1276,7 @@ class Flatworld extends Provider {
 
     /**
      * Creates a rates cache and sets it to expire in 5 minutes.
-     * 
+     *
      * @param array $rates
      * @return void
      */
@@ -1293,7 +1293,7 @@ class Flatworld extends Provider {
 
     /**
      * Creates a cache key based on order details.
-     * 
+     *
      * @return array|false|string
      */
     private function _getCacheKey(): array|false|string {
@@ -1331,7 +1331,7 @@ class Flatworld extends Provider {
 
     /**
      * Makes a request to our SalesForce API to get rates. Returns an array of rates.
-     * 
+     *
      * @param string $method
      * @param string $uri
      * @param array $options
@@ -1349,7 +1349,7 @@ class Flatworld extends Provider {
     /* Get a decoded JSON string from a fake response.
      *
      * TODO: Remove this once we have a real API to work with.
-     * 
+     *
      * @return mixed
      */
     private function _getFakeResponse() {
@@ -1552,7 +1552,7 @@ class Flatworld extends Provider {
 
     /**
      * Creates a Guzzle client with our settings and returns it.
-     * 
+     *
      * @return Client
      */
     private function _getClient(): Client {
@@ -1573,7 +1573,7 @@ class Flatworld extends Provider {
 
     /**
      * Logs a thrown error and sends an email about it.
-     * 
+     *
      * @param $uniqueId
      * @param $error
      * @return void
@@ -1622,7 +1622,7 @@ class Flatworld extends Provider {
 
     /**
      * Modify rates on order and return rates
-     * 
+     *
      * @param array $rates
      * @param $order
      * @return array
@@ -1640,7 +1640,7 @@ class Flatworld extends Provider {
 
     /**
      * Sends an email to the web team with an error message
-     * 
+     *
      * @param string $textBody The message to include in the email
      * @return void
      */
