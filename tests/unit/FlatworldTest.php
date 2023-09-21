@@ -116,20 +116,53 @@ class FlatworldProviderTest extends Unit
             'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
         );
 
-        $this->assertNotEmpty($this->flatworld->getSetting('username'));
-        $this->assertSame('Fireclay', $this->flatworld->getSetting('username'));
+        $this->assertNotEmpty($this->flatworld->getSetting('apiUsername'));
+        $this->assertSame(
+            App::env('SALESFORCE_USERNAME'),
+            $this->flatworld->getSetting('apiUsername'),
+        );
 
-        // $this->assertNotEmpty($this->flatworld->getSetting('apiUrl'));
-        // $this->assertSame('', $this->flatworld->getSetting('apiUrl'));
+        $this->assertNotEmpty($this->flatworld->getSetting('apiPassword'));
+        $this->assertSame(
+            App::env('SALESFORCE_PASSWORD'),
+            $this->flatworld->getSetting('apiPassword'),
+        );
 
-        // $this->assertNotEmpty($this->flatworld->getSetting('licenseId'));
-        // $this->assertSame('', $this->flatworld->getSetting('licenseId'));
+        $this->assertNotEmpty($this->flatworld->getSetting('apiUrl'));
+        $this->assertSame(
+            App::env('SALESFORCE_API_URL'),
+            $this->flatworld->getSetting('apiUrl'),
+        );
 
-        // $this->assertNotEmpty($this->flatworld->getSetting('licenseKey'));
-        // $this->assertSame('', $this->flatworld->getSetting('licenseKey'));
+        $this->assertNotEmpty($this->flatworld->getSetting('apiConsumerKey'));
+        $this->assertSame(
+            App::env('SALESFORCE_CONSUMER_KEY'),
+            $this->flatworld->getSetting('apiConsumerKey'),
+        );
 
-        // $this->assertNotEmpty($this->flatworld->getSetting('upsLicenseId'));
-        // $this->assertSame('', $this->flatworld->getSetting('upsLicenseId'));
+        $this->assertNotEmpty(
+            $this->flatworld->getSetting('apiConsumerSecret'),
+        );
+        $this->assertSame(
+            App::env('SALESFORCE_CONSUMER_SECRET'),
+            $this->flatworld->getSetting('apiConsumerSecret'),
+        );
+
+        $this->assertNotEmpty(
+            $this->flatworld->getSetting('enableSalesforceApi'),
+        );
+        $this->assertSame(
+            App::env('SALESFORCE_CONNECT'),
+            $this->flatworld->getSetting('enableSalesforceApi'),
+        );
+
+        $this->assertNotEmpty(
+            $this->flatworld->getSetting('enableSalesforceSandbox'),
+        );
+        $this->assertSame(
+            App::env('SALESFORCE_SANDBOX'),
+            $this->flatworld->getSetting('enableSalesforceSandbox'),
+        );
 
         $this->assertNotEmpty($this->flatworld->getSetting('totalMaxWeight'));
         $this->assertSame(
@@ -208,10 +241,24 @@ class FlatworldProviderTest extends Unit
 
         $this->assertNotEmpty($settingsHtml);
         $this->assertStringContainsString('apiUrl-label', $settingsHtml);
-        $this->assertStringContainsString('username-label', $settingsHtml);
-        $this->assertStringContainsString('licenseId-label', $settingsHtml);
-        $this->assertStringContainsString('licenseKey-label', $settingsHtml);
-        $this->assertStringContainsString('upsLicenseId-label', $settingsHtml);
+        $this->assertStringContainsString('apiUsername-label', $settingsHtml);
+        $this->assertStringContainsString('apiPassword-label', $settingsHtml);
+        $this->assertStringContainsString(
+            'apiConsumerKey-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'apiConsumerSecret-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'enableSalesforceApi-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'enableSalesforceSandbox-label',
+            $settingsHtml,
+        );
         $this->assertStringContainsString(
             'totalMaxWeight-label',
             $settingsHtml,
