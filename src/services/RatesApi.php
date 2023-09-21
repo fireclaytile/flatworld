@@ -26,7 +26,14 @@ class RatesApi extends Component
      *
      * @var Flatworld
      */
-    protected Flatworld $flatworld;
+    private Flatworld $_flatworld;
+
+    /**
+     * Salesforce enabled?
+     *
+     * @var bool
+     */
+    private bool $_salesforceEnabled;
 
     /**
      * Instance of the SalesforceRestConnection class.
@@ -36,18 +43,14 @@ class RatesApi extends Component
     public $sf;
 
     /**
-     * Salesforce enabled?
-     *
-     * @var bool
+     * RatesApi constructor.
      */
-    private bool $_salesforceEnabled;
-
     function __construct()
     {
-        $this->flatworld = Postie::getInstance()
+        $this->_flatworld = Postie::getInstance()
             ->getProviders()
             ->getProviderByHandle('flatworld');
-        $this->_salesforceEnabled = !$this->flatworld->getSetting(
+        $this->_salesforceEnabled = !$this->_flatworld->getSetting(
             'enableSalesforceApi',
         );
     }
@@ -55,8 +58,8 @@ class RatesApi extends Component
     /**
      * Get rates from Salesforce.
      *
-     * @param ShippingRequest $shippingRequest
-     * @param mixed $sf
+     * @param ShippingRequest $shippingRequest Shipping request object
+     * @param mixed $sf SalesforceRestConnection object
      * @return string
      */
     public function getRates(
@@ -87,13 +90,13 @@ class RatesApi extends Component
     {
         try {
             // get params from Postie settings
-            $apiConsumerKey = $this->flatworld->getSetting('apiConsumerKey');
-            $apiConsumerSecret = $this->flatworld->getSetting(
+            $apiConsumerKey = $this->_flatworld->getSetting('apiConsumerKey');
+            $apiConsumerSecret = $this->_flatworld->getSetting(
                 'apiConsumerSecret',
             );
-            $apiUsername = $this->flatworld->getSetting('apiUsername');
-            $apiPassword = $this->flatworld->getSetting('apiPassword');
-            $apiUrl = $this->flatworld->getSetting('apiUrl');
+            $apiUsername = $this->_flatworld->getSetting('apiUsername');
+            $apiPassword = $this->_flatworld->getSetting('apiPassword');
+            $apiUrl = $this->_flatworld->getSetting('apiUrl');
 
             $this->sf = new SalesforceRestConnection(
                 $apiConsumerKey,

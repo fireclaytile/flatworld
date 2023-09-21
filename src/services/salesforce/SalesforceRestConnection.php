@@ -6,14 +6,44 @@ use fireclaytile\flatworld\services\salesforce\models\RestDetails;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
 
 /**
- * Class for making REST API calls to Salesforce.
+ * SalesforceRestConnection Class
+ *
+ * Makes REST API calls to Salesforce.
  */
 class SalesforceRestConnection
 {
-    private $_accessToken;
-    private $_instanceURL;
-    private $_baseEndpoint = '/services/apexrest/';
+    /**
+     * Salesforce access token.
+     *
+     * @var string
+     */
+    private string $_accessToken;
 
+    /**
+     * Salesforce instance URL.
+     *
+     * @var string
+     */
+    private string $_instanceURL;
+
+    /**
+     * Salesforce base endpoint.
+     *
+     * @var string
+     */
+    private string $_baseEndpoint = '/services/apexrest/';
+
+    /**
+     * SalesforceRestConnection constructor.
+     *
+     * Makes a connection to Salesforce and stores the access token and instance URL.
+     *
+     * @param string $clientId Salesforce API client ID
+     * @param string $clientSecret Salesforce API client secret
+     * @param string $username Salesforce API username
+     * @param string $password Salesforce API password
+     * @param string $loginURL Salesforce API login URL
+     */
     public function __construct(
         $clientId,
         $clientSecret,
@@ -59,6 +89,9 @@ class SalesforceRestConnection
         $this->_instanceURL = $data['instance_url'];
     }
 
+    /**
+     * SalesforceRestConnection destructor.
+     */
     public function __destruct()
     {
     }
@@ -66,10 +99,10 @@ class SalesforceRestConnection
     /**
      * Gets shipping rates from Salesforce.
      *
-     * @param ShippingRequest $shippingRequest
-     * @return void
+     * @param ShippingRequest $shippingRequest Shipping request object
+     * @return mixed
      */
-    public function getRates(ShippingRequest $shippingRequest)
+    public function getRates(ShippingRequest $shippingRequest): mixed
     {
         $url = $this->_baseEndpoint . 'ShippingQuote';
         $restDetails = new RestDetails('GET', $url);
@@ -81,11 +114,19 @@ class SalesforceRestConnection
         );
     }
 
+    /**
+     * Makes a REST API request to Salesforce.
+     *
+     * @param string $accessToken Salesforce access token
+     * @param string $instanceURL Salesforce instance URL
+     * @param RestDetails $restDetails REST details object
+     * @return mixed
+     */
     private function _makeRequest(
         string $accessToken,
         string $instanceURL,
         RestDetails $restDetails,
-    ) {
+    ): mixed {
         $curl = curl_init($instanceURL . $restDetails->url);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
