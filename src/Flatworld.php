@@ -23,6 +23,8 @@ use fireclaytile\flatworld\variables\FlatworldVariable;
 use verbb\postie\events\ModifyShippableVariantsEvent;
 use fireclaytile\flatworld\providers\Flatworld as Provider;
 
+use fireclaytile\flatworld\services\RatesApi;
+
 /**
  * Class Flatworld
  *
@@ -56,6 +58,8 @@ class Flatworld extends Plugin
         parent::init();
 
         self::$plugin = $this;
+
+        $this->initServices();
 
         // Registers the Flatworld as new shipping provider
         Event::on(
@@ -108,5 +112,12 @@ class Flatworld extends Plugin
             ]),
             __METHOD__,
         );
+    }
+
+    private function initServices()
+    {
+        $this->setComponents([
+            'ratesApi' => RatesApi::class,
+        ]);
     }
 }
