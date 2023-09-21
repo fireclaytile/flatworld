@@ -192,13 +192,12 @@ class Flatworld extends Provider
             $message = Json::encode($message);
         }
 
-        if ($this->getSetting('displayDebugMessages')) {
-            LogToFile::info($message, 'flatworld');
-
-            return true;
+        if (!$this->getSetting('displayDebugMessages')) {
+            return false;
         }
 
-        return false;
+        LogToFile::info($message, 'flatworld');
+        return true;
     }
 
     /**

@@ -1,9 +1,13 @@
 <?php
+
 namespace fireclaytile\flatworld\services\salesforce;
 
 use fireclaytile\flatworld\services\salesforce\models\RestDetails;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
 
+/**
+ * Class for making REST API calls to Salesforce.
+ */
 class SalesforceRestConnection
 {
     private $_accessToken;
@@ -59,6 +63,12 @@ class SalesforceRestConnection
     {
     }
 
+    /**
+     * Gets shipping rates from Salesforce.
+     *
+     * @param ShippingRequest $shippingRequest
+     * @return void
+     */
     public function getRates(ShippingRequest $shippingRequest)
     {
         $url = $this->_baseEndpoint . 'ShippingQuote';
@@ -71,8 +81,11 @@ class SalesforceRestConnection
         );
     }
 
-    private function _makeRequest($accessToken, $instanceURL, $restDetails)
-    {
+    private function _makeRequest(
+        string $accessToken,
+        string $instanceURL,
+        RestDetails $restDetails,
+    ) {
         $curl = curl_init($instanceURL . $restDetails->url);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

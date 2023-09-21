@@ -1,12 +1,4 @@
 <?php
-/**
- * Flatworld plugin for Craft CMS 3.x
- *
- * Craft Commerce plugin to provide Postie with an additional shipping provider.
- *
- * @link      https://github.com/fireclaytile
- * @copyright Copyright (c) 2023 Fireclay Tile
- */
 
 namespace fireclaytile\flatworld\services;
 
@@ -21,10 +13,8 @@ use verbb\postie\Postie;
 // Report all errors
 error_reporting(E_ALL);
 
-// require_once('salesforce/SalesforceRestConnection.php');
-
 /**
- * Class RatesApi
+ * Service class for working with the Flatworld Rates API.
  *
  * @author     Fireclay Tile
  * @package    fireclaytile\flatworld\services
@@ -50,14 +40,14 @@ class RatesApi extends Component
      *
      * @var bool
      */
-    private bool $salesforceEnabled;
+    private bool $_salesforceEnabled;
 
     function __construct()
     {
         $this->flatworld = Postie::getInstance()
             ->getProviders()
             ->getProviderByHandle('flatworld');
-        $this->salesforceEnabled = !$this->flatworld->getSetting(
+        $this->_salesforceEnabled = !$this->flatworld->getSetting(
             'enableSalesforceApi',
         );
     }
@@ -73,7 +63,7 @@ class RatesApi extends Component
         ShippingRequest $shippingRequest,
         $sf = null,
     ): string {
-        if (!$this->salesforceEnabled || $shippingRequest == null) {
+        if (!$this->_salesforceEnabled || $shippingRequest == null) {
             return '';
         }
 
@@ -95,8 +85,8 @@ class RatesApi extends Component
      */
     public function salesforceConnect(): bool
     {
-        // Create connection to Salesforce
         try {
+            // get params from Postie settings
             $apiConsumerKey = $this->flatworld->getSetting('apiConsumerKey');
             $apiConsumerSecret = $this->flatworld->getSetting(
                 'apiConsumerSecret',
