@@ -216,9 +216,7 @@ class Flatworld extends Provider
         // If we've locally cached the results, return that
         if ($this->_rates) {
             $this->displayDebugMessage(
-                'Flatworld.php :: fetchShippingRates :: ' .
-                    $uniqueId .
-                    ' :: Returning locally cached rates',
+                "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: Returning locally cached rates",
             );
 
             return $this->_rates;
@@ -226,32 +224,23 @@ class Flatworld extends Provider
 
         try {
             $this->displayDebugMessage(
-                'Flatworld.php :: fetchShippingRates :: ' .
-                    $uniqueId .
-                    ' :: Fetching new rates',
+                "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: Fetching new rates",
             );
             $this->displayDebugMessage(
-                'Flatworld.php :: fetchShippingRates :: ' .
-                    $uniqueId .
-                    ' :: CALL STARTED',
+                "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: CALL STARTED",
             );
 
             $this->_rates = $this->getRates($order);
 
             $this->displayDebugMessage(
-                'Flatworld.php :: fetchShippingRates :: ' .
-                    $uniqueId .
-                    ' :: CALL FINISHED',
+                "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: CALL FINISHED",
             );
 
             if ($this->_rates) {
                 $rates = Json::encode($this->_rates);
 
                 $this->displayDebugMessage(
-                    'Flatworld.php :: fetchShippingRates :: ' .
-                        $uniqueId .
-                        ' :: Rates: ' .
-                        $rates,
+                    "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: Rates: {$rates}",
                 );
 
                 return $this->_rates;
@@ -260,16 +249,12 @@ class Flatworld extends Provider
             $this->_throwError($uniqueId, $error);
 
             $this->displayDebugMessage(
-                'Flatworld.php :: fetchShippingRates :: ' .
-                    $uniqueId .
-                    ' :: CALL FINISHED',
+                "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: CALL FINISHED",
             );
         }
 
         $this->displayDebugMessage(
-            'Flatworld.php :: fetchShippingRates :: ' .
-                $uniqueId .
-                ' :: Rates were empty',
+            "Flatworld.php :: fetchShippingRates :: {$uniqueId} :: Rates were empty",
         );
 
         return [];
