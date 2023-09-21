@@ -13,6 +13,7 @@ namespace fireclaytile\flatworld\tests\unit;
 use Craft;
 use Exception;
 use UnitTester;
+use craft\helpers\App;
 use craft\helpers\Json;
 use verbb\postie\Postie;
 use Codeception\Test\Unit;
@@ -24,7 +25,8 @@ use yii\base\InvalidConfigException;
 use fireclaytile\flatworld\providers\Flatworld;
 use fireclaytile\flatworld\variables\FlatworldVariable;
 
-class FlatworldProviderTest extends Unit {
+class FlatworldProviderTest extends Unit
+{
     /**
      * @var MockOrder $order
      */
@@ -48,11 +50,6 @@ class FlatworldProviderTest extends Unit {
     /**
      * @var array
      */
-    public array $mockApiResponse;
-
-    /**
-     * @var array
-     */
     public array $mockServiceList;
 
     /**
@@ -63,14 +60,17 @@ class FlatworldProviderTest extends Unit {
     /**
      * @return void
      */
-    protected function _before(): void {
+    protected function _before(): void
+    {
         parent::_before();
 
         Craft::$app->setEdition(Craft::Pro);
 
         $this->flatworldVariable = new FlatworldVariable();
 
-        $this->flatworld = Postie::getInstance()->getProviders()->getProviderByHandle('flatworld');
+        $this->flatworld = Postie::getInstance()
+            ->getProviders()
+            ->getProviderByHandle('flatworld');
 
         $this->prepareMockData();
     }
@@ -78,8 +78,11 @@ class FlatworldProviderTest extends Unit {
     /**
      * @return void
      */
-    public function testConfigOptionsSpecificToFlatworldAreValidAndCorrect(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testConfigOptionsSpecificToFlatworldAreValidAndCorrect(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $config = Craft::$app->getConfig()->getConfigFromFile('postie');
 
@@ -99,14 +102,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($flatworld);
         $this->assertNotEmpty($flatworld);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testSettingsSpecificToFlatworldAreValidAndCorrect(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testSettingsSpecificToFlatworldAreValidAndCorrect(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->assertNotEmpty($this->flatworld->getSetting('username'));
         $this->assertSame('Fireclay', $this->flatworld->getSetting('username'));
@@ -124,15 +132,28 @@ class FlatworldProviderTest extends Unit {
         // $this->assertSame('', $this->flatworld->getSetting('upsLicenseId'));
 
         $this->assertNotEmpty($this->flatworld->getSetting('totalMaxWeight'));
-        $this->assertSame('39750', $this->flatworld->getSetting('totalMaxWeight'));
+        $this->assertSame(
+            '39750',
+            $this->flatworld->getSetting('totalMaxWeight'),
+        );
 
         $this->assertNotEmpty($this->flatworld->getSetting('weightThreshold'));
-        $this->assertSame('150', $this->flatworld->getSetting('weightThreshold'));
+        $this->assertSame(
+            '150',
+            $this->flatworld->getSetting('weightThreshold'),
+        );
 
-        $this->assertNotEmpty($this->flatworld->getSetting('weightLimitMessage'));
-        $this->assertSame('Shipping weight limit reached. Please contact Fireclay Tile Salesperson.', $this->flatworld->getSetting('weightLimitMessage'));
+        $this->assertNotEmpty(
+            $this->flatworld->getSetting('weightLimitMessage'),
+        );
+        $this->assertSame(
+            'Shipping weight limit reached. Please contact Fireclay Tile Salesperson.',
+            $this->flatworld->getSetting('weightLimitMessage'),
+        );
 
-        $weightPerSquareFoot = $this->flatworld->getSetting('weightPerSquareFoot');
+        $weightPerSquareFoot = $this->flatworld->getSetting(
+            'weightPerSquareFoot',
+        );
 
         $this->assertNotEmpty($weightPerSquareFoot);
         $this->assertIsArray($weightPerSquareFoot);
@@ -143,19 +164,32 @@ class FlatworldProviderTest extends Unit {
         $this->assertNotEmpty($weightPerSquareFoot[0][2]);
         $this->assertSame('4.5', $weightPerSquareFoot[0][2]);
 
-        $this->assertNotEmpty($this->flatworld->getSetting('displayDebugMessages'));
-        $this->assertTrue((bool) $this->flatworld->getSetting('displayDebugMessages'));
+        $this->assertNotEmpty(
+            $this->flatworld->getSetting('displayDebugMessages'),
+        );
+        $this->assertTrue(
+            (bool) $this->flatworld->getSetting('displayDebugMessages'),
+        );
 
-        $this->assertNotEmpty($this->flatworld->getSetting('flatRateCarrierCost'));
-        $this->assertSame('8.0', $this->flatworld->getSetting('flatRateCarrierCost'));
+        $this->assertNotEmpty(
+            $this->flatworld->getSetting('flatRateCarrierCost'),
+        );
+        $this->assertSame(
+            '8.0',
+            $this->flatworld->getSetting('flatRateCarrierCost'),
+        );
 
-        $carrierClassOfServices = $this->flatworld->getSetting('carrierClassOfServices');
+        $carrierClassOfServices = $this->flatworld->getSetting(
+            'carrierClassOfServices',
+        );
 
         $this->assertIsArray($carrierClassOfServices);
         $this->assertNotEmpty($carrierClassOfServices);
         $this->assertSame($this->mockServiceList, $carrierClassOfServices);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
@@ -164,8 +198,11 @@ class FlatworldProviderTest extends Unit {
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function testSettingsTemplateHasFlatworldSpecificFields(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testSettingsTemplateHasFlatworldSpecificFields(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $settingsHtml = $this->flatworld->getSettingsHtml();
 
@@ -175,51 +212,93 @@ class FlatworldProviderTest extends Unit {
         $this->assertStringContainsString('licenseId-label', $settingsHtml);
         $this->assertStringContainsString('licenseKey-label', $settingsHtml);
         $this->assertStringContainsString('upsLicenseId-label', $settingsHtml);
-        $this->assertStringContainsString('totalMaxWeight-label', $settingsHtml);
-        $this->assertStringContainsString('weightThreshold-label', $settingsHtml);
-        $this->assertStringContainsString('weightLimitMessage-label', $settingsHtml);
-        $this->assertStringContainsString('weightPerSquareFoot-heading-1', $settingsHtml);
-        $this->assertStringContainsString('weightPerSquareFoot-heading-2', $settingsHtml);
-        $this->assertStringContainsString('weightPerSquareFoot-heading-3', $settingsHtml);
-        $this->assertStringContainsString('displayDebugMessages-label', $settingsHtml);
-        $this->assertStringContainsString('flatRateCarrierCost-label', $settingsHtml);
+        $this->assertStringContainsString(
+            'totalMaxWeight-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'weightThreshold-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'weightLimitMessage-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'weightPerSquareFoot-heading-1',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'weightPerSquareFoot-heading-2',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'weightPerSquareFoot-heading-3',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'displayDebugMessages-label',
+            $settingsHtml,
+        );
+        $this->assertStringContainsString(
+            'flatRateCarrierCost-label',
+            $settingsHtml,
+        );
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testDisplayNameReturnsAValidString(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testDisplayNameReturnsAValidString(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $displayName = $this->flatworld->displayName();
 
         $this->assertNotEmpty($displayName);
         $this->assertSame('Flatworld', $displayName);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testIconUrlReturnsAValidString(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testIconUrlReturnsAValidString(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $iconUrl = $this->flatworld->getIconUrl();
 
         $this->assertNotEmpty($iconUrl);
-        $this->assertSame('https://flatworld.test:80/cpresources/17b8c0e2/Flatworld.svg?v=1694438761', $iconUrl);
+        $this->assertSame(
+            'https://flatworld.test:80/cpresources/17b8c0e2/Flatworld.svg?v=1694438761',
+            $iconUrl,
+        );
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testServiceListReturnsAValidArrayOfServices(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testServiceListReturnsAValidArrayOfServices(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $serviceList = $this->flatworld->getServiceList();
 
@@ -227,15 +306,22 @@ class FlatworldProviderTest extends Unit {
         $this->assertNotEmpty($serviceList);
         $this->assertSame($this->mockServiceList, $serviceList);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
-    public function testFindQuickestRate() {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testFindQuickestRate()
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         // $now = \DateTime::createFromFormat('Y/m/d', '2024/09/06');
 
-        $quickestRate = $this->flatworld->findQuickestRate($this->mockApiParcelResponse);
+        $quickestRate = $this->flatworld->findQuickestRate(
+            $this->mockApiParcelResponse,
+        );
 
         $expectedRate = Json::decode('{
             "CarrierId": "4028|03",
@@ -256,7 +342,9 @@ class FlatworldProviderTest extends Unit {
         // Assert that $quickestRate is the expected rate with the quickest delivery
         $this->assertEquals($expectedRate, $quickestRate);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
@@ -272,12 +360,14 @@ class FlatworldProviderTest extends Unit {
     /**
      * @return void
      */
-    public function testResponseRates(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testResponseRates(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setResponse($this->mockApiParcelResponse);
-
 
         $rates = $this->flatworld->responseRates();
 
@@ -289,7 +379,6 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($keys);
         $this->assertNotEmpty($keys);
 
-
         $this->assertArrayHasKey('arrival', $rates[$keys[0]]);
         $this->assertArrayHasKey('transitTime', $rates[$keys[0]]);
         $this->assertArrayHasKey('arrivalDateText', $rates[$keys[0]]);
@@ -300,14 +389,19 @@ class FlatworldProviderTest extends Unit {
         // $this->assertSame('WED - 1/26/2022', $rates[$keys[1]]['arrivalDateText']);
         // $this->assertSame(27.12, $rates[$keys[1]]['amount']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testTransitTimesShowCorrectArrivalDays(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testTransitTimesShowCorrectArrivalDays(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->assertEmpty($this->flatworld->getArrival(0));
         $this->assertSame('', $this->flatworld->getArrival(0));
@@ -378,46 +472,77 @@ class FlatworldProviderTest extends Unit {
         $this->assertNotEmpty($this->flatworld->getArrival(22));
         $this->assertSame('21 days or more', $this->flatworld->getArrival(22));
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testDisplayDebugMessageDoesNotWriteToLogFileWhenDisabled(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testDisplayDebugMessageDoesNotWriteToLogFileWhenDisabled(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         // Explicitly setting display debug messages to false
         $this->flatworld->settings['displayDebugMessages'] = false;
 
-        $this->assertIsBool($this->flatworld->displayDebugMessage('This was not written to a log file!'));
-        $this->assertFalse($this->flatworld->displayDebugMessage('This was not written to a log file!'));
+        $this->assertIsBool(
+            $this->flatworld->displayDebugMessage(
+                'This was not written to a log file!',
+            ),
+        );
+        $this->assertFalse(
+            $this->flatworld->displayDebugMessage(
+                'This was not written to a log file!',
+            ),
+        );
 
         $this->flatworld->settings['displayDebugMessages'] = true;
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testDisplayDebugMessageWritesToLogFileWhenEnabled(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testDisplayDebugMessageWritesToLogFileWhenEnabled(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         // Explicitly setting display debug messages to true
         $this->flatworld->settings['displayDebugMessages'] = true;
 
-        $this->assertIsBool($this->flatworld->displayDebugMessage('This was written to a log file!'));
-        $this->assertTrue($this->flatworld->displayDebugMessage('This was written to a log file!'));
+        $this->assertIsBool(
+            $this->flatworld->displayDebugMessage(
+                'This was written to a log file!',
+            ),
+        );
+        $this->assertTrue(
+            $this->flatworld->displayDebugMessage(
+                'This was written to a log file!',
+            ),
+        );
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testSetPackageDetailsListReturnsValidArray(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testSetPackageDetailsListReturnsValidArray(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -443,15 +568,20 @@ class FlatworldProviderTest extends Unit {
 
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testGetPayloadReturnsValidArray(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPayloadReturnsValidArray(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -491,14 +621,19 @@ class FlatworldProviderTest extends Unit {
         // $this->assertSame('9737b779-a071-980d-754a-d91d4a58bb63', $payload['LicenseID']);
         // $this->assertSame('6a59faa9-187b-2f78-7f35-046358b4be26', $payload['UpsLicenseID']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testFilteringOutAddonsFromTwoLineItemsLeavesOneLineItem(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testFilteringOutAddonsFromTwoLineItemsLeavesOneLineItem(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -512,14 +647,19 @@ class FlatworldProviderTest extends Unit {
 
         $this->assertSame(5, count($mockOrderClone->getLineItems()));
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testOrderContainsStandardProducts(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsStandardProducts(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -535,14 +675,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertFalse($this->flatworld->orderContainsSampleProducts());
         $this->assertFalse($this->flatworld->orderContainsMerchandise());
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testOrderContainsSampleProducts(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsSampleProducts(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -558,14 +703,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertFalse($this->flatworld->orderContainsStandardProducts());
         $this->assertFalse($this->flatworld->orderContainsMerchandise());
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testOrderContainsMerchandise(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsMerchandise(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -581,14 +731,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertFalse($this->flatworld->orderContainsSampleProducts());
         $this->assertFalse($this->flatworld->orderContainsStandardProducts());
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testCalculatePiecesForTileBrickAndGlass(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCalculatePiecesForTileBrickAndGlass(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -611,36 +766,53 @@ class FlatworldProviderTest extends Unit {
         // We know line item #2 is a tile...
         // Explicitly setting qty to 25
         // so... (4.5 / 0.712) * 25 = 159
-        $pieces = $this->flatworld->calculatePieces(4.5, $lineItems[2]->weight, 25);
+        $pieces = $this->flatworld->calculatePieces(
+            4.5,
+            $lineItems[2]->weight,
+            25,
+        );
 
         $this->assertSame(159, intval($pieces));
 
         // We know line item #4 is a brick...
         // Explicitly setting qty to 37
         // so... (5 / 0.712) * 37 = 260
-        $pieces = $this->flatworld->calculatePieces(5, $lineItems[3]->weight, 37);
+        $pieces = $this->flatworld->calculatePieces(
+            5,
+            $lineItems[3]->weight,
+            37,
+        );
 
         $this->assertSame(260, intval($pieces));
 
         // We know line item #5 is a glass...
         // Explicitly setting qty to 18
         // so... (3 / 0.712) * 18 = 76
-        $pieces = $this->flatworld->calculatePieces(3, $lineItems[4]->weight, 18);
+        $pieces = $this->flatworld->calculatePieces(
+            3,
+            $lineItems[4]->weight,
+            18,
+        );
 
         $this->assertSame(76, intval($pieces));
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testSetTotalWeightReturnsFormattedValue(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testSetTotalWeightReturnsFormattedValue(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setTotalWeight(14000);
 
-        $this->assertSame(14000.00, $this->flatworld->getTotalWeight());
+        $this->assertSame(14000.0, $this->flatworld->getTotalWeight());
 
         $mockOrder = $this->createMockOrder();
 
@@ -652,15 +824,20 @@ class FlatworldProviderTest extends Unit {
 
         $this->assertSame(19.94, $this->flatworld->getTotalWeight());
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function testCheckTotalWeightReturnsFalseWhenAnOrderWeightIsLessThanOrEqualToZero(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckTotalWeightReturnsFalseWhenAnOrderWeightIsLessThanOrEqualToZero(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -680,15 +857,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertFalse($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function testCheckTotalWeightReturnsTrueWhenAnOrderWeightIsGreaterThanZero(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckTotalWeightReturnsTrueWhenAnOrderWeightIsGreaterThanZero(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -703,14 +885,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertTrue($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testWeightLimitations(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testWeightLimitations(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         // Explicitly setting total weights
         $this->flatworld->setTotalWeight(120);
@@ -737,15 +924,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($weightLimitReached4);
         $this->assertTrue($weightLimitReached4);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testCheckWeightLimitReturnsFalseWhenWeightLimitIsReached(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckWeightLimitReturnsFalseWhenWeightLimitIsReached(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -757,15 +949,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertFalse($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testCheckWeightLimitReturnsTrueWhenWeightLimitIsNotReached(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckWeightLimitReturnsTrueWhenWeightLimitIsNotReached(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -777,14 +974,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertTrue($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testWeightThresholds(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testWeightThresholds(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         // Explicitly setting total weights
         $this->flatworld->setTotalWeight(120);
@@ -807,14 +1009,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($weightThresholdReached4);
         $this->assertFalse($weightThresholdReached4);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndIsUnderWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndIsUnderWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(false);
@@ -829,14 +1036,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndOverWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndOverWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(false);
@@ -852,14 +1064,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
         $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsSampleProductsOnly(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsSampleProductsOnly(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(false);
         $this->flatworld->setOrderContainsMerchandise(false);
@@ -874,14 +1091,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsMerchandiseOnly(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsMerchandiseOnly(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(false);
         $this->flatworld->setOrderContainsMerchandise(true);
@@ -896,14 +1118,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsSampleProductsAndMerchandiseOnly(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsSampleProductsAndMerchandiseOnly(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(false);
         $this->flatworld->setOrderContainsMerchandise(true);
@@ -918,14 +1145,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndSamplesAndOverWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndSamplesAndOverWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(false);
@@ -941,14 +1173,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
         $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndSamplesAndUnderWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndSamplesAndUnderWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(false);
@@ -964,14 +1201,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndMerchandiseAndOverWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndMerchandiseAndOverWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(true);
@@ -987,14 +1229,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
         $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndMerchandiseAndUnderWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndMerchandiseAndUnderWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(true);
@@ -1010,14 +1257,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndSampleProductsAndMerchandiseAndOverWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndSampleProductsAndMerchandiseAndOverWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(true);
@@ -1033,14 +1285,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
         $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndSampleProductsAndMerchandiseAndUnderWeightThreshold(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndSampleProductsAndMerchandiseAndUnderWeightThreshold(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setOrderContainsMerchandise(true);
@@ -1056,28 +1313,38 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('Name', $packageDetailsList[0]);
         $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testRatesReturnsAnEmptyArrayWhenAnOrderIsNotFound(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testRatesReturnsAnEmptyArrayWhenAnOrderIsNotFound(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $rates = $this->flatworldVariable->getRates(0);
 
         $this->assertEmpty($rates);
         $this->assertIsArray($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testRatesReturnsAnEmptyArrayWhenAnOrderHasNoLineItems(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testRatesReturnsAnEmptyArrayWhenAnOrderHasNoLineItems(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(false, false);
 
@@ -1086,15 +1353,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertEmpty($rates);
         $this->assertIsArray($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testRatesCacheIsUsedWhenMultipleRequestsAreMade(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testRatesCacheIsUsedWhenMultipleRequestsAreMade(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $file = Craft::getAlias('@storage/logs/flatworld.log');
 
@@ -1112,15 +1384,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertNotEmpty($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function testFetchShippingRatesReturnsEmptyRatesWhenAnOrderHasNoLineItems(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testFetchShippingRatesReturnsEmptyRatesWhenAnOrderHasNoLineItems(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(false, false);
 
@@ -1129,14 +1406,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertEmpty($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testCheckLineItemsReturnsFalseWhenAnOrderHasNoLineItems(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckLineItemsReturnsFalseWhenAnOrderHasNoLineItems(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(false, false);
 
@@ -1147,14 +1429,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertFalse($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testCheckLineItemsReturnsTrueWhenAnOrderHasLineItems(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckLineItemsReturnsTrueWhenAnOrderHasLineItems(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(true, false);
 
@@ -1165,14 +1452,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertTrue($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testCheckLineItemRequiredFieldsReturnsFalseWhenAnOrderHasInValidLineItems(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckLineItemRequiredFieldsReturnsFalseWhenAnOrderHasInValidLineItems(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(true, false);
 
@@ -1189,14 +1481,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertFalse($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testCheckLineItemRequiredFieldsReturnsTrueWhenAnOrderHasValidLineItems(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckLineItemRequiredFieldsReturnsTrueWhenAnOrderHasValidLineItems(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(true, false);
 
@@ -1207,15 +1504,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertTrue($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function testFetchShippingRatesReturnsEmptyRatesWhenAnOrderHasNoShippingAddress(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testFetchShippingRatesReturnsEmptyRatesWhenAnOrderHasNoShippingAddress(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(true, false);
 
@@ -1224,7 +1526,9 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertEmpty($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
@@ -1232,26 +1536,39 @@ class FlatworldProviderTest extends Unit {
      * @return void
      * @throws Exception
      */
-    public function testFetchShippingRatesReturnsParcelResults(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testFetchShippingRatesReturnsParcelResults(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
         $rates = $this->flatworld->fetchShippingRates($mockOrder);
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: rates: '.print_r($rates, true));
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' .
+                __FUNCTION__ .
+                ' :: rates: ' .
+                print_r($rates, true),
+        );
 
         $this->assertIsArray($rates);
         $this->assertNotEmpty($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function testCheckShippingAddressesReturnsFalseWhenAnOrderHasNoShippingAddress(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckShippingAddressesReturnsFalseWhenAnOrderHasNoShippingAddress(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder(true, false);
 
@@ -1262,15 +1579,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertFalse($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function testCheckShippingAddressesReturnsTrueWhenAnOrderHasNoShippingAddress(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testCheckShippingAddressesReturnsTrueWhenAnOrderHasNoShippingAddress(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1281,15 +1603,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsBool($result);
         $this->assertTrue($result);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsSampleProductsDoesReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsSampleProductsDoesReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1318,17 +1645,25 @@ class FlatworldProviderTest extends Unit {
         $firstCarrierHandle = key($firstCarrier);
 
         $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
-        $this->assertSame($flatRateAmount, $rates[$firstCarrierHandle]['amount']);
+        $this->assertSame(
+            $flatRateAmount,
+            $rates[$firstCarrierHandle]['amount'],
+        );
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsStandardProductsDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsStandardProductsDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1351,15 +1686,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsMerchandiseProductsDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsMerchandiseProductsDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1384,15 +1724,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsMerchandiseAndStandardProductsDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsMerchandiseAndStandardProductsDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1416,15 +1761,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsStandardProductsAndSampleProductsDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsStandardProductsAndSampleProductsDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1448,15 +1798,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsMerchandiseAndSampleProductsDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsMerchandiseAndSampleProductsDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1480,15 +1835,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsMerchandiseStandardProductsAndSamplesDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsMerchandiseStandardProductsAndSamplesDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1511,14 +1871,19 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      */
-    public function testNoCarriersFoundDoesNotReturnFlatRateAsCheapestCarrier(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testNoCarriersFoundDoesNotReturnFlatRateAsCheapestCarrier(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrderContainsStandardProducts(true);
         $this->flatworld->setResponse($this->mockApiParcelResponse);
@@ -1533,15 +1898,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertIsArray($rates);
         $this->assertArrayNotHasKey($flatRateHandle, $rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsSampleProductsOnlyReturnsFirstCarrierWithZeroCostForCustomersTrade15Group(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsSampleProductsOnlyReturnsFirstCarrierWithZeroCostForCustomersTrade15Group(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1550,9 +1920,7 @@ class FlatworldProviderTest extends Unit {
         $userGroup15->name = 'Customers Trade 15';
         $userGroup15->handle = 'customersTrade15';
 
-        $mockOrder->user->setGroups([
-            $userGroup15,
-        ]);
+        $mockOrder->user->setGroups([$userGroup15]);
 
         $this->flatworld->setOrder($mockOrder);
         $this->flatworld->checkLineItems();
@@ -1579,15 +1947,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
         $this->assertSame(0, $rates[$firstCarrierHandle]['amount']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsMixedProductsDoesNotReturnsFirstCarrierWithZeroCostForCustomersTrade15Group(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsMixedProductsDoesNotReturnsFirstCarrierWithZeroCostForCustomersTrade15Group(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1596,9 +1969,7 @@ class FlatworldProviderTest extends Unit {
         $userGroup15->name = 'Customers Trade 15';
         $userGroup15->handle = 'customersTrade15';
 
-        $mockOrder->user->setGroups([
-            $userGroup15,
-        ]);
+        $mockOrder->user->setGroups([$userGroup15]);
 
         $this->flatworld->setOrder($mockOrder);
         $this->flatworld->checkLineItems();
@@ -1623,15 +1994,20 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
         $this->assertNotEquals(0, $rates[$firstCarrierHandle]['amount']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
      * @return void
      * @throws InvalidConfigException
      */
-    public function testOrderContainsSampleProductsOnlyDoesNotReturnCarrierWithZeroAmountForNonCustomersTrade15Group(): void {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    public function testOrderContainsSampleProductsOnlyDoesNotReturnCarrierWithZeroAmountForNonCustomersTrade15Group(): void
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $mockOrder = $this->createMockOrder();
 
@@ -1640,9 +2016,7 @@ class FlatworldProviderTest extends Unit {
         $userGroup3->name = 'Mock Group 3';
         $userGroup3->handle = 'mockGroup3';
 
-        $mockOrder->user->setGroups([
-            $userGroup3,
-        ]);
+        $mockOrder->user->setGroups([$userGroup3]);
 
         $this->flatworld->setOrder($mockOrder);
         $this->flatworld->checkLineItems();
@@ -1669,7 +2043,9 @@ class FlatworldProviderTest extends Unit {
         $this->assertArrayHasKey('amount', $rates[$firstCarrierHandle]);
         $this->assertNotEquals(0, $rates[$firstCarrierHandle]['amount']);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
     }
 
     /**
@@ -1677,8 +2053,11 @@ class FlatworldProviderTest extends Unit {
      * @return array
      * @throws InvalidConfigException
      */
-    protected function createNewApiRequest($mockOrder): array {
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: running...');
+    protected function createNewApiRequest($mockOrder): array
+    {
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: running...',
+        );
 
         $this->flatworld->setOrder($mockOrder);
         $this->flatworld->checkLineItems();
@@ -1696,11 +2075,13 @@ class FlatworldProviderTest extends Unit {
         // Lets check the cache for rates - this will be an array or be false
         $ratesCache = $this->flatworld->getRatesCache();
 
-        if (! empty($ratesCache) && is_array($ratesCache)) {
+        if (!empty($ratesCache) && is_array($ratesCache)) {
             return $ratesCache;
         }
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: getRates :: Making new API request');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: getRates :: Making new API request',
+        );
 
         $this->flatworld->setResponse($this->mockApiParcelResponse);
 
@@ -1708,7 +2089,9 @@ class FlatworldProviderTest extends Unit {
 
         $this->flatworld->setRatesCache($rates);
 
-        $this->flatworld->displayDebugMessage('FlatworldTest.php :: '.__FUNCTION__.' :: done...');
+        $this->flatworld->displayDebugMessage(
+            'FlatworldTest.php :: ' . __FUNCTION__ . ' :: done...',
+        );
 
         return $rates;
     }
@@ -1716,7 +2099,8 @@ class FlatworldProviderTest extends Unit {
     /**
      * @return void
      */
-    protected function prepareMockData(): void {
+    protected function prepareMockData(): void
+    {
         $this->mockServiceList = [
             'ABF_FREIGHT' => 'ABF Freight',
             'DEPENDABLE_HIGHWAY_EXPRESS' => 'Dependable Highway Express',
@@ -1740,61 +2124,73 @@ class FlatworldProviderTest extends Unit {
         ];
 
         $this->flatworld->settings = [
-            'apiUrl' => '',
-            'username' => 'Fireclay',
-            'licenseId' => '',
-            'licenseKey' => '',
-            'upsLicenseId' => '',
+            'apiUrl' => App::env('SALESFORCE_API_URL'),
+            'apiUsername' => App::env('SALESFORCE_USERNAME'),
+            'apiPassword' => App::env('SALESFORCE_PASSWORD'),
+            'apiConsumerKey' => App::env('SALESFORCE_CONSUMER_KEY'),
+            'apiConsumerSecret' => App::env('SALESFORCE_CONSUMER_SECRET'),
+            'enableSalesforceApi' => App::env('SALESFORCE_CONNECT'),
+            'enableSalesforceSandbox' => App::env('SALESFORCE_SANDBOX'),
             'totalMaxWeight' => '39750',
             'weightThreshold' => '150',
-            'weightLimitMessage' => 'Shipping weight limit reached. Please contact Fireclay Tile Salesperson.',
+            'weightLimitMessage' =>
+                'Shipping weight limit reached. Please contact Fireclay Tile Salesperson.',
             'weightPerSquareFoot' => [
                 [
                     0 => 'tile',
                     1 => '',
-                    2 => '4.5'
-                ], [
+                    2 => '4.5',
+                ],
+                [
                     0 => 'quickShipTile',
                     1 => '',
-                    2 => '4.5'
-                ], [
+                    2 => '4.5',
+                ],
+                [
                     0 => 'brick',
                     1 => '',
-                    2 => '5'
-                ], [
+                    2 => '5',
+                ],
+                [
                     0 => 'quickShipBrick',
                     1 => '',
-                    2 => '5'
-                ], [
+                    2 => '5',
+                ],
+                [
                     0 => 'glass',
                     1 => '',
-                    2 => '3'
-                ], [
+                    2 => '3',
+                ],
+                [
                     0 => 'quickShipGlass',
                     1 => '',
-                    2 => '3'
-                ], [
+                    2 => '3',
+                ],
+                [
                     0 => 'quickShipEssentials',
                     1 => '',
-                    2 => '3.4'
-                ], [
+                    2 => '3.4',
+                ],
+                [
                     0 => 'quickShipSeconds',
                     1 => 'tile',
-                    2 => '3.4'
-                ], [
+                    2 => '3.4',
+                ],
+                [
                     0 => 'quickShipSeconds',
                     1 => 'brick',
-                    2 => '5'
-                ], [
+                    2 => '5',
+                ],
+                [
                     0 => 'quickShipSeconds',
                     1 => 'glass',
-                    2 => '3'
-                ]
+                    2 => '3',
+                ],
             ],
             'displayDebugMessages' => '1',
             'flatRateCarrierName' => 'USPS Flat Rate',
             'flatRateCarrierCost' => '8.0',
-            'carrierClassOfServices' => $this->mockServiceList
+            'carrierClassOfServices' => $this->mockServiceList,
         ];
 
         $this->mockApiParcelResponse = Json::decode('
@@ -1990,216 +2386,6 @@ class FlatworldProviderTest extends Unit {
                 }
             ]
         ');
-
-        $this->mockApiResponse = Json::decode('{
-            "serviceRecommendationList": {
-            "lowestCostCarrierNumber": "USPS",
-            "lowestCostCarrierClassOfServiceCode": "First Class",
-            "lowestCostConsigneeFreight": 5.976,
-            "lowestCostArrivalDateText": "TUE - 2/1/2022",
-            "lowestCostTransitTime": 3,
-            "fastestCarrierNumber": "UPS",
-            "fastestCarrierClassOfServiceCode": "Next Day Air Saver",
-            "fastestConsigneeFreight": 32.544,
-            "fastestArrivalDateText": "FRI - 1/28/2022",
-            "fastestTransitTime": 1
-        },
-        "ratingResultsList": [
-            {
-                "carrierNumber": "UPS",
-                "carrierClassOfServiceCode": "Next Day Air Saver",
-                "carrierClassOfServiceCodeDescription": "UPS Next Day Air Saver",
-                "shipMode": "Parcel",
-                "rateSystem": "UPS",
-                "statusMessage": "",
-                "consignorFreight": 27.12,
-                "consigneeFreight": 32.544,
-                "listFreight": 96.46,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "WED - 1/26/2022",
-                "transitTime": 1,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "UPS",
-                "carrierClassOfServiceCode": "Next Day Air",
-                "carrierClassOfServiceCodeDescription": "UPS Next Day Air",
-                "shipMode": "Parcel",
-                "rateSystem": "UPS",
-                "statusMessage": "",
-                "consignorFreight": 30.26,
-                "consigneeFreight": 36.312,
-                "listFreight": 109.04,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "WED - 1/26/2022",
-                "transitTime": 1,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "UPS",
-                "carrierClassOfServiceCode": "3 Day Select",
-                "carrierClassOfServiceCodeDescription": "UPS 3 Day Select",
-                "shipMode": "Parcel",
-                "rateSystem": "UPS",
-                "statusMessage": "",
-                "consignorFreight": 19.78,
-                "consigneeFreight": 23.736,
-                "listFreight": 39.53,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "FRI - 1/28/2022",
-                "transitTime": 3,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "UPS",
-                "carrierClassOfServiceCode": "Ground",
-                "carrierClassOfServiceCodeDescription": "UPS Ground",
-                "shipMode": "Parcel",
-                "rateSystem": "UPS",
-                "statusMessage": "",
-                "consignorFreight": 14.56,
-                "consigneeFreight": 17.472,
-                "listFreight": 18.69,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "MON - 1/31/2022",
-                "transitTime": 4,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "UPS",
-                "carrierClassOfServiceCode": "Next Day Air Early A.M.",
-                "carrierClassOfServiceCodeDescription": "UPS Next Day Air Early A.M.",
-                "shipMode": "Parcel",
-                "rateSystem": "UPS",
-                "statusMessage": "",
-                "consignorFreight": 142.79,
-                "consigneeFreight": 171.348,
-                "listFreight": 142.79,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "WED - 1/26/2022",
-                "transitTime": 1,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "UPS",
-                "carrierClassOfServiceCode": "2nd Day Air",
-                "carrierClassOfServiceCodeDescription": "UPS 2nd Day Air",
-                "shipMode": "Parcel",
-                "rateSystem": "UPS",
-                "statusMessage": "",
-                "consignorFreight": 22.06,
-                "consigneeFreight": 26.472,
-                "listFreight": 45.75,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "THU - 1/27/2022",
-                "transitTime": 2,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "USPS",
-                "carrierClassOfServiceCode": "First Class",
-                "carrierClassOfServiceCodeDescription": "First Class",
-                "shipMode": "Parcel",
-                "rateSystem": "Parcel",
-                "statusMessage": "",
-                "consignorFreight": 4.98,
-                "consigneeFreight": 5.976,
-                "listFreight": 4.98,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "FRI - 1/28/2022",
-                "transitTime": 3,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "USPS",
-                "carrierClassOfServiceCode": "Parcel Select",
-                "carrierClassOfServiceCodeDescription": "Parcel Select",
-                "shipMode": "Parcel",
-                "rateSystem": "Parcel",
-                "statusMessage": "",
-                "consignorFreight": 9.03,
-                "consigneeFreight": 10.836,
-                "listFreight": 9.03,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "THU - 2/3/2022",
-                "transitTime": 7,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "USPS",
-                "carrierClassOfServiceCode": "Priority Express",
-                "carrierClassOfServiceCodeDescription": "Priority Express",
-                "shipMode": "Parcel",
-                "rateSystem": "Parcel",
-                "statusMessage": "",
-                "consignorFreight": 42.15,
-                "consigneeFreight": 50.58,
-                "listFreight": 42.15,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "THU - 1/27/2022",
-                "transitTime": 2,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "USPS",
-                "carrierClassOfServiceCode": "Priority Mail",
-                "carrierClassOfServiceCodeDescription": "Priority Mail",
-                "shipMode": "Parcel",
-                "rateSystem": "Parcel",
-                "statusMessage": "",
-                "consignorFreight": 9.68,
-                "consigneeFreight": 11.616,
-                "listFreight": 9.68,
-                "totalServiceFees": 0.0,
-                "fuelSurcharge": 0.0,
-                "currencyCode": "USD",
-                "arrivalDateText": "THU - 1/27/2022",
-                "transitTime": 2,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "ODFL",
-                "carrierClassOfServiceCode": "Standard",
-                "carrierClassOfServiceCodeDescription": "Standard Service",
-                "shipMode": "LTL",
-                "rateSystem": "LTL",
-                "statusMessage": "",
-                "consignorFreight": 273.16,
-                "consigneeFreight": 327.792,
-                "listFreight": 1985.29,
-                "totalServiceFees": 30.0,
-                "fuelSurcharge": 52.92,
-                "currencyCode": "USD",
-                "arrivalDateText": "TUE - 2/1/2022",
-                "transitTime": 5,
-                "shipCodeXRef": null
-            }, {
-                "carrierNumber": "ODFL",
-                "carrierClassOfServiceCode": "Guaranteed",
-                "carrierClassOfServiceCodeDescription": "Guaranteed",
-                "shipMode": "LTL",
-                "rateSystem": "LTL",
-                "statusMessage": "",
-                "consignorFreight": 337.07,
-                "consigneeFreight": 404.484,
-                "listFreight": 1966.28,
-                "totalServiceFees": 93.91,
-                "fuelSurcharge": 52.92,
-                "currencyCode": "USD",
-                "arrivalDateText": "TUE - 2/1/2022",
-                "transitTime": 5,
-                "shipCodeXRef": null
-            }
-        ]
-      }');
     }
 
     /**
@@ -2207,7 +2393,10 @@ class FlatworldProviderTest extends Unit {
      * @param bool $includeAddresses
      * @return MockOrder
      */
-    public function createMockOrder(bool $includeLineItem = true, bool $includeAddresses = true): MockOrder {
+    public function createMockOrder(
+        bool $includeLineItem = true,
+        bool $includeAddresses = true,
+    ): MockOrder {
         $order = new MockOrder();
         $order->id = 1;
         $order->currency = 'USD';
@@ -2223,9 +2412,7 @@ class FlatworldProviderTest extends Unit {
         $user->fullName = 'Joe Bloggs';
         $user->email = 'joe@bloggs.com';
 
-        $user->setGroups([
-            $userGroup1,
-        ]);
+        $user->setGroups([$userGroup1]);
 
         $order->user = $user;
 
@@ -2279,9 +2466,7 @@ class FlatworldProviderTest extends Unit {
             $product1->name = 'Test Product 1';
             $product1->typeId = 1;
             $product1->type = $productType1;
-            $product1->colorProductLinesCategory = [
-                $category1,
-            ];
+            $product1->colorProductLinesCategory = [$category1];
             $product1->defaultSku = 'test-product-1';
 
             $product2 = new MockProduct();
@@ -2414,29 +2599,17 @@ class FlatworldProviderTest extends Unit {
             $variant6->hasUnlimitedStock = false;
             $variant6->url = 'https://www.domain.com';
 
-            $product1->variants = [
-                $variant1,
-            ];
+            $product1->variants = [$variant1];
 
-            $product2->variants = [
-                $variant2,
-            ];
+            $product2->variants = [$variant2];
 
-            $product3->variants = [
-                $variant3,
-            ];
+            $product3->variants = [$variant3];
 
-            $product4->variants = [
-                $variant4,
-            ];
+            $product4->variants = [$variant4];
 
-            $product5->variants = [
-                $variant5,
-            ];
+            $product5->variants = [$variant5];
 
-            $product6->variants = [
-                $variant6,
-            ];
+            $product6->variants = [$variant6];
 
             $lineItem1 = new MockLineItem();
             $lineItem1->id = 1;
@@ -2572,7 +2745,8 @@ class FlatworldProviderTest extends Unit {
 }
 
 // Once the structure matches a real Commerce Order|Product|ProductType|Variant|LineItem|Address class, we don't really care about anything else!
-class MockOrder {
+class MockOrder
+{
     /**
      * @var int
      */
@@ -2628,26 +2802,31 @@ class MockOrder {
      */
     public MockAddress $estimatedShippingAddress;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * @return array
      */
-    public function getLineItems(): array {
+    public function getLineItems(): array
+    {
         return $this->lineItems;
     }
 
     /**
      * @return bool
      */
-    public function hasLineItems(): bool {
+    public function hasLineItems(): bool
+    {
         return count($this->lineItems) > 0;
     }
 
     /**
      * @return float
      */
-    public function getTotalWeight(): float {
+    public function getTotalWeight(): float
+    {
         return $this->totalWeight;
     }
 
@@ -2656,16 +2835,21 @@ class MockOrder {
      * @param $value
      * @return void
      */
-    public function clearNotices($key, $value): void {}
+    public function clearNotices($key, $value): void
+    {
+    }
 
     /**
      * @param $notice
      * @return void
      */
-    public function addNotice($notice): void {}
+    public function addNotice($notice): void
+    {
+    }
 }
 
-class MockCategoryGroup {
+class MockCategoryGroup
+{
     /**
      * @var int
      */
@@ -2681,10 +2865,13 @@ class MockCategoryGroup {
      */
     public string $slug;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockCategory {
+class MockCategory
+{
     /**
      * @var int
      */
@@ -2710,10 +2897,13 @@ class MockCategory {
      */
     public MockCategoryGroup $group;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockProductType {
+class MockProductType
+{
     /**
      * @var int
      */
@@ -2729,10 +2919,13 @@ class MockProductType {
      */
     public string $handle;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockProduct {
+class MockProduct
+{
     /**
      * @var int
      */
@@ -2773,10 +2966,13 @@ class MockProduct {
      */
     public array $colorProductLinesCategory;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockVariant {
+class MockVariant
+{
     /**
      * @var int
      */
@@ -2837,10 +3033,13 @@ class MockVariant {
      */
     public bool $hasUnlimitedStock;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockLineItem {
+class MockLineItem
+{
     /**
      * @var int
      */
@@ -2906,10 +3105,13 @@ class MockLineItem {
      */
     public string $description;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockAddress {
+class MockAddress
+{
     /**
      * @var int
      */
@@ -3000,10 +3202,13 @@ class MockAddress {
      */
     public MockAddressState $state;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockAddressState {
+class MockAddressState
+{
     /**
      * @var int
      */
@@ -3014,10 +3219,13 @@ class MockAddressState {
      */
     public string $abbreviation;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
-class MockUser {
+class MockUser
+{
     /**
      * @var int
      */
@@ -3038,13 +3246,16 @@ class MockUser {
      */
     public string $fullName;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * @param $group
      * @return bool
      */
-    public function isInGroup($group): bool {
+    public function isInGroup($group): bool
+    {
         if (Craft::$app->getEdition() !== Craft::Pro) {
             return false;
         }
@@ -3054,29 +3265,40 @@ class MockUser {
         }
 
         if (is_numeric($group)) {
-            return in_array($group, ArrayHelper::getColumn($this->getGroups(), 'id'), false);
+            return in_array(
+                $group,
+                ArrayHelper::getColumn($this->getGroups(), 'id'),
+                false,
+            );
         }
 
-        return in_array($group, ArrayHelper::getColumn($this->getGroups(), 'handle'), true);
+        return in_array(
+            $group,
+            ArrayHelper::getColumn($this->getGroups(), 'handle'),
+            true,
+        );
     }
 
     /**
      * @param $groups
      * @return void
      */
-    public function setGroups($groups): void {
+    public function setGroups($groups): void
+    {
         $this->groups = $groups;
     }
 
     /**
      * @return array
      */
-    public function getGroups(): array {
+    public function getGroups(): array
+    {
         return $this->groups;
     }
 }
 
-class MockUserGroup {
+class MockUserGroup
+{
     /**
      * @var int
      */
@@ -3092,6 +3314,7 @@ class MockUserGroup {
      */
     public string $handle;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
-

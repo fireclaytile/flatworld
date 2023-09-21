@@ -24,7 +24,7 @@
 
 {{ forms.autosuggestField({
     label: 'API URL' | t('postie'),
-    instructions: 'Enter your {name} API URL here.' | t('postie', { name: provider.displayName() }),
+    instructions: 'It is highly suggested to use an environment variable here. Enter your Salesforce API URL here.' | t('postie'),
     id: 'apiUrl',
     name: 'apiUrl',
     value: provider.settings.apiUrl ?? '',
@@ -34,47 +34,68 @@
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'Username' | t('postie'),
-    instructions: 'Enter your {name} Username here.' | t('postie', { name: provider.displayName() }),
-    id: 'username',
-    name: 'username',
-    value: provider.settings.username ?? '',
+    label: 'API Username' | t('postie'),
+    instructions: 'It is highly suggested to use an environment variable here. Enter your Salesforce API Username here.' | t('postie'),
+    id: 'apiUsername',
+    name: 'apiUsername',
+    value: provider.settings.apiUsername ?? '',
     required: true,
     suggestEnvVars: true,
-    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.username', 'postie'),
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.apiUsername', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'License ID' | t('postie'),
-    instructions: 'Enter your {name} License ID here.' | t('postie', { name: provider.displayName() }),
-    id: 'licenseId',
-    name: 'licenseId',
-    value: provider.settings.licenseId ?? '',
+    label: 'API Password' | t('postie'),
+    instructions: 'It is highly suggested to use an environment variable here. Enter your Salesforce API Password here.' | t('postie'),
+    id: 'apiPassword',
+    name: 'apiPassword',
+    value: provider.settings.apiPassword ?? '',
     required: true,
     suggestEnvVars: true,
-    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.licenseId', 'postie'),
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.apiPassword', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'License Key' | t('postie'),
-    instructions: 'Enter your {name} License Key here.' | t('postie', { name: provider.displayName() }),
-    id: 'licenseKey',
-    name: 'licenseKey',
-    value: provider.settings.licenseKey ?? '',
+    label: 'API Consumer Key' | t('postie'),
+    instructions: 'It is highly suggested to use an environment variable here. Enter your Salesforce API Consumer Key here.' | t('postie'),
+    id: 'apiConsumerKey',
+    name: 'apiConsumerKey',
+    value: provider.settings.apiConsumerKey ?? '',
     required: true,
     suggestEnvVars: true,
-    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.licenseKey', 'postie'),
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.apiConsumerKey', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'UPS License ID' | t('postie'),
-    instructions: 'Enter your {name} UPS License ID here.' | t('postie', { name: provider.displayName() }),
-    id: 'upsLicenseId',
-    name: 'upsLicenseId',
-    value: provider.settings.upsLicenseId ?? '',
+    label: 'API Consumer Secret' | t('postie'),
+    instructions: 'It is highly suggested to use an environment variable here. Enter your Salesforce API Consumer Secret here.' | t('postie'),
+    id: 'apiConsumerSecret',
+    name: 'apiConsumerSecret',
+    value: provider.settings.apiConsumerSecret ?? '',
     required: true,
     suggestEnvVars: true,
-    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.upsLicenseId', 'postie'),
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.apiConsumerSecret', 'postie'),
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Enable Salesforce API' | t('postie'),
+    instructions: 'Enter 1 for yes, 0 for no. It is highly suggested to use an environment variable here. Use this as an emergency API "killswitch". Using an ' | t('postie'),
+    id: 'enableSalesforceApi',
+    name: 'enableSalesforceApi',
+    on: provider.settings.enableSalesforceApi ?? false,
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableSalesforceApi', 'postie'),
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Enable Salesforce Sandbox' | t('postie'),
+    instructions: 'Enter 1 for yes, 0 for no. It is highly suggested to use an environment variable here. Enable this on DEV environments. Not for use on PROD.' | t('postie'),
+    id: 'enableSalesforceSandbox',
+    name: 'enableSalesforceSandbox',
+    on: provider.settings.enableSalesforceSandbox ?? false,
+    required: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableSalesforceSandbox', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({
@@ -157,7 +178,7 @@
 
 {{ forms.autosuggestField({
     label: 'Flat Rate Carrier Cost' | t('postie'),
-    instructions: 'Enter the Flat Rate Carrier Cost here.' | t('postie', { name: provider.displayName() }),
+    instructions: 'It is highly suggested to use an environment variable here. Enter the Flat Rate Carrier Cost here.' | t('postie', { name: provider.displayName() }),
     id: 'flatRateCarrierCost',
     name: 'flatRateCarrierCost',
     value: provider.settings.flatRateCarrierCost ?? '',
