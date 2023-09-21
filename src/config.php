@@ -28,10 +28,12 @@ return [
                 'settings' => [
                     'carrierClassOfServices' => [
                         'ABF_FREIGHT' => 'ABF Freight',
-                        'DEPENDABLE_HIGHWAY_EXPRESS' => 'Dependable Highway Express',
+                        'DEPENDABLE_HIGHWAY_EXPRESS' =>
+                            'Dependable Highway Express',
                         'FEDEX_FREIGHT_PRIORITY' => 'FedEx Freight Priority',
                         'OAK_HARBOR' => 'Oak Harbor',
-                        'OLD_DOMINION_FREIGHT_LINE' => 'Old Dominion Freight Line',
+                        'OLD_DOMINION_FREIGHT_LINE' =>
+                            'Old Dominion Freight Line',
                         'R_&_L_CARRIERS' => 'R & L Carriers',
                         'UPS_2ND_DAY_AIR' => 'UPS 2nd Day Air',
                         'UPS_SECOND_DAY_AIR_AM' => 'UPS Second Day Air AM',
@@ -39,7 +41,8 @@ return [
                         'UPS_GROUND' => 'UPS Ground',
                         'UPS_NEXT_DAY_AIR' => 'UPS Next Day Air',
                         'UPS_NEXT_DAY_AIR_SAVER' => 'UPS Next Day Air Saver',
-                        'UPS_NEXT_DAY_AIR_EARLY_AM' => 'UPS Next Day Air Early AM',
+                        'UPS_NEXT_DAY_AIR_EARLY_AM' =>
+                            'UPS Next Day Air Early AM',
                         'USPS_FIRST_CLASS' => 'USPS First Class',
                         'USPS_GROUNDADVANTAGE' => 'USPS GroundAdvantage',
                         'USPS_PARCEL_SELECT' => 'USPS Parcel Select',

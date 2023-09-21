@@ -39,7 +39,8 @@ use verbb\postie\events\ModifyRatesEvent;
  * @property-read string $settingsHtml
  * @property-read string $iconUrl
  */
-class Flatworld extends Provider {
+class Flatworld extends Provider
+{
     /**
      * @var string
      */
@@ -131,7 +132,8 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public static function displayName(): string {
+    public static function displayName(): string
+    {
         return Craft::t('flatworld', '{displayName}', [
             'displayName' => 'Flatworld',
         ]);
@@ -146,7 +148,8 @@ class Flatworld extends Provider {
      * @throws SyntaxError
      * @throws Exception
      */
-    public function getSettingsHtml(): string {
+    public function getSettingsHtml(): string
+    {
         return Craft::$app->getView()->renderTemplate('flatworld/_settings', [
             'provider' => $this,
         ]);
@@ -157,8 +160,14 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public function getIconUrl(): string {
-        return Craft::$app->getAssetManager()->getPublishedUrl('@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg', true);
+    public function getIconUrl(): string
+    {
+        return Craft::$app
+            ->getAssetManager()
+            ->getPublishedUrl(
+                '@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg',
+                true,
+            );
     }
 
     /**
@@ -166,7 +175,8 @@ class Flatworld extends Provider {
      *
      * @return array
      */
-    public function getServiceList(): array {
+    public function getServiceList(): array
+    {
         return $this->getSetting('carrierClassOfServices');
     }
 
@@ -176,8 +186,9 @@ class Flatworld extends Provider {
      * @param string $message
      * @return bool
      */
-    public function displayDebugMessage(string $message): bool {
-        if (! is_string($message)) {
+    public function displayDebugMessage(string $message): bool
+    {
+        if (!is_string($message)) {
             $message = Json::encode($message);
         }
 
@@ -197,39 +208,69 @@ class Flatworld extends Provider {
      * @return array
      * @throws Exception
      */
-    public function fetchShippingRates($order): array {
+    public function fetchShippingRates($order): array
+    {
         // Helps tracks calls from multiple instances
         $uniqueId = uniqid();
 
         // If we've locally cached the results, return that
         if ($this->_rates) {
-            $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: Returning locally cached rates');
+            $this->displayDebugMessage(
+                'Flatworld.php :: fetchShippingRates :: ' .
+                    $uniqueId .
+                    ' :: Returning locally cached rates',
+            );
 
             return $this->_rates;
         }
 
         try {
-            $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: Fetching new rates');
-            $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: CALL STARTED');
+            $this->displayDebugMessage(
+                'Flatworld.php :: fetchShippingRates :: ' .
+                    $uniqueId .
+                    ' :: Fetching new rates',
+            );
+            $this->displayDebugMessage(
+                'Flatworld.php :: fetchShippingRates :: ' .
+                    $uniqueId .
+                    ' :: CALL STARTED',
+            );
 
             $this->_rates = $this->getRates($order);
 
-            $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: CALL FINISHED');
+            $this->displayDebugMessage(
+                'Flatworld.php :: fetchShippingRates :: ' .
+                    $uniqueId .
+                    ' :: CALL FINISHED',
+            );
 
             if ($this->_rates) {
                 $rates = Json::encode($this->_rates);
 
-                $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: Rates: '.$rates);
+                $this->displayDebugMessage(
+                    'Flatworld.php :: fetchShippingRates :: ' .
+                        $uniqueId .
+                        ' :: Rates: ' .
+                        $rates,
+                );
 
                 return $this->_rates;
             }
         } catch (Throwable $error) {
             $this->_throwError($uniqueId, $error);
 
-            $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: CALL FINISHED');
+            $this->displayDebugMessage(
+                'Flatworld.php :: fetchShippingRates :: ' .
+                    $uniqueId .
+                    ' :: CALL FINISHED',
+            );
         }
 
-        $this->displayDebugMessage('Flatworld.php :: fetchShippingRates :: '.$uniqueId.' :: Rates were empty');
+        $this->displayDebugMessage(
+            'Flatworld.php :: fetchShippingRates :: ' .
+                $uniqueId .
+                ' :: Rates were empty',
+        );
 
         return [];
     }
@@ -240,18 +281,19 @@ class Flatworld extends Provider {
      * @throws GuzzleException
      * @throws InvalidConfigException
      */
-    public function getRates($order): array {
+    public function getRates($order): array
+    {
         $this->setOrder($order);
 
-        if (! $this->checkLineItems()) {
+        if (!$this->checkLineItems()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
-        if (! $this->checkLineItemRequiredFields()) {
+        if (!$this->checkLineItemRequiredFields()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
-        if (! $this->checkShippingAddress()) {
+        if (!$this->checkShippingAddress()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
@@ -260,11 +302,11 @@ class Flatworld extends Provider {
         $this->setPieces();
         $this->setTotalWeight();
 
-        if (! $this->checkTotalWeight()) {
+        if (!$this->checkTotalWeight()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
-        if (! $this->checkWeightLimit()) {
+        if (!$this->checkWeightLimit()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
@@ -273,7 +315,7 @@ class Flatworld extends Provider {
         // Lets check the rates cache before making an API request - this will be an array or be false
         $ratesCache = $this->getRatesCache();
 
-        if (! empty($ratesCache) && is_array($ratesCache)) {
+        if (!empty($ratesCache) && is_array($ratesCache)) {
             return $this->_modifyRatesEvent($ratesCache, $this->_order);
         }
 
@@ -293,8 +335,9 @@ class Flatworld extends Provider {
      * @param $order
      * @return void
      */
-    public function setOrder($order): void {
-        $this->_order = clone($order);
+    public function setOrder($order): void
+    {
+        $this->_order = clone $order;
     }
 
     /**
@@ -302,7 +345,8 @@ class Flatworld extends Provider {
      *
      * @return mixed
      */
-    public function getOrder() {
+    public function getOrder()
+    {
         return $this->_order;
     }
 
@@ -311,14 +355,19 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function checkLineItems(): bool {
-        if (! $this->_order->hasLineItems()) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: checkLineItems :: Has no line items yet, bailing out');
+    public function checkLineItems(): bool
+    {
+        if (!$this->_order->hasLineItems()) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: checkLineItems :: Has no line items yet, bailing out',
+            );
 
             return false;
         }
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: checkLineItems :: We have a line items, continuing');
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: checkLineItems :: We have a line items, continuing',
+        );
 
         return true;
     }
@@ -328,18 +377,28 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function checkLineItemRequiredFields(): bool {
+    public function checkLineItemRequiredFields(): bool
+    {
         $problems = false;
 
         $problemMessage = '';
 
         foreach ($this->_order->lineItems as $item) {
-            if (!empty($item->purchasable) && !empty($item->purchasable->product) && !empty($item->purchasable->product->type) && !empty($item->purchasable->product->type->handle)) {
+            if (
+                !empty($item->purchasable) &&
+                !empty($item->purchasable->product) &&
+                !empty($item->purchasable->product->type) &&
+                !empty($item->purchasable->product->type->handle)
+            ) {
                 if (isset($item->options['sample'])) {
                     // SKIP
-                } else if ($item->purchasable->product->type->handle === 'addons') {
+                } elseif (
+                    $item->purchasable->product->type->handle === 'addons'
+                ) {
                     // SKIP
-                } else if ($item->purchasable->product->type->handle === 'merchandise') {
+                } elseif (
+                    $item->purchasable->product->type->handle === 'merchandise'
+                ) {
                     // SKIP
                 } else {
                     if (empty($item->weight) || empty($item->qty)) {
@@ -347,21 +406,30 @@ class Flatworld extends Provider {
 
                         $problemMessage .= "\nOrderID: {$this->_order->id}, Product URL: {$item->purchasable->url}, Issue: Missing dimensions and/or weight";
 
-                        $this->displayDebugMessage('Flatworld.php :: getRates :: checkLineItemRequiredFields :: Required Fields Missing. Order ID: '.$this->_order->id.', Product ID: '.$item->purchasable->product->id);
+                        $this->displayDebugMessage(
+                            'Flatworld.php :: getRates :: checkLineItemRequiredFields :: Required Fields Missing. Order ID: ' .
+                                $this->_order->id .
+                                ', Product ID: ' .
+                                $item->purchasable->product->id,
+                        );
                     }
                 }
             }
         }
 
-        if ($problems && ! empty($problemMessage)) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: checkLineItemRequiredFields :: Invalid line items found, bailing out and sending email');
+        if ($problems && !empty($problemMessage)) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: checkLineItemRequiredFields :: Invalid line items found, bailing out and sending email',
+            );
 
             $this->_sendMail($problemMessage);
 
             return false;
         }
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: checkLineItemRequiredFields :: We have a valid line items, continuing');
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: checkLineItemRequiredFields :: We have a valid line items, continuing',
+        );
 
         return true;
     }
@@ -371,14 +439,22 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function checkShippingAddress(): bool {
-        if (empty($this->_order->shippingAddress) || empty($this->_order->shippingAddress->zipCode)) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: checkShippingAddress :: Has no shipping address yet, bailing out');
+    public function checkShippingAddress(): bool
+    {
+        if (
+            empty($this->_order->shippingAddress) ||
+            empty($this->_order->shippingAddress->zipCode)
+        ) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: checkShippingAddress :: Has no shipping address yet, bailing out',
+            );
 
             return false;
         }
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: checkShippingAddress :: We have a shipping address, continuing');
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: checkShippingAddress :: We have a shipping address, continuing',
+        );
 
         return true;
     }
@@ -388,47 +464,83 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function filterOutAddons(): void {
-        $this->_order->lineItems = array_filter($this->_order->lineItems, function($item) {
-            $isAddOn = (! empty($item->purchasable) && ! empty($item->purchasable->product) && ! empty($item->purchasable->product->type) && ! empty($item->purchasable->product->type->handle) && $item->purchasable->product->type->handle === 'addons');
+    public function filterOutAddons(): void
+    {
+        $this->_order->lineItems = array_filter(
+            $this->_order->lineItems,
+            function ($item) {
+                $isAddOn =
+                    !empty($item->purchasable) &&
+                    !empty($item->purchasable->product) &&
+                    !empty($item->purchasable->product->type) &&
+                    !empty($item->purchasable->product->type->handle) &&
+                    $item->purchasable->product->type->handle === 'addons';
 
-            return (! $isAddOn);
-        });
+                return !$isAddOn;
+            },
+        );
     }
 
     /**
      * @return void
      */
-    public function filterOutMerchandise(): void {
-        $this->_order->lineItems = array_filter($this->_order->lineItems, function($item) {
-            $isMerchandise = (! empty($item->purchasable) && ! empty($item->purchasable->product) && ! empty($item->purchasable->product->type) && ! empty($item->purchasable->product->type->handle) && $item->purchasable->product->type->handle === 'merchandise');
+    public function filterOutMerchandise(): void
+    {
+        $this->_order->lineItems = array_filter(
+            $this->_order->lineItems,
+            function ($item) {
+                $isMerchandise =
+                    !empty($item->purchasable) &&
+                    !empty($item->purchasable->product) &&
+                    !empty($item->purchasable->product->type) &&
+                    !empty($item->purchasable->product->type->handle) &&
+                    $item->purchasable->product->type->handle === 'merchandise';
 
-            return (! $isMerchandise);
-        });
+                return !$isMerchandise;
+            },
+        );
     }
 
     /**
      * @return void
      */
-    public function filterOutSampleProducts(): void {
-        $this->_order->lineItems = array_filter($this->_order->lineItems, function($item) {
-            $isSample = (isset($item->options['sample']));
+    public function filterOutSampleProducts(): void
+    {
+        $this->_order->lineItems = array_filter(
+            $this->_order->lineItems,
+            function ($item) {
+                $isSample = isset($item->options['sample']);
 
-            return (! $isSample);
-        });
+                return !$isSample;
+            },
+        );
     }
 
     /**
      * @return void
      */
-    public function filterOutStandardProducts(): void {
-        $this->_order->lineItems = array_filter($this->_order->lineItems, function($item) {
-            $isSample = (isset($item->options['sample']));
-            $isAddOn = (! empty($item->purchasable) && ! empty($item->purchasable->product) && ! empty($item->purchasable->product->type) && ! empty($item->purchasable->product->type->handle) && $item->purchasable->product->type->handle === 'addons');
-            $isMerchandise = (! empty($item->purchasable) && ! empty($item->purchasable->product) && ! empty($item->purchasable->product->type) && ! empty($item->purchasable->product->type->handle) && $item->purchasable->product->type->handle === 'merchandise');
+    public function filterOutStandardProducts(): void
+    {
+        $this->_order->lineItems = array_filter(
+            $this->_order->lineItems,
+            function ($item) {
+                $isSample = isset($item->options['sample']);
+                $isAddOn =
+                    !empty($item->purchasable) &&
+                    !empty($item->purchasable->product) &&
+                    !empty($item->purchasable->product->type) &&
+                    !empty($item->purchasable->product->type->handle) &&
+                    $item->purchasable->product->type->handle === 'addons';
+                $isMerchandise =
+                    !empty($item->purchasable) &&
+                    !empty($item->purchasable->product) &&
+                    !empty($item->purchasable->product->type) &&
+                    !empty($item->purchasable->product->type->handle) &&
+                    $item->purchasable->product->type->handle === 'merchandise';
 
-            return ($isSample || $isAddOn || $isMerchandise);
-        });
+                return $isSample || $isAddOn || $isMerchandise;
+            },
+        );
     }
 
     /**
@@ -436,10 +548,17 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function countProductTypes(): void {
-        $this->displayDebugMessage('Flatworld.php :: getRates :: Order Contains Standard Products to FALSE');
-        $this->displayDebugMessage('Flatworld.php :: getRates :: Order Contains Sample Products to FALSE');
-        $this->displayDebugMessage('Flatworld.php :: getRates :: Order Contains Merchandise to FALSE');
+    public function countProductTypes(): void
+    {
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: Order Contains Standard Products to FALSE',
+        );
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: Order Contains Sample Products to FALSE',
+        );
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: Order Contains Merchandise to FALSE',
+        );
 
         $this->setOrderContainsStandardProducts(false);
         $this->setOrderContainsSampleProducts(false);
@@ -450,12 +569,17 @@ class Flatworld extends Provider {
         $totalMerchandise = 0;
 
         foreach ($this->_order->lineItems as $item) {
-            $isSample = (isset($item->options['sample']));
-            $isMerchandise = (! empty($item->purchasable) && ! empty($item->purchasable->product) && ! empty($item->purchasable->product->type) && ! empty($item->purchasable->product->type->handle) && $item->purchasable->product->type->handle === 'merchandise');
+            $isSample = isset($item->options['sample']);
+            $isMerchandise =
+                !empty($item->purchasable) &&
+                !empty($item->purchasable->product) &&
+                !empty($item->purchasable->product->type) &&
+                !empty($item->purchasable->product->type->handle) &&
+                $item->purchasable->product->type->handle === 'merchandise';
 
             if ($isSample) {
                 $totalSample++;
-            } else if ($isMerchandise) {
+            } elseif ($isMerchandise) {
                 $totalMerchandise++;
             } else {
                 $totalStandard++;
@@ -463,19 +587,25 @@ class Flatworld extends Provider {
         }
 
         if ($totalStandard > 0) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: Order Contains Standard Products to TRUE');
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: Order Contains Standard Products to TRUE',
+            );
 
             $this->setOrderContainsStandardProducts(true);
         }
 
         if ($totalSample > 0) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: Order Contains Sample Products to TRUE');
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: Order Contains Sample Products to TRUE',
+            );
 
             $this->setOrderContainsSampleProducts(true);
         }
 
         if ($totalMerchandise > 0) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: Order Contains Merchandise to TRUE');
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: Order Contains Merchandise to TRUE',
+            );
 
             $this->setOrderContainsMerchandise(true);
         }
@@ -487,7 +617,9 @@ class Flatworld extends Provider {
      * @param bool $orderContainsStandardProducts
      * @return void
      */
-    public function setOrderContainsStandardProducts(bool $orderContainsStandardProducts): void {
+    public function setOrderContainsStandardProducts(
+        bool $orderContainsStandardProducts,
+    ): void {
         $this->_orderContainsStandardProducts = $orderContainsStandardProducts;
     }
 
@@ -496,7 +628,8 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function orderContainsStandardProducts(): bool {
+    public function orderContainsStandardProducts(): bool
+    {
         return $this->_orderContainsStandardProducts;
     }
 
@@ -506,7 +639,9 @@ class Flatworld extends Provider {
      * @param $orderContainsSampleProducts
      * @return void
      */
-    public function setOrderContainsSampleProducts($orderContainsSampleProducts): void {
+    public function setOrderContainsSampleProducts(
+        $orderContainsSampleProducts,
+    ): void {
         $this->_orderContainsSampleProducts = $orderContainsSampleProducts;
     }
 
@@ -515,7 +650,8 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function orderContainsSampleProducts(): bool {
+    public function orderContainsSampleProducts(): bool
+    {
         return $this->_orderContainsSampleProducts;
     }
 
@@ -525,7 +661,8 @@ class Flatworld extends Provider {
      * @param $orderContainsMerchandise
      * @return void
      */
-    public function setOrderContainsMerchandise($orderContainsMerchandise): void {
+    public function setOrderContainsMerchandise($orderContainsMerchandise): void
+    {
         $this->_orderContainsMerchandise = $orderContainsMerchandise;
     }
 
@@ -534,7 +671,8 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function orderContainsMerchandise(): bool {
+    public function orderContainsMerchandise(): bool
+    {
         return $this->_orderContainsMerchandise;
     }
 
@@ -543,7 +681,8 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setPieces(): void {
+    public function setPieces(): void
+    {
         $this->_pieces = [];
 
         foreach ($this->_order->lineItems as $item) {
@@ -555,51 +694,97 @@ class Flatworld extends Provider {
              * - Weights: Tile is 4.5lbs, Brick is 5lbs, Glass is 3lbs.
              * - (4.5 / 0.69) * 25 = 163 (breakdown equals weight per sq ft / variant weight) * sq ft = number of pieces
              */
-            if (! empty($item->purchasable) && ! empty($item->purchasable->product) && ! empty($item->purchasable->product->type) && ! empty($item->purchasable->product->type->handle)) {
+            if (
+                !empty($item->purchasable) &&
+                !empty($item->purchasable->product) &&
+                !empty($item->purchasable->product->type) &&
+                !empty($item->purchasable->product->type->handle)
+            ) {
                 $colorProductLinesCategorySlug = '';
 
-                if (! empty($item->purchasable->product->colorProductLinesCategory) && ! empty($item->purchasable->product->colorProductLinesCategory[0]) && $item->purchasable->product->colorProductLinesCategory[0]->slug) {
-                    $colorProductLinesCategorySlug = $item->purchasable->product->colorProductLinesCategory[0]->slug;
+                if (
+                    !empty(
+                        $item->purchasable->product->colorProductLinesCategory
+                    ) &&
+                    !empty(
+                        $item->purchasable->product
+                            ->colorProductLinesCategory[0]
+                    ) &&
+                    $item->purchasable->product->colorProductLinesCategory[0]
+                        ->slug
+                ) {
+                    $colorProductLinesCategorySlug =
+                        $item->purchasable->product
+                            ->colorProductLinesCategory[0]->slug;
                 }
 
-                $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Product Category: '.$colorProductLinesCategorySlug);
-                $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Product Type: '.$item->purchasable->product->type->handle);
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: setPieces :: Product Category: ' .
+                        $colorProductLinesCategorySlug,
+                );
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: setPieces :: Product Type: ' .
+                        $item->purchasable->product->type->handle,
+                );
 
-                $weightPerSquareFootPerProductTypes = $this->getSetting('weightPerSquareFoot');
+                $weightPerSquareFootPerProductTypes = $this->getSetting(
+                    'weightPerSquareFoot',
+                );
 
-                foreach ($weightPerSquareFootPerProductTypes as $weightPerSquareFootPerProductType) {
+                foreach (
+                    $weightPerSquareFootPerProductTypes
+                    as $weightPerSquareFootPerProductType
+                ) {
                     $productTypeHandle = $weightPerSquareFootPerProductType[0];
                     $productLineSlug = $weightPerSquareFootPerProductType[1];
                     $value = $weightPerSquareFootPerProductType[2];
 
                     // Since we have a product line slug from the plugin settings, we need to check if our product line == x AND product type == y
                     // Example: QuickShip Seconds - Tile
-                    if (! empty($productLineSlug) && $colorProductLinesCategorySlug === $productLineSlug && $item->purchasable->product->type->handle === $productTypeHandle) {
-                        $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Found Product with Product Type, Product Line and Weight Per Square Feet');
+                    if (
+                        !empty($productLineSlug) &&
+                        $colorProductLinesCategorySlug === $productLineSlug &&
+                        $item->purchasable->product->type->handle ===
+                            $productTypeHandle
+                    ) {
+                        $this->displayDebugMessage(
+                            'Flatworld.php :: getRates :: setPieces :: Found Product with Product Type, Product Line and Weight Per Square Feet',
+                        );
 
                         $weightPerSquareFoot = $value;
                         break;
 
-                    // Since we DONT have a product line slug from the plugin
-                    // settings, we are only checking if our product type == x
+                        // Since we DONT have a product line slug from the plugin
+                        // settings, we are only checking if our product type == x
                     } else {
                         // But we also need to account for handpainted since
                         // these are calculated per piece and not weight per
                         // square foot.
                         // Example: QuickShip Seconds - Handpainted
-                        if ($colorProductLinesCategorySlug === 'handpainted' && $item->purchasable->product->type->handle === $productTypeHandle) {
+                        if (
+                            $colorProductLinesCategorySlug === 'handpainted' &&
+                            $item->purchasable->product->type->handle ===
+                                $productTypeHandle
+                        ) {
                             // Note we dont see $weightPerSquareFoot. Leave it
                             // null so our "per piece" logic below is
                             // triggered...but we do break out of the loop
-                            $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Found Product with Product Type but Product Line is Handpainted');
+                            $this->displayDebugMessage(
+                                'Flatworld.php :: getRates :: setPieces :: Found Product with Product Type but Product Line is Handpainted',
+                            );
 
                             break;
 
-                        // Since we DONT have a product line slug, we are only
-                        // checking if our product type == x
-                        // Example: Brick
-                        } else if ($item->purchasable->product->type->handle === $productTypeHandle) {
-                            $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Found Product with Product Type and Weight Per Square Feet');
+                            // Since we DONT have a product line slug, we are only
+                            // checking if our product type == x
+                            // Example: Brick
+                        } elseif (
+                            $item->purchasable->product->type->handle ===
+                            $productTypeHandle
+                        ) {
+                            $this->displayDebugMessage(
+                                'Flatworld.php :: getRates :: setPieces :: Found Product with Product Type and Weight Per Square Feet',
+                            );
 
                             $weightPerSquareFoot = $value;
                             break;
@@ -607,28 +792,87 @@ class Flatworld extends Provider {
                     }
                 }
 
-                if (! empty($weightPerSquareFoot)) {
-                    $this->_pieces[] = $this->calculatePieces($weightPerSquareFoot, $item->weight, $item->qty);
+                if (!empty($weightPerSquareFoot)) {
+                    $this->_pieces[] = $this->calculatePieces(
+                        $weightPerSquareFoot,
+                        $item->weight,
+                        $item->qty,
+                    );
 
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Weight Per Square Foot: '.$weightPerSquareFoot.' ('.floatval($weightPerSquareFoot).')');
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Weight: '.$item->weight.' ('.floatval($item->weight).')');
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Qty: '.$item->qty.' ('.intval($item->qty).')');
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Pieces: '.Json::encode($this->_pieces));
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Weight Per Square Foot: ' .
+                            $weightPerSquareFoot .
+                            ' (' .
+                            floatval($weightPerSquareFoot) .
+                            ')',
+                    );
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Item Weight: ' .
+                            $item->weight .
+                            ' (' .
+                            floatval($item->weight) .
+                            ')',
+                    );
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Item Qty: ' .
+                            $item->qty .
+                            ' (' .
+                            intval($item->qty) .
+                            ')',
+                    );
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Item Pieces: ' .
+                            Json::encode($this->_pieces),
+                    );
                 } else {
                     $this->_pieces[] = intval($item->qty);
 
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: No Weight Per Square Foot');
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Weight: '.$item->weight.' ('.floatval($item->weight).')');
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Qty: '.$item->qty.' ('.intval($item->qty).')');
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Pieces: '.Json::encode($this->_pieces));
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: No Weight Per Square Foot',
+                    );
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Item Weight: ' .
+                            $item->weight .
+                            ' (' .
+                            floatval($item->weight) .
+                            ')',
+                    );
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Item Qty: ' .
+                            $item->qty .
+                            ' (' .
+                            intval($item->qty) .
+                            ')',
+                    );
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: setPieces :: Item Pieces: ' .
+                            Json::encode($this->_pieces),
+                    );
                 }
             } else {
                 $this->_pieces[] = intval($item->qty);
 
-                $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: No Purchase Item Found');
-                $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Weight: '.$item->weight.' ('.floatval($item->weight).')');
-                $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Qty: '.$item->qty.' ('.intval($item->qty).')');
-                $this->displayDebugMessage('Flatworld.php :: getRates :: setPieces :: Item Pieces: '.Json::encode($this->_pieces));
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: setPieces :: No Purchase Item Found',
+                );
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: setPieces :: Item Weight: ' .
+                        $item->weight .
+                        ' (' .
+                        floatval($item->weight) .
+                        ')',
+                );
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: setPieces :: Item Qty: ' .
+                        $item->qty .
+                        ' (' .
+                        intval($item->qty) .
+                        ')',
+                );
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: setPieces :: Item Pieces: ' .
+                        Json::encode($this->_pieces),
+                );
             }
         }
     }
@@ -643,8 +887,11 @@ class Flatworld extends Provider {
      * @param $qty
      * @return false|float
      */
-    public function calculatePieces($weightPerSquareFoot, $weight, $qty) {
-        return ceil((floatval($weightPerSquareFoot) / floatval($weight)) * intval($qty));
+    public function calculatePieces($weightPerSquareFoot, $weight, $qty)
+    {
+        return ceil(
+            (floatval($weightPerSquareFoot) / floatval($weight)) * intval($qty),
+        );
     }
 
     /**
@@ -652,7 +899,8 @@ class Flatworld extends Provider {
      *
      * @return array
      */
-    public function getPieces(): array {
+    public function getPieces(): array
+    {
         return $this->_pieces;
     }
 
@@ -662,16 +910,18 @@ class Flatworld extends Provider {
      * @param float $totalWeight
      * @return void
      */
-    public function setTotalWeight(float $totalWeight = 0.00): void {
-        $this->_totalWeight = 0.00;
+    public function setTotalWeight(float $totalWeight = 0.0): void
+    {
+        $this->_totalWeight = 0.0;
 
-        if ($totalWeight > 0.00) {
+        if ($totalWeight > 0.0) {
             $this->_totalWeight = $totalWeight;
         } else {
             $index = 0;
 
             foreach ($this->_order->lineItems as $item) {
-                $this->_totalWeight += floatval($item->weight) * $this->_pieces[$index];
+                $this->_totalWeight +=
+                    floatval($item->weight) * $this->_pieces[$index];
 
                 $index++;
             }
@@ -679,8 +929,14 @@ class Flatworld extends Provider {
 
         $this->_totalWeight = number_format($this->_totalWeight, 2, '.', '');
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: setTotalWeight :: Total Weight: '.$this->_totalWeight);
-        $this->displayDebugMessage('Flatworld.php :: getRates :: Total Max Weight: '.$this->getSetting('totalMaxWeight'));
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: setTotalWeight :: Total Weight: ' .
+                $this->_totalWeight,
+        );
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: Total Max Weight: ' .
+                $this->getSetting('totalMaxWeight'),
+        );
     }
 
     /**
@@ -689,14 +945,19 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function checkTotalWeight(): bool {
-        if ($this->getTotalWeight() <= 0.00) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: checkTotalWeight :: Total weight was zero, bailing out');
+    public function checkTotalWeight(): bool
+    {
+        if ($this->getTotalWeight() <= 0.0) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: checkTotalWeight :: Total weight was zero, bailing out',
+            );
 
             return false;
         }
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: checkTotalWeight :: Total weight found. Continuing');
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: checkTotalWeight :: Total weight found. Continuing',
+        );
 
         return true;
     }
@@ -706,7 +967,8 @@ class Flatworld extends Provider {
      *
      * @return float
      */
-    public function getTotalWeight(): float {
+    public function getTotalWeight(): float
+    {
         return $this->_totalWeight;
     }
 
@@ -719,11 +981,17 @@ class Flatworld extends Provider {
      * @return bool
      * @throws InvalidConfigException
      */
-    public function checkWeightLimit(): bool {
-        $this->_order->clearNotices('shippingMethodChanged', 'shippingWeightLimit');
+    public function checkWeightLimit(): bool
+    {
+        $this->_order->clearNotices(
+            'shippingMethodChanged',
+            'shippingWeightLimit',
+        );
 
         if ($this->weightLimitReached()) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: checkWeightLimit :: Weight limit reached');
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: checkWeightLimit :: Weight limit reached',
+            );
 
             $notice = Craft::createObject([
                 'class' => OrderNotice::class,
@@ -746,8 +1014,11 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function weightLimitReached(): bool {
-        return (! empty($this->getSetting('totalMaxWeight')) && $this->getTotalWeight() > floatval($this->getSetting('totalMaxWeight')));
+    public function weightLimitReached(): bool
+    {
+        return !empty($this->getSetting('totalMaxWeight')) &&
+            $this->getTotalWeight() >
+                floatval($this->getSetting('totalMaxWeight'));
     }
 
     /**
@@ -758,32 +1029,44 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setPackageDetailsList(): void {
+    public function setPackageDetailsList(): void
+    {
         // There is also a threshold of 150 lbs. After that threshold, Flatworld
         // seems to treat both Single box packing and Pallet as the "same".
 
         // If an order contains standard products, its over weight threshold -
         // doesnt make a difference if it contains samples and or merch - its
         // over weight threshold
-        if ($this->orderContainsStandardProducts() && ! $this->underWeightThreshold()) {
+        if (
+            $this->orderContainsStandardProducts() &&
+            !$this->underWeightThreshold()
+        ) {
             $this->setPallet();
         }
 
         // If an order contains standard products, its under weight threshold -
         // doesnt make a difference if it contains samples and or merch - has to
         // use a single box
-        else if ($this->orderContainsStandardProducts() && $this->underWeightThreshold()) {
+        elseif (
+            $this->orderContainsStandardProducts() &&
+            $this->underWeightThreshold()
+        ) {
             $this->setSingleBox();
         }
 
         // If an order contains sample products or merch, it has to use a single box
-        else if ($this->orderContainsSampleProducts() || $this->orderContainsMerchandise()) {
+        elseif (
+            $this->orderContainsSampleProducts() ||
+            $this->orderContainsMerchandise()
+        ) {
             $this->setSingleBox();
         }
 
         // There is an issue...Should never get this far!
         else {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: setPackageDetailsList :: No packing method was set');
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: setPackageDetailsList :: No packing method was set',
+            );
         }
     }
 
@@ -792,7 +1075,8 @@ class Flatworld extends Provider {
      *
      * @return array
      */
-    public function getPackageDetailsList(): array {
+    public function getPackageDetailsList(): array
+    {
         return $this->_packageDetailsList;
     }
 
@@ -801,8 +1085,10 @@ class Flatworld extends Provider {
      *
      * @return bool
      */
-    public function underWeightThreshold(): bool {
-        return $this->getTotalWeight() <= floatval($this->getSetting('weightThreshold'));
+    public function underWeightThreshold(): bool
+    {
+        return $this->getTotalWeight() <=
+            floatval($this->getSetting('weightThreshold'));
     }
 
     /**
@@ -814,7 +1100,8 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setSingleBox(): void {
+    public function setSingleBox(): void
+    {
         $this->_packageDetailsList = [
             [
                 'Name' => 'SingleBox',
@@ -822,7 +1109,10 @@ class Flatworld extends Provider {
             ],
         ];
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: setSingleBox :: '.Json::encode($this->_packageDetailsList));
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: setSingleBox :: ' .
+                Json::encode($this->_packageDetailsList),
+        );
     }
 
     /**
@@ -834,7 +1124,8 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setPallet(): void {
+    public function setPallet(): void
+    {
         $this->_packageDetailsList = [
             [
                 'PackageNumber' => 'Pallet',
@@ -842,7 +1133,10 @@ class Flatworld extends Provider {
             ],
         ];
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: setPallet :: '.Json::encode($this->_packageDetailsList));
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: setPallet :: ' .
+                Json::encode($this->_packageDetailsList),
+        );
     }
 
     /**
@@ -850,8 +1144,8 @@ class Flatworld extends Provider {
      *
      * @return array
      */
-    public function getPayload(): array {
-
+    public function getPayload(): array
+    {
         // SF API request body should look somethng like this (when turned into JSON):
         // 	{
         // 	  "ZipCode": "11111",
@@ -878,12 +1172,15 @@ class Flatworld extends Provider {
      * @return void
      * @throws GuzzleException
      */
-    public function requestRates() {
+    public function requestRates()
+    {
         $payload = $this->getPayload();
 
         $body = Json::encode($payload);
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: Payload: '.$body);
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: Payload: ' . $body,
+        );
 
         // (held over from Pacejet plugin)
         // Not entirely sure we need this but adding it in anyways as other Postie
@@ -903,8 +1200,12 @@ class Flatworld extends Provider {
      * @param $response
      * @return void
      */
-    public function setResponse($response): void {
-        $this->displayDebugMessage('Flatworld.php :: setResponse :: Response: '.JSON::encode($response));
+    public function setResponse($response): void
+    {
+        $this->displayDebugMessage(
+            'Flatworld.php :: setResponse :: Response: ' .
+                JSON::encode($response),
+        );
         $this->_response = $response;
     }
 
@@ -913,7 +1214,8 @@ class Flatworld extends Provider {
      *
      * @return mixed
      */
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->_response;
     }
 
@@ -923,7 +1225,8 @@ class Flatworld extends Provider {
      *
      * @return array
      */
-    public function responseRates(): array {
+    public function responseRates(): array
+    {
         // filter for fastest and cheapest rates
         $this->setQuickestRate();
         $this->setCheapestRate();
@@ -931,10 +1234,12 @@ class Flatworld extends Provider {
         $this->setCheapestServiceHandle();
 
         if (
-            ! empty($this->getCheapestRate()) &&
-            ! empty($this->getQuickestRate())
+            !empty($this->getCheapestRate()) &&
+            !empty($this->getQuickestRate())
         ) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: Found cheapest and fastest rates and carrier details');
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: Found cheapest and fastest rates and carrier details',
+            );
 
             $cheapestRate = $this->getCheapestRate();
             $quickestRate = $this->getQuickestRate();
@@ -978,15 +1283,24 @@ class Flatworld extends Provider {
                 }
             }
 
-            if (! $foundServiceHandle) {
-                $this->displayDebugMessage('Flatworld.php :: getRates :: Didnt find any matching carrier handles');
+            if (!$foundServiceHandle) {
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: Didnt find any matching carrier handles',
+                );
             }
 
             // Apply flat rate shipping for samples only orders: https://app.asana.com/0/1200248609605430/1201862416773959/f
-            if (! $this->orderContainsStandardProducts() && ! $this->orderContainsMerchandise() && $this->orderContainsSampleProducts() && $foundServiceHandle) {
+            if (
+                !$this->orderContainsStandardProducts() &&
+                !$this->orderContainsMerchandise() &&
+                $this->orderContainsSampleProducts() &&
+                $foundServiceHandle
+            ) {
                 $rates = $this->setFlatRate($rates);
 
-                $this->displayDebugMessage('Flatworld.php :: getRates :: Applied Flat Rate Shipping Carrier');
+                $this->displayDebugMessage(
+                    'Flatworld.php :: getRates :: Applied Flat Rate Shipping Carrier',
+                );
             }
 
             // Sort so the lowest cost carrier is first/default
@@ -995,23 +1309,38 @@ class Flatworld extends Provider {
 
             // Shipping for samples only orders for trade is $0 and $8 for everyone else
             // (We set this on the lowest cost carrier which also overrides flat rate cost)
-            if (! $this->orderContainsStandardProducts() && ! $this->orderContainsMerchandise() && $this->orderContainsSampleProducts()) {
+            if (
+                !$this->orderContainsStandardProducts() &&
+                !$this->orderContainsMerchandise() &&
+                $this->orderContainsSampleProducts()
+            ) {
                 $firstCarrier = array_slice($rates, 0, 1);
                 $firstServiceHandle = key($firstCarrier);
 
-                if (! empty($this->_order->user) && $this->_order->user->isInGroup('customersTrade15') ) {
+                if (
+                    !empty($this->_order->user) &&
+                    $this->_order->user->isInGroup('customersTrade15')
+                ) {
                     $rates[$firstServiceHandle]['amount'] = 0;
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: Applied Free Shipping on Samples only for Trade account');
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: Applied Free Shipping on Samples only for Trade account',
+                    );
                 } else {
-                    $rates[$firstServiceHandle]['amount'] = $this->getFlatRateAmount();
-                    $this->displayDebugMessage('Flatworld.php :: getRates :: Applied $8 flat rate Shipping on Samples only for samples only orders');
+                    $rates[$firstServiceHandle][
+                        'amount'
+                    ] = $this->getFlatRateAmount();
+                    $this->displayDebugMessage(
+                        'Flatworld.php :: getRates :: Applied $8 flat rate Shipping on Samples only for samples only orders',
+                    );
                 }
             }
 
             return $this->_modifyRatesEvent($rates, $this->_order);
         }
 
-        $this->displayDebugMessage('Flatworld.php :: getRates :: Didnt find any cheapest and fastest carrier details');
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRates :: Didnt find any cheapest and fastest carrier details',
+        );
 
         return [];
     }
@@ -1021,7 +1350,8 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setQuickestRate(): void {
+    public function setQuickestRate(): void
+    {
         $response = $this->getResponse();
         $this->_quickestRate = $this->findQuickestRate($response);
     }
@@ -1031,7 +1361,8 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setCheapestRate(): void {
+    public function setCheapestRate(): void
+    {
         $response = $this->getResponse();
         $this->_cheapestRate = $this->findCheapestRate($response);
     }
@@ -1041,7 +1372,8 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public function getQuickestRate(): ?array {
+    public function getQuickestRate(): ?array
+    {
         return $this->_quickestRate;
     }
 
@@ -1050,7 +1382,8 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public function getCheapestRate(): ?array {
+    public function getCheapestRate(): ?array
+    {
         return $this->_cheapestRate;
     }
 
@@ -1059,12 +1392,15 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setQuickestServiceHandle(): void {
+    public function setQuickestServiceHandle(): void
+    {
         $quickestRate = $this->getQuickestRate();
         if (empty($quickestRate)) {
             return;
         }
-        $this->_quickestServiceHandle = $this->getServiceHandle($quickestRate['ServiceLevel']);
+        $this->_quickestServiceHandle = $this->getServiceHandle(
+            $quickestRate['ServiceLevel'],
+        );
     }
 
     /**
@@ -1072,7 +1408,8 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public function getQuickestServiceHandle(): string {
+    public function getQuickestServiceHandle(): string
+    {
         return $this->_quickestServiceHandle;
     }
 
@@ -1081,12 +1418,15 @@ class Flatworld extends Provider {
      *
      * @return void
      */
-    public function setCheapestServiceHandle(): void {
+    public function setCheapestServiceHandle(): void
+    {
         $cheapestRate = $this->getCheapestRate();
         if (empty($cheapestRate)) {
             return;
         }
-        $this->_cheapestServiceHandle = $this->getServiceHandle($cheapestRate['ServiceLevel']);
+        $this->_cheapestServiceHandle = $this->getServiceHandle(
+            $cheapestRate['ServiceLevel'],
+        );
     }
 
     /**
@@ -1094,7 +1434,8 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public function getCheapestServiceHandle(): string {
+    public function getCheapestServiceHandle(): string
+    {
         return $this->_cheapestServiceHandle;
     }
 
@@ -1105,10 +1446,10 @@ class Flatworld extends Provider {
      * @param string $serviceLevel The service level string to convert
      * @return string
      */
-    public function getServiceHandle(string $serviceLevel): string {
+    public function getServiceHandle(string $serviceLevel): string
+    {
         return str_replace(' ', '_', strtoupper($serviceLevel));
     }
-
 
     /**
      * Find and return the rate with the quickest estimated delivery date and
@@ -1118,7 +1459,10 @@ class Flatworld extends Provider {
      * @param \DateTime $now (optional) The current date and time, default is now
      * @return array|null
      */
-    public function findQuickestRate(array $jsonData, \DateTime $now = null): ?array {
+    public function findQuickestRate(
+        array $jsonData,
+        \DateTime $now = null,
+    ): ?array {
         if (!$now) {
             $now = new \DateTime();
         }
@@ -1128,28 +1472,35 @@ class Flatworld extends Provider {
 
         foreach ($jsonData as $rate) {
             if (isset($rate['EstimatedDeliveryDate'])) {
-                $deliveryDate = \DateTime::createFromFormat('Y/m/d', $rate['EstimatedDeliveryDate']);
+                $deliveryDate = \DateTime::createFromFormat(
+                    'Y/m/d',
+                    $rate['EstimatedDeliveryDate'],
+                );
 
                 // make sure delivery date is in the future
                 // if ($deliveryDate >= $now && $deliveryDate < $now->add(new \DateInterval('P1D'))) {
 
-                    $timeDiff = $deliveryDate->getTimestamp() - $now->getTimestamp();
+                $timeDiff =
+                    $deliveryDate->getTimestamp() - $now->getTimestamp();
 
-                    // EstimatedDeliveryTime may not exist on the rate result
-                    // TODO: This doesn't currently work.
-                    // if (isset($rate['EstimatedDeliveryTime'])) {
-                    // 	$deliveryTime = \DateTime::createFromFormat('H:i A', $rate['EstimatedDeliveryTime']);
-                    // 	$timeDiff += $deliveryTime->getTimestamp() - $now->getTimestamp();
-                    // }
+                // EstimatedDeliveryTime may not exist on the rate result
+                // TODO: This doesn't currently work.
+                // if (isset($rate['EstimatedDeliveryTime'])) {
+                // 	$deliveryTime = \DateTime::createFromFormat('H:i A', $rate['EstimatedDeliveryTime']);
+                // 	$timeDiff += $deliveryTime->getTimestamp() - $now->getTimestamp();
+                // }
 
-                    if ($timeDiff < $minTimeDiff) {
-                        $quickestRate = $rate;
-                        $minTimeDiff = $timeDiff;
-                    }
+                if ($timeDiff < $minTimeDiff) {
+                    $quickestRate = $rate;
+                    $minTimeDiff = $timeDiff;
+                }
                 // }
             }
         }
-        $this->displayDebugMessage('Flatworld.php :: findQuickestRate :: returning: '.Json::encode($quickestRate));
+        $this->displayDebugMessage(
+            'Flatworld.php :: findQuickestRate :: returning: ' .
+                Json::encode($quickestRate),
+        );
         return $quickestRate;
     }
 
@@ -1159,13 +1510,14 @@ class Flatworld extends Provider {
      * @param array $jsonData JSON data containing shipping rate options
      * @return array|null
      */
-    public function findCheapestRate(array $jsonData): ?array {
+    public function findCheapestRate(array $jsonData): ?array
+    {
         $cheapestRate = null;
         $lowestTotal = PHP_FLOAT_MAX;
 
         foreach ($jsonData as $rate) {
             if (isset($rate['Total'])) {
-                $total = (float)$rate['Total'];
+                $total = (float) $rate['Total'];
 
                 if ($total < $lowestTotal) {
                     $cheapestRate = $rate;
@@ -1173,7 +1525,10 @@ class Flatworld extends Provider {
                 }
             }
         }
-        $this->displayDebugMessage('Flatworld.php :: findCheapestRate :: returning: '.Json::encode($cheapestRate));
+        $this->displayDebugMessage(
+            'Flatworld.php :: findCheapestRate :: returning: ' .
+                Json::encode($cheapestRate),
+        );
         return $cheapestRate;
     }
 
@@ -1183,7 +1538,8 @@ class Flatworld extends Provider {
      * @param string $transitTime
      * @return string
      */
-    public function getArrival(string $transitTime): string {
+    public function getArrival(string $transitTime): string
+    {
         if ($transitTime > 0) {
             // Pure hack until its confirmed
             if ($transitTime >= 21) {
@@ -1208,7 +1564,8 @@ class Flatworld extends Provider {
      * @param array $rates
      * @return array
      */
-    public function setFlatRate(array $rates): array {
+    public function setFlatRate(array $rates): array
+    {
         $flatRateHandle = $this->getFlatRateHandle();
         $flatRateAmount = $this->getFlatRateAmount();
 
@@ -1226,7 +1583,7 @@ class Flatworld extends Provider {
         }
 
         // Inject flat rate carrier into the rates list
-        if (! empty($flatRateCarrier)) {
+        if (!empty($flatRateCarrier)) {
             $rates[$flatRateHandle] = $flatRateCarrier;
         }
 
@@ -1238,7 +1595,8 @@ class Flatworld extends Provider {
      *
      * @return string
      */
-    public function getFlatRateHandle(): string {
+    public function getFlatRateHandle(): string
+    {
         return $this->getSetting('flatRateCarrierName');
     }
 
@@ -1247,8 +1605,14 @@ class Flatworld extends Provider {
      *
      * @return float
      */
-    public function getFlatRateAmount(): float {
-        $flatRateAmount = number_format($this->getSetting('flatRateCarrierCost'), 2, '.', ',');
+    public function getFlatRateAmount(): float
+    {
+        $flatRateAmount = number_format(
+            $this->getSetting('flatRateCarrierCost'),
+            2,
+            '.',
+            ',',
+        );
 
         return floatval($flatRateAmount);
     }
@@ -1258,18 +1622,25 @@ class Flatworld extends Provider {
      *
      * @return mixed
      */
-    public function getRatesCache(): mixed {
+    public function getRatesCache(): mixed
+    {
         $cacheKey = $this->_getCacheKey();
 
-        $this->displayDebugMessage('Flatworld.php :: getRatesCache :: Rates cache key :: '.$cacheKey);
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRatesCache :: Rates cache key :: ' . $cacheKey,
+        );
 
-        if (! Craft::$app->cache->exists($cacheKey)) {
-            $this->displayDebugMessage('Flatworld.php :: getRatesCache :: Rates cache did not exist');
+        if (!Craft::$app->cache->exists($cacheKey)) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRatesCache :: Rates cache did not exist',
+            );
 
             return false;
         }
 
-        $this->displayDebugMessage('Flatworld.php :: getRatesCache :: Rates cache found');
+        $this->displayDebugMessage(
+            'Flatworld.php :: getRatesCache :: Rates cache found',
+        );
 
         return Craft::$app->cache->get($cacheKey);
     }
@@ -1280,15 +1651,18 @@ class Flatworld extends Provider {
      * @param array $rates
      * @return void
      */
-    public function setRatesCache(array $rates): void {
+    public function setRatesCache(array $rates): void
+    {
         // Duration in minutes * seconds
-        $duration = (5 * 60);
+        $duration = 5 * 60;
 
         $cacheKey = $this->_getCacheKey();
 
         Craft::$app->cache->set($cacheKey, $rates, $duration);
 
-        $this->displayDebugMessage('Flatworld.php :: setRatesCache :: Set rates cache to expire in 5 mins');
+        $this->displayDebugMessage(
+            'Flatworld.php :: setRatesCache :: Set rates cache to expire in 5 mins',
+        );
     }
 
     /**
@@ -1296,28 +1670,33 @@ class Flatworld extends Provider {
      *
      * @return array|false|string
      */
-    private function _getCacheKey(): array|false|string {
+    private function _getCacheKey(): array|false|string
+    {
         $order = $this->getOrder();
 
-        if (! $order) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: _getCacheKey :: Order was null');
+        if (!$order) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: _getCacheKey :: Order was null',
+            );
 
             return false;
         }
 
         $packageDetailsList = $this->getPackageDetailsList();
 
-        if (! $packageDetailsList || ! $packageDetailsList[0]) {
-            $this->displayDebugMessage('Flatworld.php :: getRates :: _getCacheKey :: Package Details List was null');
+        if (!$packageDetailsList || !$packageDetailsList[0]) {
+            $this->displayDebugMessage(
+                'Flatworld.php :: getRates :: _getCacheKey :: Package Details List was null',
+            );
 
             return false;
         }
 
         $packingName = 'SingleBoxOrPallet';
 
-        if (! empty($packageDetailsList[0]['Name'])) {
+        if (!empty($packageDetailsList[0]['Name'])) {
             $packingName = $packageDetailsList[0]['Name'];
-        } elseif (! empty($packageDetailsList[0]['PackageNumber'])) {
+        } elseif (!empty($packageDetailsList[0]['PackageNumber'])) {
             $packingName = $packageDetailsList[0]['PackageNumber'];
         }
 
@@ -1338,10 +1717,20 @@ class Flatworld extends Provider {
      * @return mixed|null
      * @throws GuzzleException
      */
-    private function _getRequest(string $method, string $uri, array $options = []) {
-        $this->displayDebugMessage('Flatworld.php :: _getRequest :: Making new API request :: '.$uri);
+    private function _getRequest(
+        string $method,
+        string $uri,
+        array $options = [],
+    ) {
+        $this->displayDebugMessage(
+            'Flatworld.php :: _getRequest :: Making new API request :: ' . $uri,
+        );
 
-        $response = $this->_getClient()->request($method, ltrim($uri, '/'), $options);
+        $response = $this->_getClient()->request(
+            $method,
+            ltrim($uri, '/'),
+            $options,
+        );
 
         return Json::decode((string) $response->getBody());
     }
@@ -1352,7 +1741,8 @@ class Flatworld extends Provider {
      *
      * @return mixed
      */
-    private function _getFakeResponse() {
+    private function _getFakeResponse()
+    {
         $fakeResponse = '
             [
                 {
@@ -1555,7 +1945,8 @@ class Flatworld extends Provider {
      *
      * @return Client
      */
-    private function _getClient(): Client {
+    private function _getClient(): Client
+    {
         if ($this->_client) {
             return $this->_client;
         }
@@ -1579,7 +1970,8 @@ class Flatworld extends Provider {
      * @return void
      * @throws Exception
      */
-    private function _throwError($uniqueId, $error): void {
+    private function _throwError($uniqueId, $error): void
+    {
         $file = 'NA';
         $line = 'NA';
 
@@ -1594,26 +1986,42 @@ class Flatworld extends Provider {
                 $line = $error->getLine();
             }
 
-            Provider::error($this, Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
-                'message' => $message,
-                'file' => $file,
-                'line' => $line,
-            ]));
+            Provider::error(
+                $this,
+                Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
+                    'message' => $message,
+                    'file' => $file,
+                    'line' => $line,
+                ]),
+            );
         } else {
             $message = $error->getMessage();
             $file = $error->getFile();
             $line = $error->getLine();
 
-            Provider::error($this, Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
-                'message' => $message,
-                'file' => $file,
-                'line' => $line,
-            ]));
+            Provider::error(
+                $this,
+                Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
+                    'message' => $message,
+                    'file' => $file,
+                    'line' => $line,
+                ]),
+            );
         }
 
         $order = $this->getOrder();
 
-        $debugMessage = 'Flatworld.php :: _throwError :: '.$uniqueId.' :: MESSAGE: '.$message.', FILE: '.$file.', LINE: '.$line.', ORDER ID: '.$order->id;
+        $debugMessage =
+            'Flatworld.php :: _throwError :: ' .
+            $uniqueId .
+            ' :: MESSAGE: ' .
+            $message .
+            ', FILE: ' .
+            $file .
+            ', LINE: ' .
+            $line .
+            ', ORDER ID: ' .
+            $order->id;
 
         $this->displayDebugMessage($debugMessage);
 
@@ -1627,9 +2035,13 @@ class Flatworld extends Provider {
      * @param $order
      * @return array
      */
-    private function _modifyRatesEvent(array $rates, $order): array {
+    private function _modifyRatesEvent(array $rates, $order): array
+    {
         // Allow rate modification via events
-        $modifyRatesEvent = new ModifyRatesEvent(['rates' => $rates, 'order' => $order]);
+        $modifyRatesEvent = new ModifyRatesEvent([
+            'rates' => $rates,
+            'order' => $order,
+        ]);
 
         if ($this->hasEventHandlers(self::EVENT_MODIFY_RATES)) {
             $this->trigger(self::EVENT_MODIFY_RATES, $modifyRatesEvent);
@@ -1644,7 +2056,8 @@ class Flatworld extends Provider {
      * @param string $textBody The message to include in the email
      * @return void
      */
-    private function _sendMail(string $textBody): void {
+    private function _sendMail(string $textBody): void
+    {
         try {
             $message = new Message();
             $message->setTo('web@fireclaytile.com');
@@ -1653,7 +2066,10 @@ class Flatworld extends Provider {
 
             Craft::$app->getMailer()->send($message);
         } catch (Throwable $e) {
-            $this->displayDebugMessage('Flatworld.php :: _sendMail :: Something went wrong: '.$e->getMessage());
+            $this->displayDebugMessage(
+                'Flatworld.php :: _sendMail :: Something went wrong: ' .
+                    $e->getMessage(),
+            );
         }
     }
 }

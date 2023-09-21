@@ -16,8 +16,9 @@ use Codeception\Actor;
  * @method void pause()
  *
  * @SuppressWarnings(PHPMD)
-*/
-class AcceptanceTester extends Actor {
+ */
+class AcceptanceTester extends Actor
+{
     use _generated\AcceptanceTesterActions;
 
     /**

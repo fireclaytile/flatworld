@@ -29,7 +29,8 @@ use fireclaytile\flatworld\providers\Flatworld as Provider;
  * @author     Fireclay Tile
  * @package    fireclaytile\flatworld
  */
-class Flatworld extends Plugin {
+class Flatworld extends Plugin
+{
     /**
      * @var Flatworld
      */
@@ -50,7 +51,8 @@ class Flatworld extends Plugin {
      */
     public $hasCpSection = false;
 
-    public function init() {
+    public function init()
+    {
         parent::init();
 
         self::$plugin = $this;
@@ -59,45 +61,52 @@ class Flatworld extends Plugin {
         Event::on(
             Providers::class,
             Providers::EVENT_REGISTER_PROVIDER_TYPES,
-            function(RegisterProviderTypesEvent $event) {
+            function (RegisterProviderTypesEvent $event) {
                 $event->providerTypes[] = Provider::class;
-            }
+            },
         );
 
         Event::on(
             PluginController::class,
             PluginController::EVENT_MODIFY_VARIANT_QUERY,
-            function(ModifyShippableVariantsEvent $event) {
-                $products = Product::find()->type(['addons', 'merchandise'])->all();
+            function (ModifyShippableVariantsEvent $event) {
+                $products = Product::find()
+                    ->type(['addons', 'merchandise'])
+                    ->all();
 
                 if (count($products) > 0) {
                     $excludedProductTypeIds = [];
 
                     foreach ($products as $product) {
-                        if (!in_array($product->typeId, $excludedProductTypeIds)) {
+                        if (
+                            !in_array($product->typeId, $excludedProductTypeIds)
+                        ) {
                             $excludedProductTypeIds[] = $product->typeId;
                         }
                     }
 
-                    $event->query = Variant::find()->typeId(['not', $excludedProductTypeIds])->weight([0, null])->height([0, null])->width([0, null])->length([0, null]);
+                    $event->query = Variant::find()
+                        ->typeId(['not', $excludedProductTypeIds])
+                        ->weight([0, null])
+                        ->height([0, null])
+                        ->width([0, null])
+                        ->length([0, null]);
                 }
-            }
+            },
         );
 
-        Event::on(
-            CraftVariable::class,
-            CraftVariable::EVENT_INIT,
-            function (Event $event) {
-                $variable = $event->sender;
-                $variable->set('flatworld', FlatworldVariable::class);
-            }
-        );
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function (
+            Event $event,
+        ) {
+            $variable = $event->sender;
+            $variable->set('flatworld', FlatworldVariable::class);
+        });
 
         Craft::info(
             Craft::t('flatworld', '{name} plugin loaded', [
-                'name' => $this->name
+                'name' => $this->name,
             ]),
-            __METHOD__
+            __METHOD__,
         );
     }
 }

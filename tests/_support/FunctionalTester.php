@@ -16,8 +16,9 @@ use Codeception\Actor;
  * @method void pause()
  *
  * @SuppressWarnings(PHPMD)
-*/
-class FunctionalTester extends Actor {
+ */
+class FunctionalTester extends Actor
+{
     use _generated\FunctionalTesterActions;
 
     /**

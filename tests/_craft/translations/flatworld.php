@@ -9,7 +9,8 @@
  */
 
 return [
-	'{displayName}' => '{displayName}',
-	'{name} plugin loaded' => '{name} plugin loaded',
-	'API error: "{message}" {file}:{line}' => 'API error: "{message}" {file}:{line}',
+    '{displayName}' => '{displayName}',
+    '{name} plugin loaded' => '{name} plugin loaded',
+    'API error: "{message}" {file}:{line}' =>
+        'API error: "{message}" {file}:{line}',
 ];
