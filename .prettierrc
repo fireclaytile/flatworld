@@ -1,0 +1,27 @@
+{
+    "semi": true,
+    "singleQuote": true,
+    "parser": "php",
+    "plugins": [
+        "@prettier/plugin-php"
+    ],
+    "overrides": [
+        {
+            "files": "*.php",
+            "options": {
+                "braceStyle": "psr-2",
+                "phpVersion": "8.0",
+                "singleQuote": true,
+                "tabWidth": 4,
+                "useTabs": false
+            }
+        },
+        {
+            "files": "**/*.{css,scss}",
+            "options": {
+                "tabWidth": 2,
+                "useTabs": false
+            }
+        }
+    ]
+}

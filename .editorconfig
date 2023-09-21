@@ -1,0 +1,37 @@
+# For more information: http://EditorConfig.org
+
+# This is the top-most .editorconfig file; do not search in parent directories.
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.js]
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.yaml]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+[src/scss/**]
+indent_style = space
+indent_size = 2
+
+# https://craftcms.com/docs/3.x/extend/coding-guidelines.html & https://www.php-fig.org/psr/psr-2/
+[*.php]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true

@@ -1,0 +1,9 @@
+# config/project
+# web/cpresources
+# web/css
+# web/images
+# web/js
+# storage
+# vendor
+# node_modules
+# composer.*
