@@ -4,7 +4,7 @@ namespace fireclaytile\flatworld\services;
 
 use Craft;
 use craft\base\Component;
-use fireclaytile\flatworld\providers\Flatworld;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
 use fireclaytile\flatworld\services\salesforce\models\LineItem;
@@ -24,9 +24,9 @@ class RatesApi extends Component
     /**
      * Instance of the Flatworld Postie Provider class.
      *
-     * @var Flatworld
+     * @var FlatworldProvider
      */
-    private Flatworld $_flatworld;
+    private FlatworldProvider $_flatworld;
 
     /**
      * Salesforce enabled?

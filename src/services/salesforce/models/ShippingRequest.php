@@ -27,6 +27,13 @@ class ShippingRequest
     public bool $liftGate;
 
     /**
+     * Order type. Sample or Order
+     *
+     * @var string
+     */
+    public string $orderType;
+
+    /**
      * Line items from the order.
      *
      * @var array
@@ -43,10 +50,12 @@ class ShippingRequest
     public function __construct(
         string $zipCode,
         bool $liftGate,
+        string $orderType,
         array $lineItems,
     ) {
         $this->zipCode = $zipCode;
         $this->liftGate = $liftGate;
+        $this->orderType = $orderType;
         $this->lineItems = $lineItems;
     }
 }

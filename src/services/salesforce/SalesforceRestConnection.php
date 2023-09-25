@@ -2,6 +2,7 @@
 
 namespace fireclaytile\flatworld\services\salesforce;
 
+use Exception;
 use fireclaytile\flatworld\services\salesforce\models\RestDetails;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
 
@@ -105,7 +106,9 @@ class SalesforceRestConnection
     public function getRates(ShippingRequest $shippingRequest): mixed
     {
         $url = $this->_baseEndpoint . 'ShippingQuote';
-        $restDetails = new RestDetails('GET', $url);
+        $restDetails = new RestDetails('POST', $url);
+
+        $restDetails->body = json_encode($shippingRequest);
 
         return $this->_makeRequest(
             $this->_accessToken,
@@ -143,14 +146,10 @@ class SalesforceRestConnection
                 }
 
                 array_push($header, 'Content-type: application/json');
-                $successStatus = 201;
+                $successStatus = 200;
 
                 curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt(
-                    $curl,
-                    CURLOPT_POSTFIELDS,
-                    json_encode($restDetails->body),
-                );
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $restDetails->body);
                 break;
 
             case 'GET':

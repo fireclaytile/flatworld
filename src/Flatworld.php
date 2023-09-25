@@ -21,8 +21,11 @@ use verbb\postie\controllers\PluginController;
 use verbb\postie\events\RegisterProviderTypesEvent;
 use fireclaytile\flatworld\variables\FlatworldVariable;
 use verbb\postie\events\ModifyShippableVariantsEvent;
-use fireclaytile\flatworld\providers\Flatworld as Provider;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 
+use fireclaytile\flatworld\services\Logger;
+use fireclaytile\flatworld\services\Mailer;
+use fireclaytile\flatworld\services\Rates;
 use fireclaytile\flatworld\services\RatesApi;
 
 /**
@@ -66,7 +69,7 @@ class Flatworld extends Plugin
             Providers::class,
             Providers::EVENT_REGISTER_PROVIDER_TYPES,
             function (RegisterProviderTypesEvent $event) {
-                $event->providerTypes[] = Provider::class;
+                $event->providerTypes[] = FlatworldProvider::class;
             },
         );
 
@@ -117,6 +120,9 @@ class Flatworld extends Plugin
     private function initServices()
     {
         $this->setComponents([
+            'logger' => Logger::class,
+            'mailer' => Mailer::class,
+            'ratesService' => Rates::class,
             'ratesApi' => RatesApi::class,
         ]);
     }

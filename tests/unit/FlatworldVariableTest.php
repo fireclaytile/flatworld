@@ -6,51 +6,24 @@ use Craft;
 use Exception;
 use UnitTester;
 use craft\helpers\App;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use verbb\postie\Postie;
 use Codeception\Test\Unit;
-use Twig\Error\LoaderError;
-use Twig\Error\SyntaxError;
-use Twig\Error\RuntimeError;
-use craft\helpers\ArrayHelper;
-use yii\base\InvalidConfigException;
-use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
-use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\Logger;
-use fireclaytile\flatworld\services\Rates as RatesService;
 use fireclaytile\flatworld\variables\FlatworldVariable;
 
-class FlatworldProviderTest extends Unit
+class FlatworldVariableTest extends Unit
 {
     /**
-     * @var boolean
+     * @var FlatworldVariable
      */
-    private bool $_loggingEnabled;
-
-    /**
-     * @var MockOrder $order
-     */
-    protected MockOrder $order;
-
-    /**
-     * @var FlatworldProvider
-     */
-    protected FlatworldProvider $flatworld;
-
-    // /**
-    //  * @var RatesService
-    //  */
-    // protected RatesService $ratesService;
+    protected FlatworldVariable $flatworldVariable;
 
     /**
      * @var UnitTester
      */
     protected UnitTester $tester;
-
-    /**
-     * @var array
-     */
-    public array $mockServiceList;
 
     /**
      * @return void
@@ -60,6 +33,8 @@ class FlatworldProviderTest extends Unit
         parent::_before();
 
         Craft::$app->setEdition(Craft::Pro);
+
+        $this->flatworldVariable = new FlatworldVariable();
 
         $this->flatworld = Postie::getInstance()
             ->getProviders()
@@ -73,27 +48,14 @@ class FlatworldProviderTest extends Unit
     /**
      * @return void
      */
-    public function testConfigOptionsSpecificToFlatworldAreValidAndCorrect(): void
+    public function testRatesReturnsAnEmptyArrayWhenAnOrderIsNotFound(): void
     {
         $this->_logMessage(__METHOD__, 'running...');
 
-        $config = Craft::$app->getConfig()->getConfigFromFile('postie');
+        $rates = $this->flatworldVariable->getRates(0);
 
-        $this->assertIsArray($config);
-        $this->assertNotEmpty($config);
-        $this->assertArrayHasKey('providers', $config);
-
-        $this->assertIsArray($config['providers']);
-        $this->assertNotEmpty($config['providers']);
-        $this->assertArrayHasKey('flatworld', $config['providers']);
-
-        $this->assertIsArray($config['providers']['flatworld']);
-        $this->assertNotEmpty($config['providers']['flatworld']);
-
-        $flatworld = $config['providers']['flatworld'];
-
-        $this->assertIsArray($flatworld);
-        $this->assertNotEmpty($flatworld);
+        $this->assertEmpty($rates);
+        $this->assertIsArray($rates);
 
         $this->_logMessage(__METHOD__, 'done...');
     }
@@ -101,333 +63,16 @@ class FlatworldProviderTest extends Unit
     /**
      * @return void
      */
-    public function testSettingsSpecificToFlatworldAreValidAndCorrect(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->assertNotEmpty($this->flatworld->getSetting('apiUsername'));
-        $this->assertSame(
-            App::env('SALESFORCE_USERNAME'),
-            $this->flatworld->getSetting('apiUsername'),
-        );
-
-        $this->assertNotEmpty($this->flatworld->getSetting('apiPassword'));
-        $this->assertSame(
-            App::env('SALESFORCE_PASSWORD'),
-            $this->flatworld->getSetting('apiPassword'),
-        );
-
-        $this->assertNotEmpty($this->flatworld->getSetting('apiUrl'));
-        $this->assertSame(
-            App::env('SALESFORCE_API_URL'),
-            $this->flatworld->getSetting('apiUrl'),
-        );
-
-        $this->assertNotEmpty($this->flatworld->getSetting('apiConsumerKey'));
-        $this->assertSame(
-            App::env('SALESFORCE_CONSUMER_KEY'),
-            $this->flatworld->getSetting('apiConsumerKey'),
-        );
-
-        $this->assertNotEmpty(
-            $this->flatworld->getSetting('apiConsumerSecret'),
-        );
-        $this->assertSame(
-            App::env('SALESFORCE_CONSUMER_SECRET'),
-            $this->flatworld->getSetting('apiConsumerSecret'),
-        );
-
-        $this->assertNotEmpty(
-            $this->flatworld->getSetting('enableSalesforceApi'),
-        );
-        $this->assertSame(
-            App::env('SALESFORCE_CONNECT'),
-            $this->flatworld->getSetting('enableSalesforceApi'),
-        );
-
-        $this->assertNotEmpty(
-            $this->flatworld->getSetting('enableSalesforceSandbox'),
-        );
-        $this->assertSame(
-            App::env('SALESFORCE_SANDBOX'),
-            $this->flatworld->getSetting('enableSalesforceSandbox'),
-        );
-
-        $this->assertNotEmpty($this->flatworld->getSetting('totalMaxWeight'));
-        $this->assertSame(
-            '39750',
-            $this->flatworld->getSetting('totalMaxWeight'),
-        );
-
-        $this->assertNotEmpty($this->flatworld->getSetting('weightThreshold'));
-        $this->assertSame(
-            '150',
-            $this->flatworld->getSetting('weightThreshold'),
-        );
-
-        $this->assertNotEmpty(
-            $this->flatworld->getSetting('weightLimitMessage'),
-        );
-        $this->assertSame(
-            'Shipping weight limit reached. Please contact Fireclay Tile Salesperson.',
-            $this->flatworld->getSetting('weightLimitMessage'),
-        );
-
-        $weightPerSquareFoot = $this->flatworld->getSetting(
-            'weightPerSquareFoot',
-        );
-
-        $this->assertNotEmpty($weightPerSquareFoot);
-        $this->assertIsArray($weightPerSquareFoot);
-
-        $this->assertNotEmpty($weightPerSquareFoot[0][0]);
-        $this->assertSame('tile', $weightPerSquareFoot[0][0]);
-
-        $this->assertNotEmpty($weightPerSquareFoot[0][2]);
-        $this->assertSame('4.5', $weightPerSquareFoot[0][2]);
-
-        $this->assertNotEmpty(
-            $this->flatworld->getSetting('displayDebugMessages'),
-        );
-        $this->assertTrue(
-            (bool) $this->flatworld->getSetting('displayDebugMessages'),
-        );
-
-        $this->assertNotEmpty(
-            $this->flatworld->getSetting('flatRateCarrierCost'),
-        );
-        $this->assertSame(
-            '8.0',
-            $this->flatworld->getSetting('flatRateCarrierCost'),
-        );
-
-        $carrierClassOfServices = $this->flatworld->getSetting(
-            'carrierClassOfServices',
-        );
-
-        $this->assertIsArray($carrierClassOfServices);
-        $this->assertNotEmpty($carrierClassOfServices);
-        $this->assertSame($this->mockServiceList, $carrierClassOfServices);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
-    public function testSettingsTemplateHasFlatworldSpecificFields(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $settingsHtml = $this->flatworld->getSettingsHtml();
-
-        $this->assertNotEmpty($settingsHtml);
-        $this->assertStringContainsString('apiUrl-label', $settingsHtml);
-        $this->assertStringContainsString('apiUsername-label', $settingsHtml);
-        $this->assertStringContainsString('apiPassword-label', $settingsHtml);
-        $this->assertStringContainsString(
-            'apiConsumerKey-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'apiConsumerSecret-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'enableSalesforceApi-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'enableSalesforceSandbox-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'totalMaxWeight-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'weightThreshold-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'weightLimitMessage-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'weightPerSquareFoot-heading-1',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'weightPerSquareFoot-heading-2',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'weightPerSquareFoot-heading-3',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'displayDebugMessages-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'flatRateCarrierCost-label',
-            $settingsHtml,
-        );
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testDisplayNameReturnsAValidString(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $displayName = $this->flatworld->displayName();
-
-        $this->assertNotEmpty($displayName);
-        $this->assertSame('Flatworld', $displayName);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testIconUrlReturnsAValidString(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $iconUrl = $this->flatworld->getIconUrl();
-
-        $this->assertNotEmpty($iconUrl);
-        $this->assertSame(
-            'https://flatworld.test:80/cpresources/17b8c0e2/Flatworld.svg?v=1694438761',
-            $iconUrl,
-        );
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testServiceListReturnsAValidArrayOfServices(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $serviceList = $this->flatworld->getServiceList();
-
-        $this->assertIsArray($serviceList);
-        $this->assertNotEmpty($serviceList);
-        $this->assertSame($this->mockServiceList, $serviceList);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testDisplayDebugMessageDoesNotWriteToLogFileWhenDisabled(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        // Explicitly setting display debug messages to false
-        $this->_loggingEnabled = false;
-
-        $this->assertIsBool(
-            $this->_logMessage(
-                __METHOD__,
-                'This was not written to a log file!',
-            ),
-        );
-        $this->assertFalse(
-            $this->_logMessage(
-                __METHOD__,
-                'This was not written to a log file!',
-            ),
-        );
-
-        $this->_loggingEnabled = true;
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testDisplayDebugMessageWritesToLogFileWhenEnabled(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        // Explicitly setting display debug messages to true
-        $this->_loggingEnabled = true;
-
-        $this->assertIsBool(
-            $this->_logMessage(__METHOD__, 'This was written to a log file!'),
-        );
-        $this->assertTrue(
-            $this->_logMessage(__METHOD__, 'This was written to a log file!'),
-        );
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     * @throws Exception
-     */
-    public function testFetchShippingRatesReturnsEmptyRatesWhenAnOrderHasNoLineItems(): void
+    public function testRatesReturnsAnEmptyArrayWhenAnOrderHasNoLineItems(): void
     {
         $this->_logMessage(__METHOD__, 'running...');
 
         $mockOrder = $this->createMockOrder(false, false);
 
-        $rates = $this->flatworld->fetchShippingRates($mockOrder);
+        $rates = $this->flatworldVariable->getRates($mockOrder->id);
 
-        $this->assertIsArray($rates);
         $this->assertEmpty($rates);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     * @throws Exception
-     */
-    public function testFetchShippingRatesReturnsEmptyRatesWhenAnOrderHasNoShippingAddress(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $mockOrder = $this->createMockOrder(true, false);
-
-        $rates = $this->flatworld->fetchShippingRates($mockOrder);
-
         $this->assertIsArray($rates);
-        $this->assertEmpty($rates);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * Test fetchShippingRates method with a valid order. Currently uses fake rates data.
-     * @return void
-     * @throws Exception
-     */
-    public function testFetchShippingRatesReturnsParcelResults(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $mockOrder = $this->createMockOrder();
-
-        $rates = $this->flatworld->fetchShippingRates($mockOrder);
-        $this->_logMessage(__METHOD__, 'rates: ' . print_r($rates, true));
-
-        $this->assertIsArray($rates);
-        $this->assertNotEmpty($rates);
 
         $this->_logMessage(__METHOD__, 'done...');
     }
@@ -548,6 +193,200 @@ class FlatworldProviderTest extends Unit
             'flatRateCarrierCost' => '8.0',
             'carrierClassOfServices' => $this->mockServiceList,
         ];
+
+        $this->mockApiParcelResponse = Json::decode('
+            [
+                {
+                    "CarrierId": "4028|03",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS Ground",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/08",
+                    "PublishedRate": "44.22",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS Ground",
+                    "SubTotal": "23.34",
+                    "Total": "28.01",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "4028|12",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS 3 Day Select",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/12",
+                    "PublishedRate": "106.22",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS 3 Day Select",
+                    "SubTotal": "42.48",
+                    "Total": "50.98",
+                    "TransitDays": "3",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "4028|02",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS 2nd Day Air",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/09",
+                    "PublishedRate": "147.94",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS 2nd Day Air",
+                    "SubTotal": "42.9",
+                    "Total": "51.48",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "4028|13",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS Next Day Air Saver",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/08",
+                    "EstimatedDeliveryTime": "23:00 PT",
+                    "PublishedRate": "206.6",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS Next Day Air Saver",
+                    "SubTotal": "52.46",
+                    "Total": "62.95",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "4028|01",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS Next Day Air",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/08",
+                    "EstimatedDeliveryTime": "10:30 PT",
+                    "PublishedRate": "223.04",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS Next Day Air",
+                    "SubTotal": "55.34",
+                    "Total": "66.41",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "4028|59",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS Second Day Air AM",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/08",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "166.5",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS Second Day Air AM",
+                    "SubTotal": "58.28",
+                    "Total": "69.94",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "5624|First",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "United States Postal Service",
+                    "Days": "USPS First Class",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/09",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "64.3",
+                    "SCAC": "USPS",
+                    "ServiceLevel": "USPS First Class",
+                    "SubTotal": "62.997",
+                    "Total": "75.597",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "5624|GroundAdvantage",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "United States Postal Service",
+                    "Days": "USPS GroundAdvantage",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/09",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "64.3",
+                    "SCAC": "USPS",
+                    "ServiceLevel": "USPS GroundAdvantage",
+                    "SubTotal": "62.997",
+                    "Total": "75.597",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "5624|ParcelSelect",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "United States Postal Service",
+                    "Days": "USPS Parcel Select",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/09",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "64.3",
+                    "SCAC": "USPS",
+                    "ServiceLevel": "USPS Parcel Select",
+                    "SubTotal": "62.997",
+                    "Total": "75.597",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "5624|Priority",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "United States Postal Service",
+                    "Days": "USPS Priority",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/09",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "67.7",
+                    "SCAC": "USPS",
+                    "ServiceLevel": "USPS Priority",
+                    "SubTotal": "66.723",
+                    "Total": "80.063",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "5624|Express",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "United States Postal Service",
+                    "Days": "USPS Express",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/09",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "217.5",
+                    "SCAC": "USPS",
+                    "ServiceLevel": "USPS Express",
+                    "SubTotal": "220.225",
+                    "Total": "264.275",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                },
+                {
+                    "CarrierId": "4028|14",
+                    "CarrierMaximumCoverage": "100",
+                    "CarrierName": "UPS",
+                    "Days": "UPS Next Day Air Early AM",
+                    "Direct": "D",
+                    "EstimatedDeliveryDate": "2024/09/08",
+                    "EstimatedDeliveryTime": "08:00 PT",
+                    "PublishedRate": "294",
+                    "SCAC": "UPGD",
+                    "ServiceLevel": "UPS Next Day Air Early AM",
+                    "SubTotal": "294",
+                    "Total": "352.8",
+                    "TransitDays": "1",
+                    "Type": "parcel"
+                }
+            ]
+        ');
     }
 
     /**
