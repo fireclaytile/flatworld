@@ -874,6 +874,62 @@ class Rates extends Component
     }
 
     /**
+     * Determines the productId for an order line item.
+     *
+     * @param mixed $row A LineItem from the order.
+     * @return string
+     */
+    private function _setLineItemProductId($row): string
+    {
+        // This is taken directly from the fct Salesforce plugin.
+        if (
+            isset($row->options['masterSalesforceId']) and
+            empty($row->options['masterSalesforceId'])
+        ) {
+            return '';
+        }
+
+        $commerceService = craft\commerce\Plugin::getInstance();
+
+        // Get product.
+        $product = $commerceService
+            ->getProducts()
+            ->getProductById($row->getPurchasable()->productId);
+
+        $productId = $product->sizeSalesforceId
+            ? $product->sizeSalesforceId
+            : '01t340000043WQ6';
+
+        //  customMosaicTimestamp
+        if (
+            isset($row->options['customMosaicTimestamp']) and
+            !empty($row->options['customMosaicTimestamp'])
+        ) {
+            $productId = $row->options['salesforceId']
+                ? $row->options['salesforceId']
+                : 'a1s34000001n6bo';
+        }
+
+        // Deal with masterSalesforceId
+        if (
+            isset($row->options['masterSalesforceId']) and
+            !empty($row->options['masterSalesforceId'])
+        ) {
+            $productId = $row->options['masterSalesforceId'];
+        }
+
+        // For generalSamples products set the productId here
+        if (
+            isset($row->options['generalSampleSalesforceId']) and
+            !empty($row->options['generalSampleSalesforceId'])
+        ) {
+            $productId = $row->options['generalSampleSalesforceId'];
+        }
+
+        return $productId;
+    }
+
+    /**
      * Sets the _shippingRequest property based on the order details.
      *
      * @return void
@@ -893,7 +949,7 @@ class Rates extends Component
 
         foreach ($order->lineItems as $item) {
             $this->_shippingRequest->addLineItem(
-                new LineItem($item->purchasable->product->id, $item->qty),
+                new LineItem($this->_setLineItemProductId($item), $item->qty),
             );
         }
 
