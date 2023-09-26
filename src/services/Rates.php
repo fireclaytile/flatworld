@@ -1221,12 +1221,12 @@ class Rates extends Component
      * Find and return the rate with the quickest estimated delivery date and
      * time.
      *
-     * @param array $jsonData JSON data containing shipping rate options
+     * @param mixed $jsonData JSON data containing shipping rate options
      * @param \DateTime $now (optional) The current date and time, default is now
      * @return array|null
      */
     public function findQuickestRate(
-        array $jsonData,
+        mixed $jsonData,
         \DateTime $now = null,
     ): ?array {
         if (!$now) {
@@ -1273,11 +1273,16 @@ class Rates extends Component
     /**
      * Find and return the cheapest rate option.
      *
-     * @param array $jsonData JSON data containing shipping rate options
+     * @param mixed $jsonData JSON data containing shipping rate options
      * @return array|null
      */
-    public function findCheapestRate(array $jsonData): ?array
+    public function findCheapestRate(mixed $jsonData): ?array
     {
+        // if jsonData is a string, turn it into an object
+        if (is_string($jsonData)) {
+            $jsonData = Json::decode($jsonData);
+        }
+
         $cheapestRate = null;
         $lowestTotal = PHP_FLOAT_MAX;
 
