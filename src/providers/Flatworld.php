@@ -21,6 +21,7 @@ use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
+use fireclaytile\flatworld\services\Rates as RatesService;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -48,6 +49,11 @@ class Flatworld extends Provider
      * @var string
      */
     public $dimensionUnit = 'in';
+
+    /**
+     * @var RatesService
+     */
+    private RatesService $_ratesService;
 
     /**
      * Gets the plugin's display name.
@@ -129,9 +135,11 @@ class Flatworld extends Provider
             $this->_logMessage(__METHOD__, 'Fetching new rates', $uniqueId);
             $this->_logMessage(__METHOD__, 'CALL STARTED', $uniqueId);
 
-            $this->_rates = FlatworldPlugin::getInstance()->ratesService->getRates(
-                $order,
+            $this->_ratesService = new RatesService(
+                $this->getSetting('displayDebugMessages'),
             );
+
+            $this->_rates = $this->_ratesService->getRates($order);
 
             $this->_logMessage(__METHOD__, 'CALL FINISHED', $uniqueId);
 
@@ -157,7 +165,7 @@ class Flatworld extends Provider
      */
     public function getOrder()
     {
-        return FlatworldPlugin::getInstance()->ratesService->getOrder();
+        return $this->_ratesService->getOrder();
     }
 
     /**
@@ -189,7 +197,7 @@ class Flatworld extends Provider
      */
     public function fetchConnection(): bool
     {
-        return FlatworldPlugin::getInstance()->ratesService->testRatesConnection();
+        return $this->_ratesService->testRatesConnection();
     }
 
     /**
