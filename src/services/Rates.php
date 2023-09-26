@@ -999,121 +999,121 @@ class Rates extends Component
         $this->setCheapestServiceHandle();
 
         if (
-            !empty($this->getCheapestRate()) &&
-            !empty($this->getQuickestRate())
+            empty($this->getCheapestRate()) &&
+            empty($this->getQuickestRate())
         ) {
             $this->_logMessage(
                 __METHOD__,
-                'Found cheapest and fastest rates and carrier details',
+                'Didnt find any cheapest and fastest carrier details, so returning empty-handed.',
             );
 
-            $cheapestRate = $this->getCheapestRate();
-            $quickestRate = $this->getQuickestRate();
-            $cheapestServiceHandle = $this->getCheapestServiceHandle();
-            $quickestServiceHandle = $this->getQuickestServiceHandle();
-
-            $rates = [];
-
-            $handles = array_keys($this->getServiceList());
-
-            $foundServiceHandle = false;
-
-            // Set amounts for the cheapest and quickest options
-            foreach ($handles as $handle) {
-                if ($handle === $cheapestServiceHandle) {
-                    $foundServiceHandle = true;
-
-                    $transitTime = $cheapestRate['TransitDays'];
-                    $arrivalDateText = $cheapestRate['EstimatedDeliveryDate'];
-
-                    $arrival = $this->getArrival($transitTime);
-
-                    $rates[$handle]['arrival'] = $arrival;
-                    $rates[$handle]['transitTime'] = $transitTime;
-                    $rates[$handle]['arrivalDateText'] = $arrivalDateText;
-                    $rates[$handle]['amount'] = $cheapestRate['Total'];
-                }
-
-                if ($handle === $quickestServiceHandle) {
-                    $foundServiceHandle = true;
-
-                    $transitTime = $quickestRate['TransitDays'];
-                    $arrivalDateText = $quickestRate['EstimatedDeliveryDate'];
-
-                    $arrival = $this->getArrival($transitTime);
-
-                    $rates[$handle]['arrival'] = $arrival;
-                    $rates[$handle]['transitTime'] = $transitTime;
-                    $rates[$handle]['arrivalDateText'] = $arrivalDateText;
-                    $rates[$handle]['amount'] = $quickestRate['Total'];
-                }
-            }
-
-            if (!$foundServiceHandle) {
-                $this->_logMessage(
-                    __METHOD__,
-                    'Didnt find any matching carrier handles',
-                );
-            }
-
-            // Apply flat rate shipping for samples only orders: https://app.asana.com/0/1200248609605430/1201862416773959/f
-            if (
-                !$this->orderContainsStandardProducts() &&
-                !$this->orderContainsMerchandise() &&
-                $this->orderContainsSampleProducts() &&
-                $foundServiceHandle
-            ) {
-                $rates = $this->setFlatRate($rates);
-
-                $this->_logMessage(
-                    __METHOD__,
-                    'Applied Flat Rate Shipping Carrier',
-                );
-            }
-
-            // Sort so the lowest cost carrier is first/default
-            $amount = array_column($rates, 'amount');
-            array_multisort($amount, SORT_ASC, $rates);
-
-            // Shipping for samples only orders for trade is $0 and $8 for everyone else
-            // (We set this on the lowest cost carrier which also overrides flat rate cost)
-            if (
-                !$this->orderContainsStandardProducts() &&
-                !$this->orderContainsMerchandise() &&
-                $this->orderContainsSampleProducts()
-            ) {
-                $firstCarrier = array_slice($rates, 0, 1);
-                $firstServiceHandle = key($firstCarrier);
-
-                if (
-                    !empty($this->_order->user) &&
-                    $this->_order->user->isInGroup('customersTrade15')
-                ) {
-                    $rates[$firstServiceHandle]['amount'] = 0;
-                    $this->_logMessage(
-                        __METHOD__,
-                        'Applied Free Shipping on Samples only for Trade account',
-                    );
-                } else {
-                    $rates[$firstServiceHandle][
-                        'amount'
-                    ] = $this->getFlatRateAmount();
-                    $this->_logMessage(
-                        __METHOD__,
-                        'Applied $8 flat rate Shipping on Samples only for samples only orders',
-                    );
-                }
-            }
-
-            return $this->_modifyRatesEvent($rates, $this->_order);
+            return [];
         }
 
         $this->_logMessage(
             __METHOD__,
-            'Didnt find any cheapest and fastest carrier details',
+            'Found cheapest and fastest rates and carrier details',
         );
 
-        return [];
+        $cheapestRate = $this->getCheapestRate();
+        $quickestRate = $this->getQuickestRate();
+        $cheapestServiceHandle = $this->getCheapestServiceHandle();
+        $quickestServiceHandle = $this->getQuickestServiceHandle();
+
+        $rates = [];
+
+        $handles = array_keys($this->getServiceList());
+
+        $foundServiceHandle = false;
+
+        // Set amounts for the cheapest and quickest options
+        foreach ($handles as $handle) {
+            if ($handle === $cheapestServiceHandle) {
+                $foundServiceHandle = true;
+
+                $transitTime = $cheapestRate['TransitDays'];
+                $arrivalDateText = $cheapestRate['EstimatedDeliveryDate'];
+
+                $arrival = $this->getArrival($transitTime);
+
+                $rates[$handle]['arrival'] = $arrival;
+                $rates[$handle]['transitTime'] = $transitTime;
+                $rates[$handle]['arrivalDateText'] = $arrivalDateText;
+                $rates[$handle]['amount'] = $cheapestRate['Total'];
+            }
+
+            if ($handle === $quickestServiceHandle) {
+                $foundServiceHandle = true;
+
+                $transitTime = $quickestRate['TransitDays'];
+                $arrivalDateText = $quickestRate['EstimatedDeliveryDate'];
+
+                $arrival = $this->getArrival($transitTime);
+
+                $rates[$handle]['arrival'] = $arrival;
+                $rates[$handle]['transitTime'] = $transitTime;
+                $rates[$handle]['arrivalDateText'] = $arrivalDateText;
+                $rates[$handle]['amount'] = $quickestRate['Total'];
+            }
+        }
+
+        if (!$foundServiceHandle) {
+            $this->_logMessage(
+                __METHOD__,
+                'Didnt find any matching carrier handles',
+            );
+        }
+
+        // Apply flat rate shipping for samples only orders: https://app.asana.com/0/1200248609605430/1201862416773959/f
+        if (
+            !$this->orderContainsStandardProducts() &&
+            !$this->orderContainsMerchandise() &&
+            $this->orderContainsSampleProducts() &&
+            $foundServiceHandle
+        ) {
+            $rates = $this->setFlatRate($rates);
+
+            $this->_logMessage(
+                __METHOD__,
+                'Applied Flat Rate Shipping Carrier',
+            );
+        }
+
+        // Sort so the lowest cost carrier is first/default
+        $amount = array_column($rates, 'amount');
+        array_multisort($amount, SORT_ASC, $rates);
+
+        // Shipping for samples only orders for trade is $0 and $8 for everyone else
+        // (We set this on the lowest cost carrier which also overrides flat rate cost)
+        if (
+            !$this->orderContainsStandardProducts() &&
+            !$this->orderContainsMerchandise() &&
+            $this->orderContainsSampleProducts()
+        ) {
+            $firstCarrier = array_slice($rates, 0, 1);
+            $firstServiceHandle = key($firstCarrier);
+
+            if (
+                !empty($this->_order->user) &&
+                $this->_order->user->isInGroup('customersTrade15')
+            ) {
+                $rates[$firstServiceHandle]['amount'] = 0;
+                $this->_logMessage(
+                    __METHOD__,
+                    'Applied Free Shipping on Samples only for Trade account',
+                );
+            } else {
+                $rates[$firstServiceHandle][
+                    'amount'
+                ] = $this->getFlatRateAmount();
+                $this->_logMessage(
+                    __METHOD__,
+                    'Applied $8 flat rate Shipping on Samples only for samples only orders',
+                );
+            }
+        }
+
+        return $this->_modifyRatesEvent($rates, $this->_order);
     }
 
     /**
@@ -1246,6 +1246,10 @@ class Rates extends Component
         $quickestRate = null;
         $minTimeDiff = PHP_INT_MAX;
 
+        if ($jsonData == null) {
+            return null;
+        }
+
         foreach ($jsonData as $rate) {
             if (isset($rate['EstimatedDeliveryDate'])) {
                 $deliveryDate = \DateTime::createFromFormat(
@@ -1296,6 +1300,10 @@ class Rates extends Component
         $cheapestRate = null;
         $lowestTotal = PHP_FLOAT_MAX;
 
+        if ($jsonData == null) {
+            return null;
+        }
+
         foreach ($jsonData as $rate) {
             if (isset($rate['Total'])) {
                 $total = (float) $rate['Total'];
@@ -1321,22 +1329,21 @@ class Rates extends Component
      */
     public function getArrival(string $transitTime): string
     {
-        if ($transitTime > 0) {
-            // Pure hack until its confirmed
-            if ($transitTime >= 21) {
-                return '21 days or more';
-            } elseif ($transitTime >= 14) {
-                return '14-21 days';
-            } elseif ($transitTime >= 7) {
-                return '7-14 days';
-            } elseif ($transitTime >= 3) {
-                return '3-7 days';
-            } elseif ($transitTime >= 1) {
-                return '1-3 days';
-            }
+        if ($transitTime <= 0) {
+            return '';
         }
 
-        return '';
+        // Pure hack until its confirmed
+        if ($transitTime >= 21) {
+            return '21 days or more';
+        } elseif ($transitTime >= 14) {
+            return '14-21 days';
+        } elseif ($transitTime >= 7) {
+            return '7-14 days';
+        } elseif ($transitTime >= 3) {
+            return '3-7 days';
+        }
+        return '1-3 days';
     }
 
     /**
