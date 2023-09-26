@@ -95,6 +95,7 @@
     name: 'enableSalesforceSandbox',
     on: provider.settings.enableSalesforceSandbox ?? false,
     required: true,
+    suggestEnvVars: true,
     warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableSalesforceSandbox', 'postie'),
 }) }}
 
