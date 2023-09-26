@@ -270,7 +270,9 @@ class Flatworld extends Provider
         $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}, ORDER ID: {$order->id}";
         $this->_logMessage(__METHOD__, $debugMessage, $uniqueId);
 
-        $mailer = new Mailer($this->getSetting('displayDebugMessages'));
-        $mailer->sendMail($debugMessage);
+        if ($this->getSetting('enableErrorEmailMessages')) {
+            $mailer = new Mailer($this->getSetting('displayDebugMessages'));
+            $mailer->sendMail($debugMessage);
+        }
     }
 }

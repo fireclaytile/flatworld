@@ -79,10 +79,10 @@
 
 {{ forms.autosuggestField({
     label: 'Enable Salesforce API' | t('postie'),
-    instructions: 'Enter 1 for yes, 0 for no. It is highly suggested to use an environment variable here. Use this as an emergency API "killswitch". Using an ' | t('postie'),
+    instructions: 'Enter 1 for yes, 0 for no. It is highly suggested to use an environment variable here. Use this as an emergency API "killswitch".' | t('postie'),
     id: 'enableSalesforceApi',
     name: 'enableSalesforceApi',
-    on: provider.settings.enableSalesforceApi ?? false,
+    on: provider.settings.enableSalesforceApi ?? '',
     required: true,
     suggestEnvVars: true,
     warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableSalesforceApi', 'postie'),
@@ -93,7 +93,7 @@
     instructions: 'Enter 1 for yes, 0 for no. It is highly suggested to use an environment variable here. Enable this on DEV environments. Not for use on PROD.' | t('postie'),
     id: 'enableSalesforceSandbox',
     name: 'enableSalesforceSandbox',
-    on: provider.settings.enableSalesforceSandbox ?? false,
+    on: provider.settings.enableSalesforceSandbox ?? '',
     required: true,
     suggestEnvVars: true,
     warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableSalesforceSandbox', 'postie'),
@@ -164,6 +164,16 @@
     on: provider.settings.displayDebugMessages ?? false,
     required: true,
     warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.displayDebugMessages', 'postie'),
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Enable error emails' | t('postie'),
+    instructions: 'Whether sending error emails should be enabled.' | t('postie', { name: provider.displayName() }),
+    id: 'enableErrorEmailMessages',
+    name: 'enableErrorEmailMessages',
+    on: provider.settings.enableErrorEmailMessages ?? true,
+    required: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableErrorEmailMessages', 'postie'),
 }) }}
 
 {{ forms.autosuggestField({

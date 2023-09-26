@@ -290,10 +290,15 @@ class Rates extends Component
         if ($problems && !empty($problemMessage)) {
             $this->_logMessage(
                 __METHOD__,
-                'Invalid line items found, bailing out and sending email',
+                'Invalid line items found, bailing out...',
             );
 
-            FlatworldPlugin::getInstance()->mailer->sendMail($problemMessage);
+            if ($this->_getSetting('enableErrorEmailMessages')) {
+                $this->_logMessage(__METHOD__, 'Sending email with error.');
+                FlatworldPlugin::getInstance()->mailer->sendMail(
+                    $problemMessage,
+                );
+            }
 
             return false;
         }
