@@ -1,10 +1,15 @@
 # Flatworld Changelog
 
+## 0.9.5 - 2023-09-26
+
+-   Fix Rates service instantiation.
+-   Fix some lack of "happy path" testing.
+
 ## 0.9.4 - 2023-09-26
 
 -   Add enableErrorEmailMessages setting.
 -   Fix default on other settings.
--   Fix Rates service instanciation.
+-   Fix Rates service instantiation.
 
 ## 0.9.3 - 2023-09-26
 
