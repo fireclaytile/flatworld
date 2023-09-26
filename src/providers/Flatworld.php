@@ -165,6 +165,9 @@ class Flatworld extends Provider
      */
     public function getOrder()
     {
+        $this->_ratesService = new RatesService(
+            $this->getSetting('displayDebugMessages'),
+        );
         return $this->_ratesService->getOrder();
     }
 
@@ -197,6 +200,9 @@ class Flatworld extends Provider
      */
     public function fetchConnection(): bool
     {
+        $this->_ratesService = new RatesService(
+            $this->getSetting('displayDebugMessages'),
+        );
         return $this->_ratesService->testRatesConnection();
     }
 
