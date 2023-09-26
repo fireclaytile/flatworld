@@ -281,7 +281,11 @@ class Flatworld extends Provider
         }
 
         $order = $this->getOrder();
-        $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}, ORDER ID: {$order->id}";
+        $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}";
+        if ($order) {
+            $debugMessage .= ", ORDER ID: {$order->id}";
+        }
+
         $this->_logMessage(__METHOD__, $debugMessage, $uniqueId);
 
         if ($this->getSetting('enableErrorEmailMessages')) {
