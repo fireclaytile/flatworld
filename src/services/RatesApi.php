@@ -50,7 +50,7 @@ class RatesApi extends Component
         $this->_flatworld = Postie::getInstance()
             ->getProviders()
             ->getProviderByHandle('flatworld');
-        $this->_salesforceEnabled = !$this->_flatworld->getSetting(
+        $this->_salesforceEnabled = $this->_flatworld->getSetting(
             'enableSalesforceApi',
         );
     }
