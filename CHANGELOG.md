@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.3 - 2023-09-26
+
+-   Fix type mismatch on quickest function, for real this time?
+
 ## 0.9.2 - 2023-09-26
 
 -   Add suggestEnvVars to enableSalesforceSandbox setting. TODO: maybe we don't need this setting in this plugin?

@@ -1229,6 +1229,11 @@ class Rates extends Component
         mixed $jsonData,
         \DateTime $now = null,
     ): ?array {
+        // if jsonData is a string, turn it into an object
+        if (is_string($jsonData)) {
+            $jsonData = Json::decode($jsonData);
+        }
+
         if (!$now) {
             $now = new \DateTime();
         }
