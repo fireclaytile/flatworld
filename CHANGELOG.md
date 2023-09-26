@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.7 - 2023-09-26
+
+-   Fixed settings check in RatesAPI service
+
 ## 0.9.6 - 2023-09-26
 
 -   Fixed some error reporting.
