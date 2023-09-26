@@ -1,5 +1,11 @@
 # Flatworld Changelog
 
+## 0.9.4 - 2023-09-26
+
+-   Add enableErrorEmailMessages setting.
+-   Fix default on other settings.
+-   Fix Rates service instanciation.
+
 ## 0.9.3 - 2023-09-26
 
 -   Fix type mismatch on quickest function, for real this time?
