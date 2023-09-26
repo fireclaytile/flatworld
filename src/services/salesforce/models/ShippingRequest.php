@@ -2,6 +2,8 @@
 
 namespace fireclaytile\flatworld\services\salesforce\models;
 
+use fireclaytile\flatworld\services\salesforce\models\LineItem;
+
 /**
  * ShippingRequest model class.
  *
@@ -45,6 +47,7 @@ class ShippingRequest
      *
      * @param string $zipCode Zip code
      * @param bool $liftGate Lift gate?
+     * @param string $orderType Order type. Sample or Order
      * @param array $lineItems Line items from the order
      */
     public function __construct(
@@ -57,5 +60,10 @@ class ShippingRequest
         $this->liftGate = $liftGate;
         $this->orderType = $orderType;
         $this->lineItems = $lineItems;
+    }
+
+    public function addLineItem(LineItem $lineItem)
+    {
+        $this->lineItems[] = $lineItem;
     }
 }

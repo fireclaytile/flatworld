@@ -1,5 +1,11 @@
 # Flatworld Changelog
 
+## 0.9.1 - 2023-09-26
+
+-   Fix Connection Test
+-   Fix SalesforceAPI Integration
+-   Remove other Paceject-specific code
+
 ## 0.9.0 - 2023-09-25
 
 -   Lots of cleanup/refactoring/removing of unused code

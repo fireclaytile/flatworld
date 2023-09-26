@@ -274,7 +274,7 @@ class RatesServiceTest extends Unit
      * @return void
      * @throws InvalidConfigException
      */
-    public function testSetPackageDetailsListReturnsValidArray(): void
+    public function testGetShippingRequestReturnsValidObject(): void
     {
         $this->_logMessage(__METHOD__, 'running...');
 
@@ -290,70 +290,18 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
 
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
+        $shippingRequest = $this->ratesService->getShippingRequest();
 
-        $this->assertIsArray($packageDetailsList);
-        $this->assertNotEmpty($packageDetailsList);
-
-        $this->assertArrayHasKey(0, $packageDetailsList);
-
-        $this->assertIsArray($packageDetailsList[0]);
-        $this->assertNotEmpty($packageDetailsList[0]);
-
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     * @throws InvalidConfigException
-     */
-    public function testGetPayloadReturnsValidArray(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $mockOrder = $this->createMockOrder();
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
+        $this->assertIsObject($shippingRequest);
+        $this->assertNotEmpty($shippingRequest);
+        $this->assertInstanceOf(
+            'fireclaytile\flatworld\services\salesforce\models\ShippingRequest',
+            $shippingRequest,
         );
 
-        $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->countProductTypes();
-        $this->ratesService->setPieces();
-        $this->ratesService->setTotalWeight();
-        $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
-
-        $payload = $this->ratesService->getPayload();
-
-        codecept_debug($payload);
-        $this->assertIsArray($payload);
-        $this->assertNotEmpty($payload);
-
-        $this->assertArrayHasKey('PackageDetailsList', $payload);
-
-        $packageDetailsList = $payload['PackageDetailsList'];
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertNotEmpty($packageDetailsList);
-
-        $this->assertArrayHasKey(0, $packageDetailsList);
-
-        $this->assertIsArray($packageDetailsList[0]);
-        $this->assertNotEmpty($packageDetailsList[0]);
-
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
+        $this->assertSame('10001', $shippingRequest->zipCode);
 
         $this->_logMessage(__METHOD__, 'done...');
     }
@@ -766,321 +714,6 @@ class RatesServiceTest extends Unit
     /**
      * @return void
      */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndIsUnderWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(false);
-        $this->ratesService->setOrderContainsSampleProducts(false);
-        $this->ratesService->setTotalWeight(140);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndOverWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(false);
-        $this->ratesService->setOrderContainsSampleProducts(false);
-        $this->ratesService->setTotalWeight(1500);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
-        $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsSampleProductsOnly(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(false);
-        $this->ratesService->setOrderContainsMerchandise(false);
-        $this->ratesService->setOrderContainsSampleProducts(true);
-        $this->ratesService->setTotalWeight(150);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsMerchandiseOnly(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(false);
-        $this->ratesService->setOrderContainsMerchandise(true);
-        $this->ratesService->setOrderContainsSampleProducts(false);
-        $this->ratesService->setTotalWeight(150);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsSampleProductsAndMerchandiseOnly(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(false);
-        $this->ratesService->setOrderContainsMerchandise(true);
-        $this->ratesService->setOrderContainsSampleProducts(true);
-        $this->ratesService->setTotalWeight(150);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndSamplesAndOverWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(false);
-        $this->ratesService->setOrderContainsSampleProducts(true);
-        $this->ratesService->setTotalWeight(14900);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
-        $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndSamplesAndUnderWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(false);
-        $this->ratesService->setOrderContainsSampleProducts(true);
-        $this->ratesService->setTotalWeight(149);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndMerchandiseAndOverWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(true);
-        $this->ratesService->setOrderContainsSampleProducts(false);
-        $this->ratesService->setTotalWeight(11400);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
-        $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndMerchandiseAndUnderWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(true);
-        $this->ratesService->setOrderContainsSampleProducts(false);
-        $this->ratesService->setTotalWeight(100);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsPalletWhenOrderContainsStandardProductsAndSampleProductsAndMerchandiseAndOverWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(true);
-        $this->ratesService->setOrderContainsSampleProducts(true);
-        $this->ratesService->setTotalWeight(10000);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('PackageNumber', $packageDetailsList[0]);
-        $this->assertSame('Pallet', $packageDetailsList[0]['PackageNumber']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageDetailsListReturnsSingleBoxWhenOrderContainsStandardProductsAndSampleProductsAndMerchandiseAndUnderWeightThreshold(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
-
-        $this->ratesService->setOrderContainsStandardProducts(true);
-        $this->ratesService->setOrderContainsMerchandise(true);
-        $this->ratesService->setOrderContainsSampleProducts(true);
-        $this->ratesService->setTotalWeight(100);
-        $this->ratesService->setPackageDetailsList();
-
-        $packageDetailsList = $this->ratesService->getPackageDetailsList();
-
-        $this->assertIsArray($packageDetailsList);
-        $this->assertArrayHasKey(0, $packageDetailsList);
-        $this->assertArrayHasKey('Weight', $packageDetailsList[0]);
-        $this->assertArrayHasKey('Name', $packageDetailsList[0]);
-        $this->assertSame('SingleBox', $packageDetailsList[0]['Name']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
     public function testCheckLineItemsReturnsFalseWhenAnOrderHasNoLineItems(): void
     {
         $this->_logMessage(__METHOD__, 'running...');
@@ -1256,7 +889,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1302,7 +935,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1341,7 +974,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1379,7 +1012,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1417,7 +1050,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1455,7 +1088,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1492,7 +1125,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1566,7 +1199,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1614,7 +1247,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1664,7 +1297,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
         $this->ratesService->setResponse($this->mockApiParcelResponse);
 
         $rates = $this->ratesService->responseRates();
@@ -1733,7 +1366,7 @@ class RatesServiceTest extends Unit
         $this->ratesService->setPieces();
         $this->ratesService->setTotalWeight();
         $this->ratesService->checkWeightLimit();
-        $this->ratesService->setPackageDetailsList();
+        $this->ratesService->setShippingRequest();
 
         // Lets check the cache for rates - this will be an array or be false
         $ratesCache = $this->ratesService->getRatesCache();

@@ -10,6 +10,9 @@ use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
+use fireclaytile\flatworld\services\RatesApi;
+use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
+use fireclaytile\flatworld\services\salesforce\models\LineItem;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use verbb\postie\Postie;
@@ -28,6 +31,8 @@ class Rates extends Component
      * @var FlatworldProvider
      */
     protected FlatworldProvider $flatworld;
+
+    private RatesApi $_ratesApiService;
 
     /**
      * The Commerce order object.
@@ -54,13 +59,11 @@ class Rates extends Component
     private $_response;
 
     /**
-     * Array of package details.
+     * ShippingRequest object.
      *
-     * TODO: Determine if this is still needed. It's a holdover from the Pacejet plugin
-     *
-     * @var array
+     * @var ShippingRequest
      */
-    private array $_packageDetailsList;
+    private ShippingRequest $_shippingRequest;
 
     /**
      * @var bool
@@ -145,15 +148,17 @@ class Rates extends Component
         $this->setPieces();
         $this->setTotalWeight();
 
+        // ensure there is a weight.
         if (!$this->checkTotalWeight()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
+        // ensure the weight is within the limit.
         if (!$this->checkWeightLimit()) {
             return $this->_modifyRatesEvent([], $this->_order);
         }
 
-        $this->setPackageDetailsList();
+        $this->setShippingRequest();
 
         // Lets check the rates cache before making an API request - this will be an array or be false
         $ratesCache = $this->getRatesCache();
@@ -864,60 +869,45 @@ class Rates extends Component
     }
 
     /**
-     * Sets the _packageDetailsList property depending on if the order contains
-     * standard products, sample products, or merch.
-     *
-     * TODO: Determine how much (if any) of this is still needed. It's a holdover from the Pacejet plugin.
+     * Sets the _shippingRequest property based on the order details.
      *
      * @return void
      */
-    public function setPackageDetailsList(): void
+    public function setShippingRequest(): void
     {
-        // There is also a threshold of 150 lbs. After that threshold, Flatworld
-        // seems to treat both Single box packing and Pallet as the "same".
+        $order = $this->getOrder();
 
-        // If an order contains standard products, its over weight threshold -
-        // doesnt make a difference if it contains samples and or merch - its
-        // over weight threshold
+        // TODO: Set liftgate option
+
+        $this->_shippingRequest = new ShippingRequest(
+            $order->shippingAddress->zipCode,
+            false,
+            'Sample',
+            [],
+        );
+
+        foreach ($order->lineItems as $item) {
+            $this->_shippingRequest->addLineItem(
+                new LineItem($item->purchasable->product->id, $item->qty),
+            );
+        }
+
         if (
-            $this->orderContainsStandardProducts() &&
-            !$this->underWeightThreshold()
-        ) {
-            $this->setPallet();
-        }
-
-        // If an order contains standard products, its under weight threshold -
-        // doesnt make a difference if it contains samples and or merch - has to
-        // use a single box
-        elseif (
-            $this->orderContainsStandardProducts() &&
-            $this->underWeightThreshold()
-        ) {
-            $this->setSingleBox();
-        }
-
-        // If an order contains sample products or merch, it has to use a single box
-        elseif (
-            $this->orderContainsSampleProducts() ||
+            $this->orderContainsStandardProducts() ||
             $this->orderContainsMerchandise()
         ) {
-            $this->setSingleBox();
-        }
-
-        // There is an issue...Should never get this far!
-        else {
-            $this->_logMessage(__METHOD__, 'No packing method was set');
+            $this->_shippingRequest->orderType = 'Order';
         }
     }
 
     /**
-     * Gets the _packageDetailsList property.
+     * Gets the _shippingRequest property.
      *
-     * @return array
+     * @return ShippingRequest
      */
-    public function getPackageDetailsList(): array
+    public function getShippingRequest(): ShippingRequest
     {
-        return $this->_packageDetailsList;
+        return $this->_shippingRequest;
     }
 
     /**
@@ -932,78 +922,20 @@ class Rates extends Component
     }
 
     /**
-     * Sets the _packageDetailsList property to an array containing a single box
-     * name and total weight.
+     * Tests the connection to the Rates API.
      *
-     * TODO: Determine if this is still needed. It's a holdover from the Pacejet
-     * plugin.
-     *
-     * @return void
+     * @return boolean
      */
-    public function setSingleBox(): void
+    public function testRatesConnection(): bool
     {
-        $this->_packageDetailsList = [
-            [
-                'Name' => 'SingleBox',
-                'Weight' => $this->getTotalWeight(),
-            ],
-        ];
+        $this->_logMessage(__METHOD__, 'Testing Rates API Connection');
 
-        $this->_logMessage(
-            __METHOD__,
-            Json::encode($this->_packageDetailsList),
-        );
-    }
+        $this->_ratesApiService = FlatworldPlugin::getInstance()->ratesApi;
+        $result = $this->_ratesApiService->salesforceConnect();
 
-    /**
-     * Sets the _packageDetailsList property to an array containing a pallet
-     * name and total weight.
-     *
-     * TODO: Determine if this is still needed. It's a holdover from the Pacejet
-     * plugin.
-     *
-     * @return void
-     */
-    public function setPallet(): void
-    {
-        $this->_packageDetailsList = [
-            [
-                'PackageNumber' => 'Pallet',
-                'Weight' => $this->getTotalWeight(),
-            ],
-        ];
+        $this->_logMessage(__METHOD__, 'Rates API Connection: ' . $result);
 
-        $this->_logMessage(
-            __METHOD__,
-            Json::encode($this->_packageDetailsList),
-        );
-    }
-
-    /**
-     * Returns an array of settings to use as a payload for the API request.
-     *
-     * @return array
-     */
-    public function getPayload(): array
-    {
-        // SF API request body should look somethng like this (when turned into JSON):
-        // 	{
-        // 	  "ZipCode": "11111",
-        // 	  "LineItems": [
-        // 	    {
-        // 		  "ProductId": "12345",
-        // 		  "Quantity": 25
-        // 		}
-        // 	  ]
-        // 	}
-
-        // TODO: Change this return to match the example just above. It's from the Pacejet plugin.
-        return [
-            'PackageDetailsList' => $this->getPackageDetailsList(),
-            'Location' => $this->_getSetting('username'),
-            'LicenseID' => $this->_getSetting('licenseId'),
-            'UpsLicenseID' => $this->_getSetting('upsLicenseId'),
-        ];
+        return $result;
     }
 
     /**
@@ -1014,20 +946,13 @@ class Rates extends Component
      */
     public function requestRates()
     {
-        $payload = $this->getPayload();
+        $shippingRequest = $this->_shippingRequest;
+        $body = Json::encode($shippingRequest);
 
-        $body = Json::encode($payload);
+        $this->_logMessage(__METHOD__, 'ShippingRequest: ' . $body);
 
-        $this->_logMessage(__METHOD__, 'Payload: ' . $body);
-
-        // (held over from Pacejet plugin)
-        // Not entirely sure we need this but adding it in anyways as other Postie
-        // providers seem to use it
-        $this->beforeSendPayload($this, $payload, $this->_order);
-
-        $response = $this->_getRequest('POST', 'Rates', [
-            'body' => $body,
-        ]);
+        $this->_ratesApiService = FlatworldPlugin::getInstance()->ratesApi;
+        $response = $this->_ratesApiService->getRates($shippingRequest);
 
         $this->setResponse($response);
     }
@@ -1513,75 +1438,20 @@ class Rates extends Component
             return false;
         }
 
-        $packageDetailsList = $this->getPackageDetailsList();
+        $shippingRequest = $this->getShippingRequest();
 
-        if (!$packageDetailsList || !$packageDetailsList[0]) {
-            $this->_logMessage(__METHOD__, 'Package Details List was null');
-
+        if (!$shippingRequest || !$shippingRequest->zipCode) {
+            $this->_logMessage(__METHOD__, 'Shipping Request was null');
             return false;
         }
 
-        $packingName = 'SingleBoxOrPallet';
+        $zipcode = $order->shippingAddress->zipCode;
+        $totalWeight = $this->_totalWeight;
 
-        if (!empty($packageDetailsList[0]['Name'])) {
-            $packingName = $packageDetailsList[0]['Name'];
-        } elseif (!empty($packageDetailsList[0]['PackageNumber'])) {
-            $packingName = $packageDetailsList[0]['PackageNumber'];
-        }
-
-        $packingWeight = $packageDetailsList[0]['Weight'];
-
-        // Cart ID + Packing Method + Total Weight
-        $cacheKey = "$order->id--$packingName--$packingWeight";
+        // Cart ID + Zipcode + Total Weight
+        $cacheKey = "$order->id--$zipcode--$totalWeight";
 
         return str_replace(' ', '--', $cacheKey);
-    }
-
-    /**
-     * Makes a request to our SalesForce API to get rates. Returns an array of rates.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param array $options
-     * @return mixed|null
-     * @throws GuzzleException
-     */
-    private function _getRequest(
-        string $method,
-        string $uri,
-        array $options = [],
-    ) {
-        $this->_logMessage(__METHOD__, 'Making new API request :: ' . $uri);
-
-        $response = $this->_getClient()->request(
-            $method,
-            ltrim($uri, '/'),
-            $options,
-        );
-
-        return Json::decode((string) $response->getBody());
-    }
-
-    /**
-     * Creates a Guzzle client with our settings and returns it.
-     *
-     * @return Client
-     */
-    private function _getClient(): Client
-    {
-        if ($this->_client) {
-            return $this->_client;
-        }
-
-        return $this->_client = Craft::createGuzzleClient([
-            'base_uri' => $this->_getSetting('apiUrl'),
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'FlatworldLocation' => $this->_getSetting('username'),
-                'FlatworldLicenseKey' => $this->_getSetting('licenseKey'),
-            ],
-        ]);
     }
 
     /**

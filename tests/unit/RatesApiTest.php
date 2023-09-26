@@ -58,9 +58,8 @@ class RatesApiTest extends Unit
     public function testGetRatesWithValidRequest()
     {
         // Prepare the sample shipping request
-        $shippingRequest = new ShippingRequest('46239', true, 'Sample', [
-            new LineItem('01t8000000336tr', 1),
-        ]);
+        $shippingRequest = new ShippingRequest('46239', true, 'Sample', []);
+        $shippingRequest->addLineItem(new LineItem('01t8000000336tr', 1));
 
         // Call the getRates function with the sample shipping request
         $this->salesforceConnect();

@@ -59,7 +59,7 @@ class RatesApi extends Component
      * Get rates from Salesforce.
      *
      * @param ShippingRequest $shippingRequest Shipping request object
-     * @param mixed $sf SalesforceRestConnection object
+     * @param mixed $sf SalesforceRestConnection object - useful for tests
      * @return string
      */
     public function getRates(

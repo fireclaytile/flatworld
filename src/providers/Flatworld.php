@@ -183,6 +183,16 @@ class Flatworld extends Provider
     }
 
     /**
+     * Tests the connection to the Rates API.
+     *
+     * @return bool
+     */
+    public function fetchConnection(): bool
+    {
+        return FlatworldPlugin::getInstance()->ratesService->testRatesConnection();
+    }
+
+    /**
      * Logs a debug message to the log file if logging is enabled.
      *
      * @param string $method Method that called this function
