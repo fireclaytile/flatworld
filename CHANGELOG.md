@@ -1,5 +1,11 @@
 # Flatworld Changelog
 
+## 0.9.6 - 2023-09-26
+
+-   Fixed some error reporting.
+-   Set ShippingRequest LineItems to use the same method of determining the productId as the main Salesforce plugin.
+-   Fixed settings template so a couple settings actually get saved.
+
 ## 0.9.5 - 2023-09-26
 
 -   Fix Rates service instantiation.
