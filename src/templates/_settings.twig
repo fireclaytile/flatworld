@@ -178,7 +178,7 @@
 
 {{ forms.autosuggestField({
     label: 'Flat Rate Carrier Name' | t('postie'),
-    instructions: 'Enter the Flat Rate Carrier Name here.' | t('postie', { name: provider.displayName() }),
+    instructions: 'Enter the Flat Rate Carrier Name here. This is what will be displayed to the customer.' | t('postie', { name: provider.displayName() }),
     id: 'flatRateCarrierName',
     name: 'flatRateCarrierName',
     value: provider.settings.flatRateCarrierName ?? '',

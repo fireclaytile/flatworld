@@ -73,7 +73,6 @@ class Flatworld extends Plugin
             },
         );
 
-        // TODO: Is this needed?
         Event::on(
             PluginController::class,
             PluginController::EVENT_MODIFY_VARIANT_QUERY,
