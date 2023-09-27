@@ -1221,13 +1221,20 @@ class Rates extends Component
      */
     public function setQuickestServiceHandle(): void
     {
-        $quickestRate = $this->getQuickestRate();
-        if (empty($quickestRate)) {
+        $rate = $this->getQuickestRate();
+        if (empty($rate)) {
             return;
         }
-        $this->_quickestServiceHandle = $this->getServiceHandle(
-            $quickestRate['ServiceLevel'],
-        );
+
+        if ($rate['Type'] == 'ltl') {
+            $this->_quickestServiceHandle = $this->getServiceHandle(
+                $rate['CarrierName'],
+            );
+        } else {
+            $this->_quickestServiceHandle = $this->getServiceHandle(
+                $rate['ServiceLevel'],
+            );
+        }
     }
 
     /**
@@ -1247,13 +1254,20 @@ class Rates extends Component
      */
     public function setCheapestServiceHandle(): void
     {
-        $cheapestRate = $this->getCheapestRate();
-        if (empty($cheapestRate)) {
+        $rate = $this->getCheapestRate();
+        if (empty($rate)) {
             return;
         }
-        $this->_cheapestServiceHandle = $this->getServiceHandle(
-            $cheapestRate['ServiceLevel'],
-        );
+
+        if ($rate['Type'] == 'ltl') {
+            $this->_cheapestServiceHandle = $this->getServiceHandle(
+                $rate['CarrierName'],
+            );
+        } else {
+            $this->_cheapestServiceHandle = $this->getServiceHandle(
+                $rate['ServiceLevel'],
+            );
+        }
     }
 
     /**

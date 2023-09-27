@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.8 - 2023-09-27
+
+-   Set cheapest and quickest rate service handles properly when they are LTL rates.
+
 ## 0.9.7 - 2023-09-26
 
 -   Fixed settings check in RatesAPI service
