@@ -85,14 +85,14 @@ class Rates extends Component
      *
      * @var string
      */
-    private string $_quickestServiceHandle;
+    private string $_quickestServiceHandle = '';
 
     /**
      * The handle of the cheapest carrier.
      *
      * @var string
      */
-    private string $_cheapestServiceHandle;
+    private string $_cheapestServiceHandle = '';
 
     /**
      * The quickest rate information.
