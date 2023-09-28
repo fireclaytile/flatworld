@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.10 - 2023-09-28
+
+-   Removed `weightThreshold`` setting
+
 ## 0.9.9 - 2023-09-28
 
 -   Bugfix and setting clarification

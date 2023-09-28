@@ -1444,7 +1444,6 @@ class RatesServiceTest extends Unit
             'enableSalesforceApi' => App::env('SALESFORCE_CONNECT'),
             'enableSalesforceSandbox' => App::env('SALESFORCE_SANDBOX'),
             'totalMaxWeight' => '39750',
-            'weightThreshold' => '150',
             'weightLimitMessage' =>
                 'Shipping weight limit reached. Please contact Fireclay Tile Salesperson.',
             'weightPerSquareFoot' => [

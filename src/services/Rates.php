@@ -972,17 +972,6 @@ class Rates extends Component
     }
 
     /**
-     * Determines if the Total Weight of the order is under the weight threshold.
-     *
-     * @return bool
-     */
-    public function underWeightThreshold(): bool
-    {
-        return $this->getTotalWeight() <=
-            floatval($this->_getSetting('weightThreshold'));
-    }
-
-    /**
      * Tests the connection to the Rates API.
      *
      * @return boolean

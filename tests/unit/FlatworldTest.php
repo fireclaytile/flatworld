@@ -159,12 +159,6 @@ class FlatworldProviderTest extends Unit
             $this->flatworld->getSetting('totalMaxWeight'),
         );
 
-        $this->assertNotEmpty($this->flatworld->getSetting('weightThreshold'));
-        $this->assertSame(
-            '150',
-            $this->flatworld->getSetting('weightThreshold'),
-        );
-
         $this->assertNotEmpty(
             $this->flatworld->getSetting('weightLimitMessage'),
         );
@@ -246,10 +240,6 @@ class FlatworldProviderTest extends Unit
         );
         $this->assertStringContainsString(
             'totalMaxWeight-label',
-            $settingsHtml,
-        );
-        $this->assertStringContainsString(
-            'weightThreshold-label',
             $settingsHtml,
         );
         $this->assertStringContainsString(
@@ -488,7 +478,6 @@ class FlatworldProviderTest extends Unit
             'enableSalesforceApi' => App::env('SALESFORCE_CONNECT'),
             'enableSalesforceSandbox' => App::env('SALESFORCE_SANDBOX'),
             'totalMaxWeight' => '39750',
-            'weightThreshold' => '150',
             'weightLimitMessage' =>
                 'Shipping weight limit reached. Please contact Fireclay Tile Salesperson.',
             'weightPerSquareFoot' => [

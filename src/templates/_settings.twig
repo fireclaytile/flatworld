@@ -111,17 +111,6 @@
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'Weight Threshold' | t('postie'),
-    instructions: 'Enter the weight threshold here. This value is used to determine whether a single box or pallet is used as the packing method.' | t('postie', { name: provider.displayName() }),
-    id: 'weightThreshold',
-    name: 'weightThreshold',
-    value: provider.settings.weightThreshold ?? '',
-    required: true,
-    suggestEnvVars: true,
-    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.weightThreshold', 'postie'),
-}) }}
-
-{{ forms.autosuggestField({
     label: 'Weight Limit Message' | t('postie'),
     instructions: 'Enter the weight limit message here.' | t('postie', { name: provider.displayName() }),
     id: 'weightLimitMessage',
