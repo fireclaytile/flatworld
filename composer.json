@@ -2,7 +2,7 @@
   "name": "fireclaytile/flatworld",
   "description": "Craft Commerce plugin to provide Postie with an additional shipping provider.",
   "type": "craft-plugin",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "keywords": [
     "craft",
     "cms",
