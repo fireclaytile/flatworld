@@ -938,8 +938,6 @@ class Rates extends Component
     {
         $order = $this->getOrder();
 
-        // TODO: Set liftgate option
-
         $this->_shippingRequest = new ShippingRequest(
             $order->shippingAddress->zipCode,
             false,
@@ -958,6 +956,10 @@ class Rates extends Component
             $this->orderContainsMerchandise()
         ) {
             $this->_shippingRequest->orderType = 'Order';
+        }
+
+        if ($order->truckLiftCharge) {
+            $this->_shippingRequest->liftGate = true;
         }
     }
 

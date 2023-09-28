@@ -1,8 +1,12 @@
 # Flatworld Changelog
 
+## 0.9.11 - 2023-09-28
+
+-   set `liftGate` on Shipping Request
+
 ## 0.9.10 - 2023-09-28
 
--   Removed `weightThreshold`` setting
+-   Removed `weightThreshold` setting
 
 ## 0.9.9 - 2023-09-28
 
