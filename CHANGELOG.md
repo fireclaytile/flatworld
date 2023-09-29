@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.13 - 2023-09-29
+
+-   Account for null TransitDays data
+
 ## 0.9.12 - 2023-09-29
 
 -   Include liftGate in cacheKey for rates
