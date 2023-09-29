@@ -1528,11 +1528,13 @@ class Rates extends Component
             return false;
         }
 
+        $liftGate = $shippingRequest->liftGate ? 'lg' : '';
+
         $zipcode = $order->shippingAddress->zipCode;
         $totalWeight = $this->_totalWeight;
 
         // Cart ID + Zipcode + Total Weight
-        $cacheKey = "$order->id--$zipcode--$totalWeight";
+        $cacheKey = "$order->id--$zipcode--$totalWeight--$liftGate";
 
         return str_replace(' ', '--', $cacheKey);
     }

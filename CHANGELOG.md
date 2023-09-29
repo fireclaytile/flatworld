@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.12 - 2023-09-29
+
+-   Include liftGate in cacheKey for rates
+
 ## 0.9.11 - 2023-09-28
 
 -   set `liftGate` on Shipping Request
