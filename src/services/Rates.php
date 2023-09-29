@@ -1385,12 +1385,12 @@ class Rates extends Component
     /**
      * Returns a string of the estimated arrival time based on the transit time.
      *
-     * @param string $transitTime
+     * @param string|null $transitTime
      * @return string
      */
-    public function getArrival(string $transitTime): string
+    public function getArrival(?string $transitTime): string
     {
-        if ($transitTime <= 0) {
+        if (!$transitTime || $transitTime <= 0) {
             return '';
         }
 
