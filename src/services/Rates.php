@@ -8,9 +8,11 @@ use craft\commerce\models\OrderNotice;
 use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
+use fireclaytile\flatworld\models\ShippingRate;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\RatesApi;
+use fireclaytile\flatworld\services\ShippingRates;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
 use fireclaytile\flatworld\services\salesforce\models\LineItem;
 use GuzzleHttp\Client;
@@ -79,34 +81,6 @@ class Rates extends Component
      * @var bool
      */
     private bool $_orderContainsStandardProducts;
-
-    /**
-     * The handle of the quickest carrier.
-     *
-     * @var string
-     */
-    private string $_quickestServiceHandle = '';
-
-    /**
-     * The handle of the cheapest carrier.
-     *
-     * @var string
-     */
-    private string $_cheapestServiceHandle = '';
-
-    /**
-     * The quickest rate information.
-     *
-     * @var array|null
-     */
-    private ?array $_quickestRate;
-
-    /**
-     * The cheapest rate information.
-     *
-     * @var array|null
-     */
-    private ?array $_cheapestRate;
 
     /**
      * @var boolean
@@ -1039,16 +1013,12 @@ class Rates extends Component
      */
     public function responseRates(): array
     {
-        // filter for fastest and cheapest rates
-        $this->setQuickestRate();
-        $this->setCheapestRate();
-        $this->setQuickestServiceHandle();
-        $this->setCheapestServiceHandle();
+        $response = $this->getResponse();
+        $shippingRates = new ShippingRates(json_encode($response));
 
-        if (
-            empty($this->getCheapestRate()) &&
-            empty($this->getQuickestRate())
-        ) {
+        $cheapestRate = $shippingRates->getCheapestRate();
+        $quickestRate = $shippingRates->getFastestRate();
+        if (empty($cheapestRate) && empty($quickestRate)) {
             $this->_logMessage(
                 __METHOD__,
                 'Didnt find any cheapest and fastest carrier details, so returning empty-handed.',
@@ -1062,10 +1032,12 @@ class Rates extends Component
             'Found cheapest and fastest rates and carrier details',
         );
 
-        $cheapestRate = $this->getCheapestRate();
-        $quickestRate = $this->getQuickestRate();
-        $cheapestServiceHandle = $this->getCheapestServiceHandle();
-        $quickestServiceHandle = $this->getQuickestServiceHandle();
+        $cheapestServiceHandle = $cheapestRate
+            ? $cheapestRate->getServiceHandle()
+            : '';
+        $quickestServiceHandle = $quickestRate
+            ? $quickestRate->getServiceHandle()
+            : '';
 
         $rates = [];
 
@@ -1078,29 +1050,25 @@ class Rates extends Component
             if ($handle === $cheapestServiceHandle) {
                 $foundServiceHandle = true;
 
-                $transitTime = $cheapestRate['TransitDays'];
-                $arrivalDateText = $cheapestRate['EstimatedDeliveryDate'];
-
-                $arrival = $this->getArrival($transitTime);
-
-                $rates[$handle]['arrival'] = $arrival;
-                $rates[$handle]['transitTime'] = $transitTime;
-                $rates[$handle]['arrivalDateText'] = $arrivalDateText;
-                $rates[$handle]['amount'] = $cheapestRate['Total'];
+                $rates[$handle][
+                    'arrival'
+                ] = $cheapestRate->getArrivalEstimationString();
+                $rates[$handle]['transitTime'] = $cheapestRate->transitDays;
+                $rates[$handle]['arrivalDateText'] =
+                    $cheapestRate->estimatedDeliveryDate;
+                $rates[$handle]['amount'] = $cheapestRate->total;
             }
 
             if ($handle === $quickestServiceHandle) {
                 $foundServiceHandle = true;
 
-                $transitTime = $quickestRate['TransitDays'];
-                $arrivalDateText = $quickestRate['EstimatedDeliveryDate'];
-
-                $arrival = $this->getArrival($transitTime);
-
-                $rates[$handle]['arrival'] = $arrival;
-                $rates[$handle]['transitTime'] = $transitTime;
-                $rates[$handle]['arrivalDateText'] = $arrivalDateText;
-                $rates[$handle]['amount'] = $quickestRate['Total'];
+                $rates[$handle][
+                    'arrival'
+                ] = $quickestRate->getArrivalEstimationString();
+                $rates[$handle]['transitTime'] = $quickestRate->transitDays;
+                $rates[$handle]['arrivalDateText'] =
+                    $quickestRate->estimatedDeliveryDate;
+                $rates[$handle]['amount'] = $quickestRate->total;
             }
         }
 
@@ -1161,250 +1129,6 @@ class Rates extends Component
         }
 
         return $this->_modifyRatesEvent($rates, $this->_order);
-    }
-
-    /**
-     * Sets the _quickRate property.
-     *
-     * @return void
-     */
-    public function setQuickestRate(): void
-    {
-        $response = $this->getResponse();
-        $this->_quickestRate = $this->findQuickestRate($response);
-    }
-
-    /**
-     * Sets the _cheapestRate property.
-     *
-     * @return void
-     */
-    public function setCheapestRate(): void
-    {
-        $response = $this->getResponse();
-        $this->_cheapestRate = $this->findCheapestRate($response);
-    }
-
-    /**
-     * Gets the _quickestRate property.
-     *
-     * @return string
-     */
-    public function getQuickestRate(): ?array
-    {
-        return $this->_quickestRate;
-    }
-
-    /**
-     * Gets the _cheapestRate property.
-     *
-     * @return string
-     */
-    public function getCheapestRate(): ?array
-    {
-        return $this->_cheapestRate;
-    }
-
-    /**
-     * Sets the _quickestServiceHandle property.
-     *
-     * @return void
-     */
-    public function setQuickestServiceHandle(): void
-    {
-        $rate = $this->getQuickestRate();
-        if (empty($rate)) {
-            return;
-        }
-
-        if ($rate['Type'] == 'ltl') {
-            $this->_quickestServiceHandle = $this->getServiceHandle(
-                $rate['CarrierName'],
-            );
-        } else {
-            $this->_quickestServiceHandle = $this->getServiceHandle(
-                $rate['ServiceLevel'],
-            );
-        }
-    }
-
-    /**
-     * Gets the _quickestServiceHandle property.
-     *
-     * @return string
-     */
-    public function getQuickestServiceHandle(): string
-    {
-        return $this->_quickestServiceHandle;
-    }
-
-    /**
-     * Sets the _cheapestServiceHandle property.
-     *
-     * @return void
-     */
-    public function setCheapestServiceHandle(): void
-    {
-        $rate = $this->getCheapestRate();
-        if (empty($rate)) {
-            return;
-        }
-
-        if ($rate['Type'] == 'ltl') {
-            $this->_cheapestServiceHandle = $this->getServiceHandle(
-                $rate['CarrierName'],
-            );
-        } else {
-            $this->_cheapestServiceHandle = $this->getServiceHandle(
-                $rate['ServiceLevel'],
-            );
-        }
-    }
-
-    /**
-     * Gets the _cheapestServiceHandle property.
-     *
-     * @return string
-     */
-    public function getCheapestServiceHandle(): string
-    {
-        return $this->_cheapestServiceHandle;
-    }
-
-    /**
-     * Converts a "ServiceLevel" into uppercase with underscores in place of
-     * spaces.
-     *
-     * @param string $serviceLevel The service level string to convert
-     * @return string
-     */
-    public function getServiceHandle(string $serviceLevel): string
-    {
-        return str_replace(' ', '_', strtoupper($serviceLevel));
-    }
-
-    /**
-     * Find and return the rate with the quickest estimated delivery date and
-     * time.
-     *
-     * @param mixed $jsonData JSON data containing shipping rate options
-     * @param \DateTime $now (optional) The current date and time, default is now
-     * @return array|null
-     */
-    public function findQuickestRate(
-        mixed $jsonData,
-        \DateTime $now = null,
-    ): ?array {
-        // if jsonData is a string, turn it into an object
-        if (is_string($jsonData)) {
-            $jsonData = Json::decode($jsonData);
-        }
-
-        if (!$now) {
-            $now = new \DateTime();
-        }
-
-        $quickestRate = null;
-        $minTimeDiff = PHP_INT_MAX;
-
-        if ($jsonData == null) {
-            return null;
-        }
-
-        foreach ($jsonData as $rate) {
-            if (isset($rate['EstimatedDeliveryDate'])) {
-                $deliveryDate = \DateTime::createFromFormat(
-                    'Y/m/d',
-                    $rate['EstimatedDeliveryDate'],
-                );
-
-                // make sure delivery date is in the future
-                // if ($deliveryDate >= $now && $deliveryDate < $now->add(new \DateInterval('P1D'))) {
-
-                $timeDiff =
-                    $deliveryDate->getTimestamp() - $now->getTimestamp();
-
-                // EstimatedDeliveryTime may not exist on the rate result
-                // TODO: This doesn't currently work.
-                // if (isset($rate['EstimatedDeliveryTime'])) {
-                // 	$deliveryTime = \DateTime::createFromFormat('H:i A', $rate['EstimatedDeliveryTime']);
-                // 	$timeDiff += $deliveryTime->getTimestamp() - $now->getTimestamp();
-                // }
-
-                if ($timeDiff < $minTimeDiff) {
-                    $quickestRate = $rate;
-                    $minTimeDiff = $timeDiff;
-                }
-                // }
-            }
-        }
-        $this->_logMessage(
-            __METHOD__,
-            'returning: ' . Json::encode($quickestRate),
-        );
-        return $quickestRate;
-    }
-
-    /**
-     * Find and return the cheapest rate option.
-     *
-     * @param mixed $jsonData JSON data containing shipping rate options
-     * @return array|null
-     */
-    public function findCheapestRate(mixed $jsonData): ?array
-    {
-        // if jsonData is a string, turn it into an object
-        if (is_string($jsonData)) {
-            $jsonData = Json::decode($jsonData);
-        }
-
-        $cheapestRate = null;
-        $lowestTotal = PHP_FLOAT_MAX;
-
-        if ($jsonData == null) {
-            return null;
-        }
-
-        foreach ($jsonData as $rate) {
-            if (isset($rate['Total'])) {
-                $total = (float) $rate['Total'];
-
-                if ($total < $lowestTotal) {
-                    $cheapestRate = $rate;
-                    $lowestTotal = $total;
-                }
-            }
-        }
-        $this->_logMessage(
-            __METHOD__,
-            'returning: ' . Json::encode($cheapestRate),
-        );
-        return $cheapestRate;
-    }
-
-    /**
-     * Returns a string of the estimated arrival time based on the transit time.
-     *
-     * @param string|null $transitTime
-     * @return string
-     */
-    public function getArrival(?string $transitTime): string
-    {
-        if (!$transitTime || $transitTime <= 0) {
-            return '';
-        }
-
-        // Pure hack until its confirmed
-        if ($transitTime >= 21) {
-            return '21 days or more';
-        } elseif ($transitTime >= 14) {
-            return '14-21 days';
-        } elseif ($transitTime >= 7) {
-            return '7-14 days';
-        } elseif ($transitTime >= 3) {
-            return '3-7 days';
-        }
-        return '1-3 days';
     }
 
     /**

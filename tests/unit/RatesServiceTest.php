@@ -80,68 +80,6 @@ class RatesServiceTest extends Unit
         $this->prepareMockData();
     }
 
-    public function testFindQuickestRate()
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        // $now = \DateTime::createFromFormat('Y/m/d', '2024/09/06');
-
-        $quickestRate = $this->ratesService->findQuickestRate(
-            $this->mockApiParcelResponse,
-        );
-
-        $expectedRate = Json::decode('{
-            "CarrierId": "4028|03",
-            "CarrierMaximumCoverage": "100",
-            "CarrierName": "UPS",
-            "Days": "UPS Ground",
-            "Direct": "D",
-            "EstimatedDeliveryDate": "2024/09/08",
-            "PublishedRate": "44.22",
-            "SCAC": "UPGD",
-            "ServiceLevel": "UPS Ground",
-            "SubTotal": "23.34",
-            "Total": "128.01",
-            "TransitDays": "1",
-            "Type": "parcel"
-        }');
-
-        // Assert that $quickestRate is the expected rate with the quickest delivery
-        $this->assertEquals($expectedRate, $quickestRate);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    public function testFindCheapestRate()
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $cheapestRate = $this->ratesService->findCheapestRate(
-            $this->mockApiParcelResponse,
-        );
-
-        $expectedRate = Json::decode('{
-            "CarrierId": "4028|12",
-            "CarrierMaximumCoverage": "100",
-            "CarrierName": "UPS",
-            "Days": "UPS 3 Day Select",
-            "Direct": "D",
-            "EstimatedDeliveryDate": "2024/09/12",
-            "PublishedRate": "106.22",
-            "SCAC": "UPGD",
-            "ServiceLevel": "UPS 3 Day Select",
-            "SubTotal": "42.48",
-            "Total": "50.98",
-            "TransitDays": "3",
-            "Type": "parcel"
-        }');
-
-        // Assert that $cheapestRate is the expected rate with the cheapest rate
-        $this->assertEquals($expectedRate, $cheapestRate);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
     /**
      * @return void
      */
@@ -181,91 +119,6 @@ class RatesServiceTest extends Unit
         // $this->assertSame(1, $rates[$keys[1]]['transitTime']);
         // $this->assertSame('WED - 1/26/2022', $rates[$keys[1]]['arrivalDateText']);
         // $this->assertSame(27.12, $rates[$keys[1]]['amount']);
-
-        $this->_logMessage(__METHOD__, 'done...');
-    }
-
-    /**
-     * @return void
-     */
-    public function testTransitTimesShowCorrectArrivalDays(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
-
-        $this->assertEmpty($this->ratesService->getArrival(0));
-        $this->assertSame('', $this->ratesService->getArrival(0));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(1));
-        $this->assertSame('1-3 days', $this->ratesService->getArrival(1));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(2));
-        $this->assertSame('1-3 days', $this->ratesService->getArrival(2));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(3));
-        $this->assertSame('3-7 days', $this->ratesService->getArrival(3));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(4));
-        $this->assertSame('3-7 days', $this->ratesService->getArrival(4));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(5));
-        $this->assertSame('3-7 days', $this->ratesService->getArrival(5));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(6));
-        $this->assertSame('3-7 days', $this->ratesService->getArrival(6));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(7));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(7));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(8));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(8));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(9));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(9));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(10));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(10));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(11));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(11));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(12));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(12));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(13));
-        $this->assertSame('7-14 days', $this->ratesService->getArrival(13));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(14));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(14));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(15));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(15));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(16));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(16));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(17));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(17));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(18));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(18));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(19));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(19));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(20));
-        $this->assertSame('14-21 days', $this->ratesService->getArrival(20));
-
-        $this->assertNotEmpty($this->ratesService->getArrival(21));
-        $this->assertSame(
-            '21 days or more',
-            $this->ratesService->getArrival(21),
-        );
-
-        $this->assertNotEmpty($this->ratesService->getArrival(22));
-        $this->assertSame(
-            '21 days or more',
-            $this->ratesService->getArrival(22),
-        );
 
         $this->_logMessage(__METHOD__, 'done...');
     }
@@ -687,24 +540,21 @@ class RatesServiceTest extends Unit
             $this->flatworld->settings,
         );
 
+        $mockOrder = $this->createMockOrder();
+
+        $this->ratesService->setOrder($mockOrder);
+
         // Explicitly setting total weights
+
+        // under max
         $this->ratesService->setTotalWeight(120);
-        $weightThresholdReached1 = $this->ratesService->underWeightThreshold();
+        $weightThresholdReached1 = $this->ratesService->checkWeightLimit();
         $this->assertIsBool($weightThresholdReached1);
         $this->assertTrue($weightThresholdReached1);
 
-        $this->ratesService->setTotalWeight(150);
-        $weightThresholdReached2 = $this->ratesService->underWeightThreshold();
-        $this->assertIsBool($weightThresholdReached2);
-        $this->assertTrue($weightThresholdReached2);
-
-        $this->ratesService->setTotalWeight(151);
-        $weightThresholdReached3 = $this->ratesService->underWeightThreshold();
-        $this->assertIsBool($weightThresholdReached3);
-        $this->assertFalse($weightThresholdReached3);
-
-        $this->ratesService->setTotalWeight(400);
-        $weightThresholdReached4 = $this->ratesService->underWeightThreshold();
+        // over max
+        $this->ratesService->setTotalWeight(40000);
+        $weightThresholdReached4 = $this->ratesService->checkWeightLimit();
         $this->assertIsBool($weightThresholdReached4);
         $this->assertFalse($weightThresholdReached4);
 
