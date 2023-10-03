@@ -48,9 +48,9 @@ class RatesServiceTest extends Unit
     protected UnitTester $tester;
 
     /**
-     * @var array
+     * @var string
      */
-    public array $mockApiParcelResponse;
+    public string $mockApiParcelResponse;
 
     /**
      * @var array
@@ -1354,7 +1354,7 @@ class RatesServiceTest extends Unit
             'carrierClassOfServices' => $this->mockServiceList,
         ];
 
-        $this->mockApiParcelResponse = Json::decode('
+        $this->mockApiParcelResponse = '
             [
                 {
                     "CarrierId": "4028|03",
@@ -1546,7 +1546,7 @@ class RatesServiceTest extends Unit
                     "Type": "parcel"
                 }
             ]
-        ');
+        ';
     }
 
     /**

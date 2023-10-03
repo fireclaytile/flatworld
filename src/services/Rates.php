@@ -1014,7 +1014,7 @@ class Rates extends Component
     public function responseRates(): array
     {
         $response = $this->getResponse();
-        $shippingRates = new ShippingRates(json_encode($response));
+        $shippingRates = new ShippingRates($response);
 
         $cheapestRate = $shippingRates->getCheapestRate();
         $quickestRate = $shippingRates->getFastestRate();
