@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.15 - 2023-10-03
+
+-   Bugfix
+
 ## 0.9.14 - 2023-10-03
 
 -   Refactor soem ShippingRates code to make it easier to handle and test.
