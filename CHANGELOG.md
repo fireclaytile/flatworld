@@ -1,5 +1,10 @@
 # Flatworld Changelog
 
+## 0.9.14 - 2023-10-03
+
+-   Refactor soem ShippingRates code to make it easier to handle and test.
+-   Quickest Rate now factors in the EstimatedDeliveryTime.
+
 ## 0.9.13 - 2023-09-29
 
 -   Account for null TransitDays data
