@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.16 - 2023-10-03
+
+-   Bugfix for flat rate handle
+
 ## 0.9.15 - 2023-10-03
 
 -   Bugfix

@@ -1164,13 +1164,18 @@ class Rates extends Component
     }
 
     /**
-     * Gets the flat rate carrier name from the plugin settings.
+     * Gets the flat rate carrier handle based from the plugin settings.
      *
      * @return string
      */
     public function getFlatRateHandle(): string
     {
-        return $this->_getSetting('flatRateCarrierName');
+        $handle = str_replace(
+            ' ',
+            '_',
+            strtoupper($this->_getSetting('flatRateCarrierName')),
+        );
+        return $handle;
     }
 
     /**
