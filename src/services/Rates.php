@@ -925,10 +925,7 @@ class Rates extends Component
             );
         }
 
-        if (
-            $this->orderContainsStandardProducts() ||
-            $this->orderContainsMerchandise()
-        ) {
+        if ($this->orderContainsStandardProducts()) {
             $this->_shippingRequest->orderType = 'Order';
         }
 
