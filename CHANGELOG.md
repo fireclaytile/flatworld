@@ -1,5 +1,10 @@
 # Flatworld Changelog
 
+## 0.9.17 - 2023-10-10
+
+-   Add `enableLiftGateRates` setting. This will allow you to disable lift gate rates if you don't want them.
+-   Improve rate memoized cachekey generation.
+
 ## 0.9.16 - 2023-10-03
 
 -   Bugfix for flat rate handle
