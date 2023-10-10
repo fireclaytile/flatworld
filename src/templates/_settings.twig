@@ -100,6 +100,17 @@
 }) }}
 
 {{ forms.autosuggestField({
+    label: 'Enable Liftgate Rates' | t('postie'),
+    instructions: 'Enter 1 for yes, 0 for no. It is highly suggested to use an environment variable here. Enabling this will allow requests to the Salesforce Shipping Rate API to include "liftGate"' | t('postie'),
+    id: 'enableLiftGateRates',
+    name: 'enableLiftGateRates',
+    value: provider.settings.enableLiftGateRates ?? '0',
+    required: true,
+    suggestEnvVars: true,
+    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.enableLiftGateRates', 'postie'),
+}) }}
+
+{{ forms.autosuggestField({
     label: 'Total Max Weight' | t('postie'),
     instructions: 'Enter the total max weight in lbs here.' | t('postie', { name: provider.displayName() }),
     id: 'totalMaxWeight',

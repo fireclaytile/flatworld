@@ -929,7 +929,10 @@ class Rates extends Component
             $this->_shippingRequest->orderType = 'Order';
         }
 
-        if ($order->truckLiftCharge) {
+        if (
+            $order->truckLiftCharge &&
+            $this->_getSetting('enableLiftGateRates')
+        ) {
             $this->_shippingRequest->liftGate = true;
         }
     }
