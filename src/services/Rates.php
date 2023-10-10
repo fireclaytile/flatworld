@@ -18,6 +18,7 @@ use fireclaytile\flatworld\services\salesforce\models\LineItem;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use verbb\postie\Postie;
+use verbb\postie\helpers\PostieHelper;
 use verbb\postie\events\ModifyRatesEvent;
 use yii\base\InvalidConfigException;
 
@@ -1257,15 +1258,11 @@ class Rates extends Component
             return false;
         }
 
-        $liftGate = $shippingRequest->liftGate ? 'lg' : '';
+        $prefix = $shippingRequest->liftGate ? 'flatworld-lg' : 'flatworld';
 
-        $zipcode = $order->shippingAddress->zipCode;
-        $totalWeight = $this->_totalWeight;
+        $cacheKey = PostieHelper::getSignature($order, $prefix);
 
-        // Cart ID + Zipcode + Total Weight
-        $cacheKey = "$order->id--$zipcode--$totalWeight--$liftGate";
-
-        return str_replace(' ', '--', $cacheKey);
+        return $cacheKey;
     }
 
     /**
