@@ -1030,7 +1030,11 @@ class Rates extends Component
 
         $this->_logMessage(
             __METHOD__,
-            'Found cheapest and fastest rates and carrier details',
+            'Cheapest rate: ' . Json::encode($cheapestRate),
+        );
+        $this->_logMessage(
+            __METHOD__,
+            'Fastest rate: ' . Json::encode($quickestRate),
         );
 
         $cheapestServiceHandle = $cheapestRate
