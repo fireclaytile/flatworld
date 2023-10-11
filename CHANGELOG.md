@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 0.9.18 - 2023-10-11
+
+-   Improved logging of cheapest and quickest rates
+
 ## 0.9.17 - 2023-10-10
 
 -   Add `enableLiftGateRates` setting. This will allow you to disable lift gate rates if you don't want them.
