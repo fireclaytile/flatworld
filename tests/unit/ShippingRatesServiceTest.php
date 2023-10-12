@@ -132,9 +132,9 @@ class ShippingRatesTest extends Unit
     }
 
     /**
-     * Test that getFastestShippingRate() returns the cheapest ShippingRate object.
+     * Test that getFastestShippingRate() returns the fastest ShippingRate option.
      */
-    public function testGetFastestShippingRateReturnsCheapestShippingRate()
+    public function testGetFastestShippingRateReturnsFastestShippingRate()
     {
         $ratesJson = '
             [

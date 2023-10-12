@@ -7,8 +7,8 @@ namespace fireclaytile\flatworld\services\salesforce\models;
  *
  * Used to store details about a REST API call.
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\services\salesforce\models
+ * @author      Fireclay Tile
+ * @since       0.9.0
  */
 class RestDetails
 {

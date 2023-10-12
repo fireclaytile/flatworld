@@ -5,11 +5,11 @@ namespace fireclaytile\flatworld\tests\unit;
 use Craft;
 use Exception;
 use UnitTester;
-use craft\helpers\Json;
 use craft\helpers\App;
 use verbb\postie\Postie;
 use Codeception\Test\Unit;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\variables\FlatworldVariable;
 use fireclaytile\flatworld\services\RatesApi;
 use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
@@ -24,6 +24,11 @@ class RatesApiTest extends Unit
      * @var UnitTester
      */
     protected UnitTester $tester;
+
+    /**
+     * @var FlatworldProvider
+     */
+    protected FlatworldProvider $flatworld;
 
     /**
      * @var array

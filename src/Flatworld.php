@@ -31,8 +31,8 @@ use fireclaytile\flatworld\services\RatesApi;
 /**
  * Class Flatworld
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld
+ * @author      Fireclay Tile
+ * @since       0.8.0
  */
 class Flatworld extends Plugin
 {

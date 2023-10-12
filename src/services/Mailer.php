@@ -6,14 +6,13 @@ use Craft;
 use Throwable;
 use craft\base\Component;
 use craft\mail\Message;
-use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\services\Logger;
 
 /**
  * Service class for emailing.
  *
  * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\services
+ * @since      0.9.0
  */
 class Mailer extends Component
 {

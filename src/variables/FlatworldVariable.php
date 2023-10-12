@@ -18,8 +18,8 @@ use fireclaytile\flatworld\services\Logger;
 /**
  * Class FlatworldVariable
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\variables
+ * @author      Fireclay Tile
+ * @since       0.8.0
  */
 class FlatworldVariable
 {

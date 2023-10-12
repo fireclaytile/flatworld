@@ -10,6 +10,9 @@ use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
  * SalesforceRestConnection Class
  *
  * Makes REST API calls to Salesforce.
+ *
+ * @author      Fireclay Tile
+ * @since       0.9.0
  */
 class SalesforceRestConnection
 {
@@ -135,7 +138,7 @@ class SalesforceRestConnection
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $header = ["Authorization: OAuth $accessToken"];
-        $successStatus;
+        $successStatus = 0;
 
         switch ($restDetails->method) {
             case 'POST':
@@ -161,7 +164,6 @@ class SalesforceRestConnection
                     'SalesforceRestConnection->makeRequest: Invalid REST API method-> ' .
                         $restDetails->method,
                 );
-                break;
         }
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);

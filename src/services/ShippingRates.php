@@ -9,6 +9,9 @@ use fireclaytile\flatworld\models\ShippingRate;
 /**
  * Service class for working with shipping rates that are returned from our API.
  * You can instantiate this with some rates JSON and it will allow you to access cheapest and fastest rates, etc.
+ *
+ * @author      Fireclay Tile
+ * @since       0.9.14
  */
 class ShippingRates
 {

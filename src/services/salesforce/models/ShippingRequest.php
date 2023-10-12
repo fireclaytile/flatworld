@@ -9,8 +9,8 @@ use fireclaytile\flatworld\services\salesforce\models\LineItem;
  *
  * Used to store details about a shipping request.
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\services\salesforce\models
+ * @author      Fireclay Tile
+ * @since       0.9.0
  */
 class ShippingRequest
 {

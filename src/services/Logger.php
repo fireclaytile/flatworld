@@ -9,8 +9,8 @@ use putyourlightson\logtofile\LogToFile;
 /**
  * Service class for logging messages.
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\services
+ * @author      Fireclay Tile
+ * @since       0.9.0
  */
 class Logger extends Component
 {

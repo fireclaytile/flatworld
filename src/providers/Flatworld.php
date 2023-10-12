@@ -16,9 +16,7 @@ namespace fireclaytile\flatworld\providers;
 use Craft;
 use Exception;
 use Throwable;
-use craft\commerce\models\OrderNotice;
 use craft\helpers\Json;
-use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\Rates as RatesService;
@@ -31,8 +29,8 @@ use verbb\postie\events\ModifyRatesEvent;
 /**
  * Class Flatworld
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\providers
+ * @author      Fireclay Tile
+ * @since       0.9.0
  *
  * @property-read array|string[] $serviceList
  * @property-read string $settingsHtml

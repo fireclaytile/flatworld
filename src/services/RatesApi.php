@@ -2,12 +2,11 @@
 
 namespace fireclaytile\flatworld\services;
 
-use Craft;
 use craft\base\Component;
+use Exception;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
-use fireclaytile\flatworld\services\salesforce\models\LineItem;
 use verbb\postie\Postie;
 
 // Report all errors
@@ -16,8 +15,8 @@ error_reporting(E_ALL);
 /**
  * Service class for working with the Flatworld Rates API.
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\services
+ * @author      Fireclay Tile
+ * @since       0.8.0
  */
 class RatesApi extends Component
 {

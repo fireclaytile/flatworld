@@ -8,25 +8,21 @@ use craft\commerce\models\OrderNotice;
 use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
-use fireclaytile\flatworld\models\ShippingRate;
 use fireclaytile\flatworld\services\Logger;
-use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\RatesApi;
 use fireclaytile\flatworld\services\ShippingRates;
 use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
 use fireclaytile\flatworld\services\salesforce\models\LineItem;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use verbb\postie\Postie;
 use verbb\postie\helpers\PostieHelper;
-use verbb\postie\events\ModifyRatesEvent;
 use yii\base\InvalidConfigException;
 
 /**
  * Service class Rates.
  *
- * @author     Fireclay Tile
- * @package    fireclaytile\flatworld\services
+ * @author      Fireclay Tile
+ * @since       0.9.0
  */
 class Rates extends Component
 {
@@ -166,7 +162,7 @@ class Rates extends Component
     /**
      * Gets the _order property.
      *
-     * @return void
+     * @return mixed
      */
     public function getOrder()
     {

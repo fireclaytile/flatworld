@@ -4,6 +4,9 @@ namespace fireclaytile\flatworld\models;
 
 /**
  * Model class for a shipping rate.
+ *
+ * @author      Fireclay Tile
+ * @since       0.9.14
  */
 class ShippingRate
 {
