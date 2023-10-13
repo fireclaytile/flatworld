@@ -1080,26 +1080,12 @@ class Rates extends Component
             );
         }
 
-        // Apply flat rate shipping for samples only orders: https://app.asana.com/0/1200248609605430/1201862416773959/f
-        if (
-            !$this->orderContainsStandardProducts() &&
-            !$this->orderContainsMerchandise() &&
-            $this->orderContainsSampleProducts() &&
-            $foundServiceHandle
-        ) {
-            $rates = $this->setFlatRate($rates);
-
-            $this->_logMessage(
-                __METHOD__,
-                'Applied Flat Rate Shipping Carrier',
-            );
-        }
-
         // Sort so the lowest cost carrier is first/default
         $amount = array_column($rates, 'amount');
         array_multisort($amount, SORT_ASC, $rates);
 
-        // Shipping for samples only orders for trade is $0 and $8 for everyone else
+        // Shipping for samples only orders will differ from standard orders
+        // The rates and carrienr handles are set in the plugin settings
         // (We set this on the lowest cost carrier which also overrides flat rate cost)
         if (
             !$this->orderContainsStandardProducts() &&
@@ -1113,7 +1099,19 @@ class Rates extends Component
                 !empty($this->_order->user) &&
                 $this->_order->user->isInGroup('customersTrade15')
             ) {
-                $rates[$firstServiceHandle]['amount'] = 0;
+                $rates[$firstServiceHandle][
+                    'amount'
+                ] = $this->getTradeFlatRateAmount();
+
+                $flatRateHandle = $this->getTradeFlatRateHandle();
+                if (!empty($flatRateHandle)) {
+                    $rates = $this->_changeKey(
+                        $rates,
+                        $firstServiceHandle,
+                        $flatRateHandle,
+                    );
+                }
+
                 $this->_logMessage(
                     __METHOD__,
                     'Applied Free Shipping on Samples only for Trade account',
@@ -1122,46 +1120,24 @@ class Rates extends Component
                 $rates[$firstServiceHandle][
                     'amount'
                 ] = $this->getFlatRateAmount();
+
+                $flatRateHandle = $this->getFlatRateHandle();
+                if (!empty($flatRateHandle)) {
+                    $rates = $this->_changeKey(
+                        $rates,
+                        $firstServiceHandle,
+                        $flatRateHandle,
+                    );
+                }
+
                 $this->_logMessage(
                     __METHOD__,
-                    'Applied $8 flat rate Shipping on Samples only for samples only orders',
+                    'Applied Flat Rate Shipping on Samples only for samples-only orders',
                 );
             }
         }
 
         return $this->_modifyRatesEvent($rates, $this->_order);
-    }
-
-    /**
-     * Sets the flat-rate shipping price on rates.
-     *
-     * @param array $rates
-     * @return array
-     */
-    public function setFlatRate(array $rates): array
-    {
-        $flatRateHandle = $this->getFlatRateHandle();
-        $flatRateAmount = $this->getFlatRateAmount();
-
-        $flatRateCarrier = [];
-
-        // Remove any carrier less than flat rate carrier
-        foreach ($rates as $handle => $rate) {
-            if ($rate['amount'] < $flatRateAmount) {
-                // Grab a copy first so we can use its info like arrival time
-                $flatRateCarrier = array_merge($rate);
-                $flatRateCarrier['amount'] = $flatRateAmount;
-
-                unset($rates[$handle]);
-            }
-        }
-
-        // Inject flat rate carrier into the rates list
-        if (!empty($flatRateCarrier)) {
-            $rates[$flatRateHandle] = $flatRateCarrier;
-        }
-
-        return $rates;
     }
 
     /**
@@ -1180,6 +1156,21 @@ class Rates extends Component
     }
 
     /**
+     * Gets the Trade customer flat rate carrier handle based from the plugin settings.
+     *
+     * @return string
+     */
+    public function getTradeFlatRateHandle(): string
+    {
+        $handle = str_replace(
+            ' ',
+            '_',
+            strtoupper($this->_getSetting('tradeFlatRateCarrierName')),
+        );
+        return $handle;
+    }
+
+    /**
      * Gets the flat rate amount from the plugin settings.
      *
      * @return float
@@ -1188,6 +1179,23 @@ class Rates extends Component
     {
         $flatRateAmount = number_format(
             $this->_getSetting('flatRateCarrierCost'),
+            2,
+            '.',
+            ',',
+        );
+
+        return floatval($flatRateAmount);
+    }
+
+    /**
+     * Gets the Trade customer flat rate amount from the plugin settings.
+     *
+     * @return float
+     */
+    public function getTradeFlatRateAmount(): float
+    {
+        $flatRateAmount = number_format(
+            $this->_getSetting('tradeFlatRateCarrierCost'),
             2,
             '.',
             ',',
@@ -1310,5 +1318,28 @@ class Rates extends Component
 
         $logger = new Logger(true);
         return $logger->logMessage($msg);
+    }
+
+    /**
+     * Replaces a key in an array with a new key.
+     *
+     * @param array $array
+     * @param int|string $oldKey
+     * @param int|string $newKey
+     * @return array
+     */
+    private function _changeKey(
+        array $array,
+        int|string $oldKey,
+        int|string $newKey,
+    ): array {
+        if (!array_key_exists($oldKey, $array)) {
+            return $array;
+        }
+
+        $keys = array_keys($array);
+        $keys[array_search($oldKey, $keys)] = $newKey;
+
+        return array_combine($keys, $array);
     }
 }
