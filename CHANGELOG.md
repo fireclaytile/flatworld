@@ -1,5 +1,12 @@
 # Flatworld Changelog
 
+## 0.9.19 - 2023-10-13
+
+-   Update suggested configuration in README
+-   Add `tradeFlatRateCarrierName` and `tradeFlatRateCarrierCost` settings
+-   Fix flat rate-related manipulation of rates
+-   Some code cleanup and refactoring
+
 ## 0.9.18 - 2023-10-11
 
 -   Improved logging of cheapest and quickest rates
