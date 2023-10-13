@@ -11,8 +11,8 @@ use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\RatesApi;
 use fireclaytile\flatworld\services\ShippingRates;
-use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
-use fireclaytile\flatworld\services\salesforce\models\LineItem;
+use fireclaytile\flatworld\models\ShippingRequest;
+use fireclaytile\flatworld\models\LineItem;
 use GuzzleHttp\Exception\GuzzleException;
 use verbb\postie\Postie;
 use verbb\postie\helpers\PostieHelper;
@@ -954,7 +954,7 @@ class Rates extends Component
         $this->_logMessage(__METHOD__, 'Testing Rates API Connection');
 
         $this->_ratesApiService = FlatworldPlugin::getInstance()->ratesApi;
-        $result = $this->_ratesApiService->salesforceConnect();
+        $result = $this->_ratesApiService->testRatesConnection();
 
         $this->_logMessage(__METHOD__, 'Rates API Connection: ' . $result);
 

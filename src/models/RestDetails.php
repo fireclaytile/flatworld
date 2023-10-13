@@ -1,6 +1,6 @@
 <?php
 
-namespace fireclaytile\flatworld\services\salesforce\models;
+namespace fireclaytile\flatworld\models;
 
 /**
  * RestDetails model class.

@@ -3,18 +3,28 @@
 namespace fireclaytile\flatworld\tests\unit;
 
 use Craft;
-use Exception;
 use UnitTester;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use verbb\postie\Postie;
 use Codeception\Test\Unit;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\variables\FlatworldVariable;
 
 class FlatworldVariableTest extends Unit
 {
+    /**
+     * @var boolean
+     */
+    private bool $_loggingEnabled;
+
+    /**
+     * @var array
+     */
+    public array $mockServiceList;
+
     /**
      * @var FlatworldVariable
      */
@@ -24,6 +34,11 @@ class FlatworldVariableTest extends Unit
      * @var UnitTester
      */
     protected UnitTester $tester;
+
+    /**
+     * @var FlatworldProvider
+     */
+    protected FlatworldProvider $flatworld;
 
     /**
      * @return void

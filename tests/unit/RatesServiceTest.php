@@ -144,7 +144,7 @@ class RatesServiceTest extends Unit
         $this->assertIsObject($shippingRequest);
         $this->assertNotEmpty($shippingRequest);
         $this->assertInstanceOf(
-            'fireclaytile\flatworld\services\salesforce\models\ShippingRequest',
+            'fireclaytile\flatworld\models\ShippingRequest',
             $shippingRequest,
         );
 

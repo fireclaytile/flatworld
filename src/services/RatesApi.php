@@ -6,7 +6,7 @@ use craft\base\Component;
 use Exception;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
-use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
+use fireclaytile\flatworld\models\ShippingRequest;
 use verbb\postie\Postie;
 
 // Report all errors
@@ -18,7 +18,7 @@ error_reporting(E_ALL);
  * @author      Fireclay Tile
  * @since       0.8.0
  */
-class RatesApi extends Component
+class RatesApi extends Component implements RatesApiInterface
 {
     /**
      * Instance of the Flatworld Postie Provider class.
@@ -70,7 +70,7 @@ class RatesApi extends Component
         }
 
         if ($sf == null) {
-            $this->salesforceConnect();
+            $this->_salesforceConnect();
         } else {
             $this->sf = $sf;
         }
@@ -81,11 +81,21 @@ class RatesApi extends Component
     }
 
     /**
+     * Tests the connection to the Rates API.
+     *
+     * @return boolean
+     */
+    public function testRatesConnection(): bool
+    {
+        return $this->_salesforceConnect();
+    }
+
+    /**
      * Create a connection to Salesforce. Returns true if successful, false if not.
      *
      * @return bool
      */
-    public function salesforceConnect(): bool
+    private function _salesforceConnect(): bool
     {
         try {
             // get params from Postie settings

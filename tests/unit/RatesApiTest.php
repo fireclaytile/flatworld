@@ -13,8 +13,8 @@ use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\variables\FlatworldVariable;
 use fireclaytile\flatworld\services\RatesApi;
 use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
-use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
-use fireclaytile\flatworld\services\salesforce\models\LineItem;
+use fireclaytile\flatworld\models\ShippingRequest;
+use fireclaytile\flatworld\models\LineItem;
 
 class RatesApiTest extends Unit
 {

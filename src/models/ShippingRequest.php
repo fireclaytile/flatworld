@@ -1,8 +1,8 @@
 <?php
 
-namespace fireclaytile\flatworld\services\salesforce\models;
+namespace fireclaytile\flatworld\models;
 
-use fireclaytile\flatworld\services\salesforce\models\LineItem;
+use fireclaytile\flatworld\models\LineItem;
 
 /**
  * ShippingRequest model class.

@@ -3,8 +3,9 @@
 namespace fireclaytile\flatworld\services\salesforce;
 
 use Exception;
-use fireclaytile\flatworld\services\salesforce\models\RestDetails;
-use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
+use fireclaytile\flatworld\models\RestDetails;
+use fireclaytile\flatworld\models\ShippingRequest;
+use fireclaytile\flatworld\services\RatesRestConnectionInterface;
 
 /**
  * SalesforceRestConnection Class
@@ -14,7 +15,7 @@ use fireclaytile\flatworld\services\salesforce\models\ShippingRequest;
  * @author      Fireclay Tile
  * @since       0.9.0
  */
-class SalesforceRestConnection
+class SalesforceRestConnection implements RatesRestConnectionInterface
 {
     /**
      * Salesforce access token.
