@@ -41,12 +41,12 @@ class Flatworld extends Provider
     /**
      * @var string
      */
-    public $weightUnit = 'lb';
+    public string $weightUnit = 'lb';
 
     /**
      * @var string
      */
-    public $dimensionUnit = 'in';
+    public string $dimensionUnit = 'in';
 
     /**
      * @var RatesService
@@ -88,12 +88,10 @@ class Flatworld extends Provider
      */
     public function getIconUrl(): string
     {
-        return Craft::$app
-            ->getAssetManager()
-            ->getPublishedUrl(
-                '@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg',
-                true,
-            );
+        return Craft::$app->assetManager->getPublishedUrl(
+            '@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg',
+            true,
+        );
     }
 
     /**

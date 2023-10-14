@@ -9,6 +9,8 @@ use putyourlightson\logtofile\LogToFile;
 /**
  * Service class for logging messages.
  *
+ * TODO: Change this completely for Craft 4. Helpful reference: https://putyourlightson.com/articles/adding-logging-to-craft-plugins-with-monolog
+ *
  * @author      Fireclay Tile
  * @since       0.9.0
  */
