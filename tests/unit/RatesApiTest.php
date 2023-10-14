@@ -35,13 +35,6 @@ class RatesApiTest extends Unit
      */
     public array $mockServiceList;
 
-    /**
-     * Instance of the SalesforceRestConnection class.
-     *
-     * @var mixed
-     */
-    public $sf;
-
     protected function _before(): void
     {
         parent::_before();
@@ -66,10 +59,9 @@ class RatesApiTest extends Unit
         $shippingRequest = new ShippingRequest('46239', true, 'Sample', []);
         $shippingRequest->addLineItem(new LineItem('01t8000000336tr', 1));
 
-        // Call the getRates function with the sample shipping request
-        $this->salesforceConnect();
-        codecept_debug($this->sf);
-        $rates = $this->ratesApiService->getRates($shippingRequest, $this->sf);
+        $this->ratesApiService = new RatesApi($this->flatworld->settings);
+
+        $rates = $this->ratesApiService->getRates($shippingRequest);
         codecept_debug($rates);
 
         $this->assertNotNull($rates);
@@ -177,32 +169,5 @@ class RatesApiTest extends Unit
             'flatRateCarrierCost' => '8.0',
             'carrierClassOfServices' => $this->mockServiceList,
         ];
-    }
-
-    private function salesforceConnect(): bool
-    {
-        // Create connection to Salesforce
-        try {
-            $apiConsumerKey = $this->flatworld->getSetting('apiConsumerKey');
-            $apiConsumerSecret = $this->flatworld->getSetting(
-                'apiConsumerSecret',
-            );
-            $apiUsername = $this->flatworld->getSetting('apiUsername');
-            $apiPassword = $this->flatworld->getSetting('apiPassword');
-            $apiUrl = $this->flatworld->getSetting('apiUrl');
-
-            $this->sf = new SalesforceRestConnection(
-                $apiConsumerKey,
-                $apiConsumerSecret,
-                $apiUsername,
-                $apiPassword,
-                $apiUrl,
-            );
-
-            return true;
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            return false;
-        }
     }
 }
