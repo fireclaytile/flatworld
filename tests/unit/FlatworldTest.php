@@ -883,7 +883,7 @@ class FlatworldProviderTest extends Unit
             $address->address2 = '';
             $address->address3 = '';
             $address->city = 'New York';
-            $address->zipCode = '10001';
+            $address->postalCode = '10001';
             $address->phone = '';
             $address->stateName = 'New York';
             $address->countryId = 236;
@@ -1310,7 +1310,7 @@ class MockAddress
     /**
      * @var string
      */
-    public string $zipCode;
+    public string $postalCode;
 
     /**
      * @var string

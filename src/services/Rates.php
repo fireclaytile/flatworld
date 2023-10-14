@@ -291,7 +291,7 @@ class Rates extends Component
     {
         if (
             empty($this->_order->shippingAddress) ||
-            empty($this->_order->shippingAddress->zipCode)
+            empty($this->_order->shippingAddress->postalCode)
         ) {
             $this->_logMessage(
                 __METHOD__,
@@ -910,7 +910,7 @@ class Rates extends Component
         $order = $this->getOrder();
 
         $this->_shippingRequest = new ShippingRequest(
-            $order->shippingAddress->zipCode,
+            $order->shippingAddress->postalCode,
             false,
             'Sample',
             [],
