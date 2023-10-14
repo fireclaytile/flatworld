@@ -2,19 +2,17 @@
 
 namespace fireclaytile\flatworld\tests\unit;
 
+use Codeception\Test\Unit;
 use Craft;
-use Exception;
 use UnitTester;
 use craft\helpers\App;
-use verbb\postie\Postie;
-use Codeception\Test\Unit;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
-use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
-use fireclaytile\flatworld\variables\FlatworldVariable;
-use fireclaytile\flatworld\services\RatesApi;
-use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
-use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\models\LineItem;
+use fireclaytile\flatworld\models\ShippingRequest;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
+use fireclaytile\flatworld\services\RatesApi;
+use fireclaytile\flatworld\variables\FlatworldVariable;
+use verbb\postie\Postie;
 
 class RatesApiTest extends Unit
 {
@@ -34,13 +32,6 @@ class RatesApiTest extends Unit
      * @var array
      */
     public array $mockServiceList;
-
-    /**
-     * Instance of the SalesforceRestConnection class.
-     *
-     * @var mixed
-     */
-    public $sf;
 
     protected function _before(): void
     {
@@ -66,10 +57,9 @@ class RatesApiTest extends Unit
         $shippingRequest = new ShippingRequest('46239', true, 'Sample', []);
         $shippingRequest->addLineItem(new LineItem('01t8000000336tr', 1));
 
-        // Call the getRates function with the sample shipping request
-        $this->salesforceConnect();
-        codecept_debug($this->sf);
-        $rates = $this->ratesApiService->getRates($shippingRequest, $this->sf);
+        $this->ratesApiService = new RatesApi($this->flatworld->settings);
+
+        $rates = $this->ratesApiService->getRates($shippingRequest);
         codecept_debug($rates);
 
         $this->assertNotNull($rates);
@@ -177,32 +167,5 @@ class RatesApiTest extends Unit
             'flatRateCarrierCost' => '8.0',
             'carrierClassOfServices' => $this->mockServiceList,
         ];
-    }
-
-    private function salesforceConnect(): bool
-    {
-        // Create connection to Salesforce
-        try {
-            $apiConsumerKey = $this->flatworld->getSetting('apiConsumerKey');
-            $apiConsumerSecret = $this->flatworld->getSetting(
-                'apiConsumerSecret',
-            );
-            $apiUsername = $this->flatworld->getSetting('apiUsername');
-            $apiPassword = $this->flatworld->getSetting('apiPassword');
-            $apiUrl = $this->flatworld->getSetting('apiUrl');
-
-            $this->sf = new SalesforceRestConnection(
-                $apiConsumerKey,
-                $apiConsumerSecret,
-                $apiUsername,
-                $apiPassword,
-                $apiUrl,
-            );
-
-            return true;
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            return false;
-        }
     }
 }

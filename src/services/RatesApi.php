@@ -30,25 +30,30 @@ class RatesApi extends Component implements RatesApiInterface
     /**
      * Salesforce enabled?
      *
-     * @var bool
+     * @var bool|null
      */
-    private bool $_salesforceEnabled;
+    private bool|null $_salesforceEnabled;
 
     /**
      * Instance of the SalesforceRestConnection class.
      *
      * @var mixed
      */
-    public $sf;
+    private $_sf;
 
     /**
      * RatesApi constructor.
      */
-    function __construct()
+    function __construct($settings = null)
     {
         $this->_flatworld = Postie::getInstance()
             ->getProviders()
             ->getProviderByHandle('flatworld');
+
+        if ($settings) {
+            $this->_flatworld->settings = $settings;
+        }
+
         $this->_salesforceEnabled = $this->_flatworld->getSetting(
             'enableSalesforceApi',
         );
@@ -58,24 +63,16 @@ class RatesApi extends Component implements RatesApiInterface
      * Get rates from Salesforce.
      *
      * @param ShippingRequest $shippingRequest Shipping request object
-     * @param mixed $sf SalesforceRestConnection object - useful for tests
      * @return string
      */
-    public function getRates(
-        ShippingRequest $shippingRequest,
-        $sf = null,
-    ): string {
+    public function getRates(ShippingRequest $shippingRequest): string
+    {
         if (!$this->_salesforceEnabled || $shippingRequest == null) {
             return '';
         }
 
-        if ($sf == null) {
-            $this->_salesforceConnect();
-        } else {
-            $this->sf = $sf;
-        }
-
-        $rates = $this->sf->getRates($shippingRequest);
+        $this->_salesforceConnect();
+        $rates = $this->_sf->getRates($shippingRequest);
 
         return json_encode($rates);
     }
@@ -107,7 +104,7 @@ class RatesApi extends Component implements RatesApiInterface
             $apiPassword = $this->_flatworld->getSetting('apiPassword');
             $apiUrl = $this->_flatworld->getSetting('apiUrl');
 
-            $this->sf = new SalesforceRestConnection(
+            $this->_sf = new SalesforceRestConnection(
                 $apiConsumerKey,
                 $apiConsumerSecret,
                 $apiUsername,
