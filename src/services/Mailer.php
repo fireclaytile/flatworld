@@ -17,9 +17,9 @@ use fireclaytile\flatworld\services\Logger;
 class Mailer extends Component
 {
     /**
-     * @var boolean
+     * @var boolean|null
      */
-    private bool $_loggingEnabled;
+    private bool|null $_loggingEnabled;
 
     /**
      * Mailer constructor.
