@@ -80,9 +80,9 @@ class Rates extends Component
     private bool $_orderContainsStandardProducts;
 
     /**
-     * @var boolean
+     * @var boolean|null
      */
-    private bool $_loggingEnabled;
+    private bool|null $_loggingEnabled;
 
     /**
      * Rates constructor.

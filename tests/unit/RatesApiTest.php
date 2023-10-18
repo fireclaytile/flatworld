@@ -2,19 +2,17 @@
 
 namespace fireclaytile\flatworld\tests\unit;
 
+use Codeception\Test\Unit;
 use Craft;
-use Exception;
 use UnitTester;
 use craft\helpers\App;
-use verbb\postie\Postie;
-use Codeception\Test\Unit;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
-use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
-use fireclaytile\flatworld\variables\FlatworldVariable;
-use fireclaytile\flatworld\services\RatesApi;
-use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
-use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\models\LineItem;
+use fireclaytile\flatworld\models\ShippingRequest;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
+use fireclaytile\flatworld\services\RatesApi;
+use fireclaytile\flatworld\variables\FlatworldVariable;
+use verbb\postie\Postie;
 
 class RatesApiTest extends Unit
 {
