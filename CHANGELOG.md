@@ -1,5 +1,11 @@
 # Flatworld Changelog
 
+## 1.0.0 - 2023-10-19
+
+-   Release v1.0.0
+-   Add rate type to returned rates array
+-   Documentation updates
+
 ## 0.9.19 - 2023-10-13
 
 -   Update suggested configuration in README
