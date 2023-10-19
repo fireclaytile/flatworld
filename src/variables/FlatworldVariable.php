@@ -31,6 +31,39 @@ class FlatworldVariable
     private bool|null $_loggingEnabled;
 
     /**
+     * Returns an array of shipping rates for the given order.
+     *
+     * The rates are returned as an array. Generally, this will return either:
+     *
+     * 1. An empty array if the order is not found or has no line items.
+     * 2. An array of 2 rates, with the first being the cheapest and the second being the fastest.
+     * 3. An array of 1 rate if there is only 1 rate available, or if the cheapest and fastest rates are the same.
+     *
+     * Example:
+     * Array
+     *   (
+     *     [FLAT_RATE_SHIPPING] => Array
+     *       (
+     *         [arrival] => 3-7 days
+     *         [transitTime] => 3
+     *         [arrivalDateText] => 2023/10/23
+     *         [amount] => 8
+     *         [type] => parcel
+     *       )
+     *
+     *     [UPS_SECOND_DAY_AIR_AM] => Array
+     *       (
+     *         [arrival] => 1-3 days
+     *         [transitTime] => 1
+     *         [arrivalDateText] => 2023/10/19
+     *         [amount] => 48.06
+     *         [type] => parcel
+     *       )
+     *   )
+     *
+     * Notes:
+     * - 'type' will either be 'parcel' or 'ltl'.
+     *
      * @param int $orderId
      * @return array
      */
