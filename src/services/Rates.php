@@ -1058,6 +1058,7 @@ class Rates extends Component
                 $rates[$handle]['arrivalDateText'] =
                     $cheapestRate->estimatedDeliveryDate;
                 $rates[$handle]['amount'] = $cheapestRate->total;
+                $rates[$handle]['type'] = $quickestRate->type;
             }
 
             if ($handle === $quickestServiceHandle) {
@@ -1070,6 +1071,7 @@ class Rates extends Component
                 $rates[$handle]['arrivalDateText'] =
                     $quickestRate->estimatedDeliveryDate;
                 $rates[$handle]['amount'] = $quickestRate->total;
+                $rates[$handle]['type'] = $quickestRate->type;
             }
         }
 
