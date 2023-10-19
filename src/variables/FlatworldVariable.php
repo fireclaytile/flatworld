@@ -31,17 +31,16 @@ class FlatworldVariable
     private bool|null $_loggingEnabled;
 
     /**
-     * @param $orderId
+     * @param int $orderId
      * @return array
      */
-    public function getRates($orderId): array
+    public function getRates(int $orderId): array
     {
         $flatworld = Postie::getInstance()
             ->getProviders()
             ->getProviderByHandle('flatworld');
 
         $this->_loggingEnabled = $flatworld->getSetting('displayDebugMessages');
-
         $this->_logMessage(__METHOD__, 'Order ID: ' . $orderId);
 
         $order = Order::find()
@@ -49,8 +48,6 @@ class FlatworldVariable
             ->one();
 
         if (!empty($order)) {
-            $this->_logMessage(__METHOD__, 'Found an order');
-
             $rates = $flatworld->fetchShippingRates($order);
 
             if ($rates) {
@@ -58,17 +55,13 @@ class FlatworldVariable
                     __METHOD__,
                     'Rates: ' . Json::encode($rates),
                 );
-
                 return $rates;
             }
-
             $this->_logMessage(__METHOD__, 'Rates were empty');
-
             return [];
         }
 
         $this->_logMessage(__METHOD__, 'Order was empty');
-
         return [];
     }
 
