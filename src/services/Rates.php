@@ -7,6 +7,7 @@ use craft\base\Component;
 use craft\commerce\models\OrderNotice;
 use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
+use fireclaytile\flatworld\models\ShippingRate;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\RatesApi;
@@ -1042,45 +1043,13 @@ class Rates extends Component
 
         $rates = [];
 
-        $handles = array_keys($this->getServiceList());
-
-        $foundServiceHandle = false;
-
-        // Set amounts for the cheapest and quickest options
-        foreach ($handles as $handle) {
-            if ($handle === $cheapestServiceHandle) {
-                $foundServiceHandle = true;
-
-                $rates[$handle][
-                    'arrival'
-                ] = $cheapestRate->getArrivalEstimationString();
-                $rates[$handle]['transitTime'] = $cheapestRate->transitDays;
-                $rates[$handle]['arrivalDateText'] =
-                    $cheapestRate->estimatedDeliveryDate;
-                $rates[$handle]['amount'] = $cheapestRate->total;
-                $rates[$handle]['type'] = $quickestRate->type;
-            }
-
-            if ($handle === $quickestServiceHandle) {
-                $foundServiceHandle = true;
-
-                $rates[$handle][
-                    'arrival'
-                ] = $quickestRate->getArrivalEstimationString();
-                $rates[$handle]['transitTime'] = $quickestRate->transitDays;
-                $rates[$handle]['arrivalDateText'] =
-                    $quickestRate->estimatedDeliveryDate;
-                $rates[$handle]['amount'] = $quickestRate->total;
-                $rates[$handle]['type'] = $quickestRate->type;
-            }
-        }
-
-        if (!$foundServiceHandle) {
-            $this->_logMessage(
-                __METHOD__,
-                'Didnt find any matching carrier handles',
-            );
-        }
+        $this->_setCheapestAndQuickestRates(
+            $rates,
+            $cheapestServiceHandle,
+            $cheapestRate,
+            $quickestServiceHandle,
+            $quickestRate,
+        );
 
         // Sort so the lowest cost carrier is first/default
         $amount = array_column($rates, 'amount');
@@ -1089,55 +1058,7 @@ class Rates extends Component
         // Shipping for samples only orders will differ from standard orders
         // The rates and carrienr handles are set in the plugin settings
         // (We set this on the lowest cost carrier which also overrides flat rate cost)
-        if (
-            !$this->orderContainsStandardProducts() &&
-            !$this->orderContainsMerchandise() &&
-            $this->orderContainsSampleProducts()
-        ) {
-            $firstCarrier = array_slice($rates, 0, 1);
-            $firstServiceHandle = key($firstCarrier);
-
-            if (
-                !empty($this->_order->user) &&
-                $this->_order->user->isInGroup('customersTrade15')
-            ) {
-                $rates[$firstServiceHandle][
-                    'amount'
-                ] = $this->getTradeFlatRateAmount();
-
-                $flatRateHandle = $this->getTradeFlatRateHandle();
-                if (!empty($flatRateHandle)) {
-                    $rates = $this->_changeKey(
-                        $rates,
-                        $firstServiceHandle,
-                        $flatRateHandle,
-                    );
-                }
-
-                $this->_logMessage(
-                    __METHOD__,
-                    'Applied Free Shipping on Samples only for Trade account',
-                );
-            } else {
-                $rates[$firstServiceHandle][
-                    'amount'
-                ] = $this->getFlatRateAmount();
-
-                $flatRateHandle = $this->getFlatRateHandle();
-                if (!empty($flatRateHandle)) {
-                    $rates = $this->_changeKey(
-                        $rates,
-                        $firstServiceHandle,
-                        $flatRateHandle,
-                    );
-                }
-
-                $this->_logMessage(
-                    __METHOD__,
-                    'Applied Flat Rate Shipping on Samples only for samples-only orders',
-                );
-            }
-        }
+        $this->_setSampleOnlyShippingRates($rates);
 
         return $this->_modifyRatesEvent($rates, $this->_order);
     }
@@ -1244,6 +1165,121 @@ class Rates extends Component
         Craft::$app->cache->set($cacheKey, $rates, $duration);
 
         $this->_logMessage(__METHOD__, 'Set rates cache to expire in 5 mins');
+    }
+
+    /**
+     * Sets the shipping rates for the cheapest and quickest options.
+     *
+     * @param array $rates The shipping rates array.
+     * @param string $cheapestServiceHandle The handle of the cheapest shipping service.
+     * @param ShippingRate $cheapestRate The cheapest shipping rate.
+     * @param string $quickestServiceHandle The handle of the quickest shipping service.
+     * @param ShippingRate $quickestRate The quickest shipping rate.
+     */
+    private function _setCheapestAndQuickestRates(
+        array &$rates,
+        string $cheapestServiceHandle,
+        ShippingRate $cheapestRate,
+        string $quickestServiceHandle,
+        ShippingRate $quickestRate,
+    ): void {
+        $handles = array_keys($this->getServiceList());
+        $foundServiceHandle = false;
+
+        // Set amounts for the cheapest and quickest options
+        foreach ($handles as $handle) {
+            if ($handle === $cheapestServiceHandle) {
+                $foundServiceHandle = true;
+
+                $rates[$handle][
+                    'arrival'
+                ] = $cheapestRate->getArrivalEstimationString();
+                $rates[$handle]['transitTime'] = $cheapestRate->transitDays;
+                $rates[$handle]['arrivalDateText'] =
+                    $cheapestRate->estimatedDeliveryDate;
+                $rates[$handle]['amount'] = $cheapestRate->total;
+                $rates[$handle]['type'] = $quickestRate->type;
+            }
+
+            if ($handle === $quickestServiceHandle) {
+                $foundServiceHandle = true;
+
+                $rates[$handle][
+                    'arrival'
+                ] = $quickestRate->getArrivalEstimationString();
+                $rates[$handle]['transitTime'] = $quickestRate->transitDays;
+                $rates[$handle]['arrivalDateText'] =
+                    $quickestRate->estimatedDeliveryDate;
+                $rates[$handle]['amount'] = $quickestRate->total;
+                $rates[$handle]['type'] = $quickestRate->type;
+            }
+        }
+
+        if (!$foundServiceHandle) {
+            $this->_logMessage(
+                __METHOD__,
+                'Didnt find any matching carrier handles',
+            );
+        }
+    }
+
+    /**
+     * Gets the shipping rate amount for samples-only orders.
+     *
+     * @return float The shipping rate amount.
+     */
+    private function _getSamplesOnlyShippingRateAmount(): float
+    {
+        if (
+            !empty($this->_order->user) &&
+            $this->_order->user->isInGroup('customersTrade15')
+        ) {
+            $amount = $this->getTradeFlatRateAmount();
+
+            $this->_logMessage(
+                __METHOD__,
+                'Applied Free Shipping on Samples only for Trade account',
+            );
+        } else {
+            $amount = $this->getFlatRateAmount();
+
+            $this->_logMessage(
+                __METHOD__,
+                'Applied Flat Rate Shipping on Samples only for samples-only orders',
+            );
+        }
+
+        return $amount;
+    }
+
+    /**
+     * Sets the shipping rates for sample-only orders.
+     *
+     * @param array $rates The shipping rates array.
+     */
+    private function _setSampleOnlyShippingRates(array &$rates): void
+    {
+        if (
+            !$this->orderContainsStandardProducts() &&
+            !$this->orderContainsMerchandise() &&
+            $this->orderContainsSampleProducts()
+        ) {
+            $firstCarrier = array_slice($rates, 0, 1);
+            $firstServiceHandle = key($firstCarrier);
+
+            $rates[$firstServiceHandle][
+                'amount'
+            ] = $this->_getSamplesOnlyShippingRateAmount();
+
+            $flatRateHandle = $this->getFlatRateHandle();
+            if (!empty($flatRateHandle)) {
+                $rates = $this->_changeKey(
+                    $rates,
+                    $firstServiceHandle,
+                    $flatRateHandle,
+                );
+            }
+        }
     }
 
     /**
