@@ -1,5 +1,10 @@
 # Flatworld Changelog
 
+## 1.1.0 - 2023-10-21
+
+-   Simplify flat rate handle usage.
+-   Improve rates service readability.
+
 ## 1.0.0 - 2023-10-19
 
 -   Release v1.0.0
