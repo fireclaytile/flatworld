@@ -438,8 +438,7 @@ class FlatworldProviderTest extends Unit
 
         $msg = "{$method} :: {$message}";
 
-        $logger = new Logger(true);
-        return $logger->logMessage($msg);
+        return Logger::logMessage($msg, true);
     }
 
     /**

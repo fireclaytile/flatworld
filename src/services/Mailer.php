@@ -47,10 +47,12 @@ class Mailer extends Component
 
             Craft::$app->getMailer()->send($message);
         } catch (Throwable $e) {
-            $logger = new Logger($this->_loggingEnabled);
-            $logger->logMessage(
-                __METHOD__ . ' :: Something went wrong: ' . $e->getMessage(),
-            );
+            $msg =
+                __METHOD__ .
+                ' :: Something went wrong: ' .
+                $e->getMessage() .
+                '';
+            Logger::logMessage($msg, $this->_loggingEnabled);
         }
     }
 }

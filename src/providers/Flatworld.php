@@ -227,8 +227,7 @@ class Flatworld extends Provider
             $msg = "{$method} :: {$uniqueId} :: {$message}";
         }
 
-        $logger = new Logger(true);
-        return $logger->logMessage($msg);
+        return Logger::logMessage($msg, true);
     }
 
     /**
