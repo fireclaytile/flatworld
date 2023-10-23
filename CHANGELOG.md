@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 1.1.1 - 2023-10-23
+
+-   Finish simplifiying flat rate handle usage (remove `tradeFlatRateCarrierName` setting)
+
 ## 1.1.0 - 2023-10-21
 
 -   Simplify flat rate handle usage.

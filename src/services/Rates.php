@@ -1079,21 +1079,6 @@ class Rates extends Component
     }
 
     /**
-     * Gets the Trade customer flat rate carrier handle based from the plugin settings.
-     *
-     * @return string
-     */
-    public function getTradeFlatRateHandle(): string
-    {
-        $handle = str_replace(
-            ' ',
-            '_',
-            strtoupper($this->_getSetting('tradeFlatRateCarrierName')),
-        );
-        return $handle;
-    }
-
-    /**
      * Gets the flat rate amount from the plugin settings.
      *
      * @return float
