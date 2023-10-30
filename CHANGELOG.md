@@ -1,6 +1,6 @@
 # Flatworld Changelog
 
-## (unreleased)
+## 1.1.2 - 2023-10-30
 
 -   Ensure TransitDays is a numeric value.
 -   Turn Logger into a static class.
