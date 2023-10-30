@@ -16,6 +16,9 @@ use fireclaytile\flatworld\services\Logger;
  */
 class Mailer extends Component
 {
+    const MAIL_TO = 'web@fireclaytile.com';
+    const MAIL_SUBJECT = 'Flatworld Plugin - Error Found';
+
     /**
      * @var boolean|null
      */
@@ -41,8 +44,8 @@ class Mailer extends Component
     {
         try {
             $message = new Message();
-            $message->setTo('web@fireclaytile.com');
-            $message->setSubject('Flatworld Plugin - Error Found');
+            $message->setTo(self::MAIL_TO);
+            $message->setSubject(self::MAIL_SUBJECT);
             $message->setTextBody($textBody);
 
             Craft::$app->getMailer()->send($message);
