@@ -224,8 +224,8 @@ class Rates extends Component
     public function checkLineItemRequiredFields(): bool
     {
         $problems = false;
-
         $problemMessage = '';
+        $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
 
         foreach ($this->_order->lineItems as $item) {
             if (
@@ -265,7 +265,7 @@ class Rates extends Component
                 'Invalid line items found, bailing out...',
             );
 
-            if ($this->_getSetting('enableErrorEmailMessages')) {
+            if (!$devMode && $this->_getSetting('enableErrorEmailMessages')) {
                 $this->_logMessage(__METHOD__, 'Sending email with error.');
                 FlatworldPlugin::getInstance()->mailer->sendMail(
                     $problemMessage,

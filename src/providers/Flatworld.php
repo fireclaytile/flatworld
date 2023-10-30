@@ -242,6 +242,7 @@ class Flatworld extends Provider
     {
         $file = 'NA';
         $line = 'NA';
+        $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
 
         if (method_exists($error, 'hasResponse')) {
             $data = Json::decode((string) $error->getResponse()->getBody());
@@ -285,7 +286,7 @@ class Flatworld extends Provider
 
         $this->_logMessage(__METHOD__, $debugMessage, $uniqueId);
 
-        if ($this->getSetting('enableErrorEmailMessages')) {
+        if (!$devMode && $this->getSetting('enableErrorEmailMessages')) {
             $mailer = new Mailer($this->getSetting('displayDebugMessages'));
             $mailer->sendMail($debugMessage);
         }

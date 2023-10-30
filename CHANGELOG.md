@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## unreleased
+
+-   Don't send error emails if Craft devMode is enabled.
+
 ## 1.1.2 - 2023-10-30
 
 -   Ensure TransitDays is a numeric value.
