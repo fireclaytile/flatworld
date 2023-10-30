@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## (unreleased)
+
+-   Ensure TransitDays is a numeric value.
+
 ## 1.1.1 - 2023-10-23
 
 -   Finish simplifiying flat rate handle usage (remove `tradeFlatRateCarrierName` setting)

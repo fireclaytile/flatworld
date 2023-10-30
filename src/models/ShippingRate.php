@@ -57,7 +57,9 @@ class ShippingRate
         $shippingRate->serviceLevel = $data['ServiceLevel'];
         $shippingRate->carrierName = $data['CarrierName'];
         $shippingRate->total = $data['Total'];
-        $shippingRate->transitDays = $data['TransitDays'];
+        $shippingRate->transitDays = is_numeric($data['TransitDays'])
+            ? $data['TransitDays']
+            : null;
         $shippingRate->estimatedDeliveryDate =
             $data['EstimatedDeliveryDate'] ?? null;
         $shippingRate->estimatedDeliveryTime =
