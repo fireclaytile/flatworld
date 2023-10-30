@@ -49,6 +49,10 @@ class ShippingRates
     {
         $rates = json_decode($ratesJson, true);
 
+        if (!$rates) {
+            return;
+        }
+
         foreach ($rates as $rate) {
             $this->_rates[] = ShippingRate::fromArray($rate);
         }

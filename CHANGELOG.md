@@ -5,6 +5,7 @@
 -   Ensure TransitDays is a numeric value.
 -   Turn Logger into a static class.
 -   Use constants in Mailer class.
+-   Handle possible empty or null rates array in ShippingRates service.
 
 ## 1.1.1 - 2023-10-23
 
