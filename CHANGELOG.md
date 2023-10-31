@@ -3,6 +3,7 @@
 ## unreleased
 
 -   Don't send error emails if Craft devMode is enabled.
+-   Allow null rates to be returned from the Shipping Rates service.
 
 ## 1.1.2 - 2023-10-30
 

@@ -19,10 +19,10 @@ class ShippingRates
     private array $_rates;
 
     // cheapest rate
-    private ShippingRate $_cheapestRate;
+    private ShippingRate|null $_cheapestRate;
 
     // fastest rate
-    private ShippingRate $_fastestRate;
+    private ShippingRate|null $_fastestRate;
 
     /**
      * ShippingRates constructor.
@@ -34,10 +34,15 @@ class ShippingRates
         if ($ratesJson == null) {
             $ratesJson = '[]';
         }
-
+        $this->_rates = [];
+        $this->_cheapestRate = null;
+        $this->_fastestRate = null;
         $this->setRates($ratesJson);
-        $this->setFastestRate();
-        $this->setCheapestRate();
+
+        if (!empty($this->_rates)) {
+            $this->setFastestRate();
+            $this->setCheapestRate();
+        }
     }
 
     /**
@@ -89,9 +94,9 @@ class ShippingRates
     /**
      * Get the cheapest rate.
      *
-     * @return ShippingRate
+     * @return ShippingRate|null
      */
-    public function getCheapestRate(): ShippingRate
+    public function getCheapestRate(): ?ShippingRate
     {
         return $this->_cheapestRate;
     }
