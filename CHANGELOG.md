@@ -1,6 +1,6 @@
 # Flatworld Changelog
 
-## unreleased
+## 1.1.3 - 2023-10-31
 
 -   Don't send error emails if Craft devMode is enabled.
 -   Allow null rates to be returned from the Shipping Rates service.
