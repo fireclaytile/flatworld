@@ -1012,7 +1012,8 @@ class Rates extends Component
     public function responseRates(): array
     {
         $response = $this->getResponse();
-        $shippingRates = new ShippingRates($response);
+        $allowedCarrierServices = $this->_getSetting('carrierClassOfServices');
+        $shippingRates = new ShippingRates($response, $allowedCarrierServices);
 
         $cheapestRate = $shippingRates->getCheapestRate();
         $quickestRate = $shippingRates->getFastestRate();

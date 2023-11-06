@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 1.2.0 - 2023-11-06
+
+-   Rates now will be filtered based on whether or not they are using a Carrier Service that is enabled in the Postie settings. This way, getting Cheapest and Fastest rates don't return rates from carriers that are not enabled in the settings.
+
 ## 1.1.3 - 2023-10-31
 
 -   Don't send error emails if Craft devMode is enabled.

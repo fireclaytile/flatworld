@@ -28,38 +28,23 @@ class ShippingRates
      * ShippingRates constructor.
      *
      * @param string|null $ratesJson `JSON` string of rates
+     * @param array|null $allowedCarrierServices Carrier Services allowed for rates
      */
-    public function __construct(?string $ratesJson = null)
-    {
+    public function __construct(
+        ?string $ratesJson = null,
+        ?array $allowedCarrierServices = null,
+    ) {
         if ($ratesJson == null) {
             $ratesJson = '[]';
         }
         $this->_rates = [];
         $this->_cheapestRate = null;
         $this->_fastestRate = null;
-        $this->setRates($ratesJson);
+        $this->_setRates($ratesJson, $allowedCarrierServices);
 
         if (!empty($this->_rates)) {
-            $this->setFastestRate();
-            $this->setCheapestRate();
-        }
-    }
-
-    /**
-     * Set the rates array from a `JSON` string.
-     *
-     * @param string $ratesJson
-     */
-    public function setRates(string $ratesJson): void
-    {
-        $rates = json_decode($ratesJson, true);
-
-        if (!$rates) {
-            return;
-        }
-
-        foreach ($rates as $rate) {
-            $this->_rates[] = ShippingRate::fromArray($rate);
+            $this->_setFastestRate();
+            $this->_setCheapestRate();
         }
     }
 
@@ -74,11 +59,31 @@ class ShippingRates
     }
 
     /**
+     * Get the cheapest rate.
+     *
+     * @return ShippingRate|null
+     */
+    public function getCheapestRate(): ?ShippingRate
+    {
+        return $this->_cheapestRate;
+    }
+
+    /**
+     * Get the fastest rate.
+     *
+     * @return ShippingRate|null
+     */
+    public function getFastestRate(): ?ShippingRate
+    {
+        return $this->_fastestRate;
+    }
+
+    /**
      * Sets the cheapest rate that exists from the rates array. Also sets the cheapest rate service level handle.
      *
      * @return void
      */
-    public function setCheapestRate(): void
+    private function _setCheapestRate(): void
     {
         $cheapestRate = $this->_rates[0];
 
@@ -92,21 +97,11 @@ class ShippingRates
     }
 
     /**
-     * Get the cheapest rate.
-     *
-     * @return ShippingRate|null
-     */
-    public function getCheapestRate(): ?ShippingRate
-    {
-        return $this->_cheapestRate;
-    }
-
-    /**
      * Sets the fastest rate that exists from the array of rates. Also sets the fastest rate service level handle.
      *
      * @return void
      */
-    public function setFastestRate(): void
+    private function _setFastestRate(): void
     {
         $fastestRate = null;
 
@@ -125,13 +120,41 @@ class ShippingRates
     }
 
     /**
-     * Get the fastest rate.
+     * Set the rates array from a `JSON` string.
      *
-     * @return ShippingRate|null
+     * @param string $ratesJson `JSON` string of rates
+     * @param array|null $allowedCarrierServices Carriers allowed for rates
      */
-    public function getFastestRate(): ?ShippingRate
-    {
-        return $this->_fastestRate;
+    private function _setRates(
+        string $ratesJson,
+        ?array $allowedCarrierServices = null,
+    ): void {
+        $rates = json_decode($ratesJson, true);
+
+        if (!$rates) {
+            return;
+        }
+
+        $filteredRates = $rates;
+
+        if ($allowedCarrierServices !== null) {
+            $filteredRates = array_filter($rates, function ($rate) use (
+                $allowedCarrierServices,
+            ) {
+                if ($rate['Type'] === 'parcel') {
+                    return in_array(
+                        $rate['ServiceLevel'],
+                        $allowedCarrierServices,
+                    );
+                }
+                // ltl rates
+                return in_array($rate['CarrierName'], $allowedCarrierServices);
+            });
+        }
+
+        foreach ($filteredRates as $rate) {
+            $this->_rates[] = ShippingRate::fromArray($rate);
+        }
     }
 
     /**
