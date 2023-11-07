@@ -60,9 +60,14 @@
     "codeception/module-asserts": "^1.0.0",
     "codeception/module-phpbrowser": "^1.0.0",
     "codeception/module-yii2": "^1.1",
+    "craftcms/ecs": "dev-main",
     "craftcms/rector": "dev-main",
     "vlucas/phpdotenv": "^5.4"
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix"
+  }
 }

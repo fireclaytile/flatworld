@@ -2,8 +2,6 @@
 
 namespace fireclaytile\flatworld\models;
 
-use fireclaytile\flatworld\models\LineItem;
-
 /**
  * ShippingRequest model class.
  *

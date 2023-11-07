@@ -14,12 +14,12 @@
 namespace fireclaytile\flatworld\providers;
 
 use Craft;
-use Exception;
-use Throwable;
 use craft\helpers\Json;
+use Exception;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\Rates as RatesService;
+use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;

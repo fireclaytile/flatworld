@@ -3,10 +3,9 @@
 namespace fireclaytile\flatworld\services;
 
 use Craft;
-use Throwable;
 use craft\base\Component;
 use craft\mail\Message;
-use fireclaytile\flatworld\services\Logger;
+use Throwable;
 
 /**
  * Service class for emailing.
@@ -29,7 +28,7 @@ class Mailer extends Component
      *
      * @param boolean $loggingEnabled Whether or not logging is enabled
      */
-    function __construct($loggingEnabled = false)
+    public function __construct($loggingEnabled = false)
     {
         $this->_loggingEnabled = $loggingEnabled;
     }

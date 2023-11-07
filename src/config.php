@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2023 Fireclay Tile
  */
 
-use craft\helpers\App;
-
 return [
     // Global settings
     '*' => [

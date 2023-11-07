@@ -7,16 +7,13 @@ use craft\base\Component;
 use craft\commerce\models\OrderNotice;
 use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
-use fireclaytile\flatworld\models\ShippingRate;
-use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
-use fireclaytile\flatworld\services\Logger;
-use fireclaytile\flatworld\services\RatesApi;
-use fireclaytile\flatworld\services\ShippingRates;
-use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\models\LineItem;
+use fireclaytile\flatworld\models\ShippingRate;
+use fireclaytile\flatworld\models\ShippingRequest;
+use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use GuzzleHttp\Exception\GuzzleException;
-use verbb\postie\Postie;
 use verbb\postie\helpers\PostieHelper;
+use verbb\postie\Postie;
 use yii\base\InvalidConfigException;
 
 /**
@@ -88,7 +85,7 @@ class Rates extends Component
     /**
      * Rates constructor.
      */
-    function __construct($loggingEnabled = false, $settings = null)
+    public function __construct($loggingEnabled = false, $settings = null)
     {
         $this->_loggingEnabled = $loggingEnabled;
 

@@ -4,9 +4,9 @@ namespace fireclaytile\flatworld\services;
 
 use craft\base\Component;
 use Exception;
+use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use fireclaytile\flatworld\services\salesforce\SalesforceRestConnection;
-use fireclaytile\flatworld\models\ShippingRequest;
 use verbb\postie\Postie;
 
 // Report all errors
@@ -44,7 +44,7 @@ class RatesApi extends Component implements RatesApiInterface
     /**
      * RatesApi constructor.
      */
-    function __construct($settings = null)
+    public function __construct($settings = null)
     {
         $this->_flatworld = Postie::getInstance()
             ->getProviders()
