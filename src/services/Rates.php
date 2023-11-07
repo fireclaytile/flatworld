@@ -858,7 +858,7 @@ class Rates extends Component
             return '';
         }
 
-        $commerceService = craft\commerce\Plugin::getInstance();
+        $commerceService = \craft\commerce\Plugin::getInstance();
 
         // Get product.
         $product = $commerceService

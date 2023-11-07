@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 -   add ECS tool and run for pre-craft-4 cleanup
+-   add craftcms/phpstan and run for pre-craft-4 cleanup
 
 ## 1.2.0 - 2023-11-06
 

@@ -61,6 +61,7 @@
     "codeception/module-phpbrowser": "^1.0.0",
     "codeception/module-yii2": "^1.1",
     "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
     "craftcms/rector": "dev-main",
     "vlucas/phpdotenv": "^5.4"
   },
@@ -68,6 +69,7 @@
   "prefer-stable": true,
   "scripts": {
     "check-cs": "ecs check --ansi",
-    "fix-cs": "ecs check --ansi --fix"
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
   }
 }
