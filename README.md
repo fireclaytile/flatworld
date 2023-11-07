@@ -26,6 +26,8 @@ Provides live shipping rates during checkout from Flatworld (https://flatworldgs
 
 ## Configuration
 
+Please note: `GROUND` is a special class of service that is used for flat rate carrier matching. Should be used for the "Trade Customer Flat Rate Carrier Name" setting.
+
 ```
 <?php
 /**
@@ -85,8 +87,7 @@ return [
                         'USPS_EXPRESS' => 'USPS Express',
                         'USPS_PRIORITY' => 'USPS Priority',
                         'USPS_FLAT_RATE' => 'USPS Flat Rate',
-                        'FLAT_RATE_SHIPPING' => 'Flat Rate Shipping',
-                        'TRADE_CUSTOMER_SHIPPING' => 'Trade Customer Shipping',
+                        'GROUND' => 'Ground',
                     ],
                 ],
             ],

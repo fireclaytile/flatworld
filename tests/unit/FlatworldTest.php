@@ -295,8 +295,8 @@ class FlatworldProviderTest extends Unit
         $iconUrl = $this->flatworld->getIconUrl();
 
         $this->assertNotEmpty($iconUrl);
-        $this->assertSame(
-            'https://flatworld.test:80/cpresources/17b8c0e2/Flatworld.svg?v=1694438761',
+        $this->assertRegExp(
+            '/https:\/\/flatworld\.test:80\/cpresources\/[a-f0-9]{8}\/Flatworld\.svg\?v=\d+/',
             $iconUrl,
         );
 
@@ -438,8 +438,7 @@ class FlatworldProviderTest extends Unit
 
         $msg = "{$method} :: {$message}";
 
-        $logger = new Logger(true);
-        return $logger->logMessage($msg);
+        return Logger::logMessage($msg, true);
     }
 
     /**

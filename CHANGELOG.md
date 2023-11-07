@@ -1,5 +1,30 @@
 # Flatworld Changelog
 
+## 1.2.0 - 2023-11-06
+
+-   Rates now will be filtered based on whether or not they are using a Carrier Service that is enabled in the Postie settings. This way, getting Cheapest and Fastest rates don't return rates from carriers that are not enabled in the settings.
+
+## 1.1.3 - 2023-10-31
+
+-   Don't send error emails if Craft devMode is enabled.
+-   Allow null rates to be returned from the Shipping Rates service.
+
+## 1.1.2 - 2023-10-30
+
+-   Ensure TransitDays is a numeric value.
+-   Turn Logger into a static class.
+-   Use constants in Mailer class.
+-   Handle possible empty or null rates array in ShippingRates service.
+
+## 1.1.1 - 2023-10-23
+
+-   Finish simplifiying flat rate handle usage (remove `tradeFlatRateCarrierName` setting)
+
+## 1.1.0 - 2023-10-21
+
+-   Simplify flat rate handle usage.
+-   Improve rates service readability.
+
 ## 1.0.0 - 2023-10-19
 
 -   Release v1.0.0

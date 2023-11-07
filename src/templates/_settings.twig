@@ -199,17 +199,6 @@
 }) }}
 
 {{ forms.autosuggestField({
-    label: 'Trade Customer Flat Rate Carrier Name' | t('postie'),
-    instructions: 'It is highly suggested to use an environment variable here. Enter the Trade Customer Flat Rate Carrier Name here. This is what will be displayed to the customer. Must match a Shipping Method Name.' | t('postie', { name: provider.displayName() }),
-    id: 'tradeFlatRateCarrierName',
-    name: 'tradeFlatRateCarrierName',
-    value: provider.settings.tradeFlatRateCarrierName ?? '',
-    required: true,
-    suggestEnvVars: true,
-    warning: macros.configWarning('providers.' ~ provider.handle ~ '.settings.tradeFlatRateCarrierName', 'postie'),
-}) }}
-
-{{ forms.autosuggestField({
     label: 'Trade Customer Flat Rate Carrier Cost' | t('postie'),
     instructions: 'It is highly suggested to use an environment variable here. Enter the Trade Customer Flat Rate Carrier Cost here.' | t('postie', { name: provider.displayName() }),
     id: 'tradeFlatRateCarrierCost',
