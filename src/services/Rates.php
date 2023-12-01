@@ -7,7 +7,6 @@ use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
-use fireclaytile\flatworld\models\LineItem;
 use fireclaytile\flatworld\models\OrderMetaData;
 use fireclaytile\flatworld\models\ShippingRate;
 use fireclaytile\flatworld\models\ShippingRequest;
@@ -50,7 +49,7 @@ class Rates extends Component
      *
      * @var ShippingRequest
      */
-    private ShippingRequest $_shippingRequest;
+    private ShippingRequest $shippingRequest;
 
     /**
      * @var boolean|null
@@ -83,10 +82,13 @@ class Rates extends Component
      * @param OrderMetaData $orderMetaData The metadata of the order.
      * @return array Returns an array of rates for the order.
      */
-    public function getRates(Order $order, OrderMetaData $orderMetaData): array
-    {
+    public function getRates(
+        Order $order,
+        OrderMetaData $orderMetaData,
+        ShippingRequest $shippingRequest,
+    ): array {
         $this->setOrder($order);
-        $this->setShippingRequest($orderMetaData);
+        $this->shippingRequest = $shippingRequest;
 
         // Lets check the rates cache before making an API request - this will be an array or be false
         $ratesCache = $this->getRatesCache();
@@ -127,103 +129,13 @@ class Rates extends Component
     }
 
     /**
-     * Determines the productId for an order line item.
-     *
-     * @param mixed $row A LineItem from the order.
-     * @return string
-     */
-    private function _setLineItemProductId($row): string
-    {
-        // This is taken directly from the fct Salesforce plugin.
-        if (
-            isset($row->options['masterSalesforceId']) and
-            empty($row->options['masterSalesforceId'])
-        ) {
-            return '';
-        }
-
-        $commerceService = \craft\commerce\Plugin::getInstance();
-
-        // Get product.
-        $product = $commerceService
-            ->getProducts()
-            ->getProductById($row->getPurchasable()->productId);
-
-        $productId = $product->sizeSalesforceId
-            ? $product->sizeSalesforceId
-            : '01t340000043WQ6';
-
-        //  customMosaicTimestamp
-        if (
-            isset($row->options['customMosaicTimestamp']) and
-            !empty($row->options['customMosaicTimestamp'])
-        ) {
-            $productId = $row->options['salesforceId']
-                ? $row->options['salesforceId']
-                : 'a1s34000001n6bo';
-        }
-
-        // Deal with masterSalesforceId
-        if (
-            isset($row->options['masterSalesforceId']) and
-            !empty($row->options['masterSalesforceId'])
-        ) {
-            $productId = $row->options['masterSalesforceId'];
-        }
-
-        // For generalSamples products set the productId here
-        if (
-            isset($row->options['generalSampleSalesforceId']) and
-            !empty($row->options['generalSampleSalesforceId'])
-        ) {
-            $productId = $row->options['generalSampleSalesforceId'];
-        }
-
-        return $productId;
-    }
-
-    /**
-     * Sets the _shippingRequest property based on the order details.
-     *
-     * @return void
-     */
-    public function setShippingRequest(OrderMetaData $orderMetaData): void
-    {
-        $order = $this->getOrder();
-
-        $this->_shippingRequest = new ShippingRequest(
-            $order->shippingAddress->zipCode,
-            false,
-            'Sample',
-            [],
-        );
-
-        foreach ($order->lineItems as $item) {
-            $this->_shippingRequest->addLineItem(
-                new LineItem($this->_setLineItemProductId($item), $item->qty),
-            );
-        }
-
-        if ($orderMetaData->containsStandardProducts) {
-            $this->_shippingRequest->orderType = 'Order';
-        }
-
-        if (
-            $order->truckLiftCharge &&
-            $this->_getSetting('enableLiftGateRates')
-        ) {
-            $this->_shippingRequest->liftGate = true;
-        }
-    }
-
-    /**
-     * Gets the _shippingRequest property.
+     * Gets the shippingRequest property.
      *
      * @return ShippingRequest
      */
     public function getShippingRequest(): ShippingRequest
     {
-        return $this->_shippingRequest;
+        return $this->shippingRequest;
     }
 
     /**
@@ -251,7 +163,7 @@ class Rates extends Component
      */
     public function requestRates()
     {
-        $shippingRequest = $this->_shippingRequest;
+        $shippingRequest = $this->shippingRequest;
         $body = Json::encode($shippingRequest);
 
         $this->_logMessage(__METHOD__, 'ShippingRequest: ' . $body);

@@ -18,6 +18,7 @@ use Craft;
 use craft\helpers\Json;
 use Exception;
 use fireclaytile\flatworld\models\OrderMetaData;
+use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\OrderValidator;
@@ -55,6 +56,13 @@ class Flatworld extends Provider
      * @var RatesService
      */
     private RatesService $_ratesService;
+
+    /**
+     * ShippingRequest object.
+     *
+     * @var ShippingRequest
+     */
+    private ShippingRequest $shippingRequest;
 
     /**
      * Gets the plugin's display name.
@@ -149,6 +157,17 @@ class Flatworld extends Provider
                 $uniqueId,
             );
 
+            $this->_logMessage(
+                __METHOD__,
+                'Creating ShippingRequest',
+                $uniqueId,
+            );
+            $this->shippingRequest = new ShippingRequest(
+                $order,
+                $orderMetaData,
+                $this->getSetting('enableLiftGateRates'),
+            );
+
             $this->_logMessage(__METHOD__, 'Fetching rates', $uniqueId);
             $this->_ratesService = new RatesService(
                 $this->getSetting('displayDebugMessages'),
@@ -157,6 +176,7 @@ class Flatworld extends Provider
             $this->_rates = $this->_ratesService->getRates(
                 $order,
                 $orderMetaData,
+                $this->shippingRequest,
             );
 
             if ($this->_rates) {
@@ -318,6 +338,11 @@ class Flatworld extends Provider
         $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}";
         if ($order) {
             $debugMessage .= ", ORDER ID: {$order->id}";
+        }
+
+        if ($this->shippingRequest) {
+            $requestJson = json_encode($this->shippingRequest);
+            $debugMessage .= ", SHIPPING REQUEST: {$requestJson}";
         }
 
         $this->_logMessage(__METHOD__, $debugMessage, $uniqueId);
