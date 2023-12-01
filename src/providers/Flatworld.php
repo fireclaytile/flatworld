@@ -17,6 +17,7 @@ use Craft;
 
 use craft\helpers\Json;
 use Exception;
+use fireclaytile\flatworld\models\OrderMetaData;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\OrderValidator;
@@ -133,16 +134,30 @@ class Flatworld extends Provider
 
         try {
             $this->_logMessage(__METHOD__, 'Validating order', $uniqueId);
-            if (!$this->validateOrder($order)) {
+
+            $orderMetaData = $this->validateOrder($order);
+
+            if (!$orderMetaData) {
                 return $this->modifyRatesEvent([], $order);
             }
 
-            $this->_logMessage(__METHOD__, 'Fetching new rates', $uniqueId);
+            $orderMetaDataJson = json_encode($orderMetaData);
+
+            $this->_logMessage(
+                __METHOD__,
+                "OrderMetaData: {$orderMetaDataJson}",
+                $uniqueId,
+            );
+
+            $this->_logMessage(__METHOD__, 'Fetching rates', $uniqueId);
             $this->_ratesService = new RatesService(
                 $this->getSetting('displayDebugMessages'),
             );
 
-            $this->_rates = $this->_ratesService->getRates($order);
+            $this->_rates = $this->_ratesService->getRates(
+                $order,
+                $orderMetaData,
+            );
 
             if ($this->_rates) {
                 $rates = Json::encode($this->_rates);
@@ -207,14 +222,21 @@ class Flatworld extends Provider
     }
 
     /**
-     * Validates the order.
+     * Validates an order.
      *
-     * @param mixed $order
-     * @return boolean
+     * Creates an OrderValidator object and validates the order. The validation checks include weight per square foot, total max weight, and weight limit message.
+     *
+     * @param mixed $order The order to validate.
+     * @return OrderMetaData|false Returns an OrderMetaData object if the order is valid, false otherwise.
      */
-    private function validateOrder($order): bool
+    private function validateOrder($order): OrderMetaData|false
     {
-        $orderValidator = new OrderValidator($order);
+        $orderValidator = new OrderValidator(
+            $order,
+            $this->getSetting('weightPerSquareFoot'),
+            $this->getSetting('totalMaxWeight'),
+            $this->getSetting('weightLimitMessage'),
+        );
         return $orderValidator->validate();
     }
 

@@ -4,18 +4,17 @@ namespace fireclaytile\flatworld\services;
 
 use Craft;
 use craft\base\Component;
-use craft\commerce\models\OrderNotice;
+use craft\commerce\elements\Order;
 use craft\helpers\Json;
 use fireclaytile\flatworld\Flatworld as FlatworldPlugin;
 use fireclaytile\flatworld\models\LineItem;
+use fireclaytile\flatworld\models\OrderMetaData;
 use fireclaytile\flatworld\models\ShippingRate;
 use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
 use GuzzleHttp\Exception\GuzzleException;
 use verbb\postie\helpers\PostieHelper;
 use verbb\postie\Postie;
-use yii\base\InvalidConfigException;
-use fireclaytile\flatworld\services\OrderValidator;
 
 /**
  * Service class Rates.
@@ -40,16 +39,6 @@ class Rates extends Component
     private $_order;
 
     /**
-     * @var array
-     */
-    private array $_pieces;
-
-    /**
-     * @var float
-     */
-    private float $_totalWeight;
-
-    /**
      * The response from the API call for rates.
      *
      * @var mixed
@@ -62,21 +51,6 @@ class Rates extends Component
      * @var ShippingRequest
      */
     private ShippingRequest $_shippingRequest;
-
-    /**
-     * @var bool
-     */
-    private bool $_orderContainsMerchandise;
-
-    /**
-     * @var bool
-     */
-    private bool $_orderContainsSampleProducts;
-
-    /**
-     * @var bool
-     */
-    private bool $_orderContainsStandardProducts;
 
     /**
      * @var boolean|null
@@ -100,31 +74,19 @@ class Rates extends Component
     }
 
     /**
-     * @param $order
-     * @return array
-     * @throws GuzzleException
-     * @throws InvalidConfigException
+     * Retrieves shipping rates for an order.
+     *
+     * First checks the rates cache. If rates are not in the cache, it makes an API request to retrieve them.
+     * The retrieved rates are then cached for future use.
+     *
+     * @param Order $order The order to get rates for.
+     * @param OrderMetaData $orderMetaData The metadata of the order.
+     * @return array Returns an array of rates for the order.
      */
-    public function getRates($order): array
+    public function getRates(Order $order, OrderMetaData $orderMetaData): array
     {
         $this->setOrder($order);
-
-        $this->filterOutAddons();
-        $this->countProductTypes();
-        $this->setPieces();
-        $this->setTotalWeight();
-
-        // ensure there is a weight.
-        if (!$this->checkTotalWeight()) {
-            return $this->_modifyRatesEvent([], $this->_order);
-        }
-
-        // ensure the weight is within the limit.
-        if (!$this->checkWeightLimit()) {
-            return $this->_modifyRatesEvent([], $this->_order);
-        }
-
-        $this->setShippingRequest();
+        $this->setShippingRequest($orderMetaData);
 
         // Lets check the rates cache before making an API request - this will be an array or be false
         $ratesCache = $this->getRatesCache();
@@ -135,7 +97,7 @@ class Rates extends Component
 
         $this->requestRates();
 
-        $rates = $this->responseRates();
+        $rates = $this->responseRates($orderMetaData);
 
         // Lets cache the rates
         $this->setRatesCache($rates);
@@ -149,7 +111,7 @@ class Rates extends Component
      * @param $order
      * @return void
      */
-    public function setOrder($order): void
+    public function setOrder(Order $order): void
     {
         $this->_order = clone $order;
     }
@@ -162,541 +124,6 @@ class Rates extends Component
     public function getOrder()
     {
         return $this->_order;
-    }
-
-    /**
-     * Filters out addons from the order's lineItems.
-     *
-     * @return void
-     */
-    public function filterOutAddons(): void
-    {
-        $this->_order->lineItems = array_filter(
-            $this->_order->lineItems,
-            function ($item) {
-                $isAddOn =
-                    !empty($item->purchasable) &&
-                    !empty($item->purchasable->product) &&
-                    !empty($item->purchasable->product->type) &&
-                    !empty($item->purchasable->product->type->handle) &&
-                    $item->purchasable->product->type->handle === 'addons';
-
-                return !$isAddOn;
-            },
-        );
-    }
-
-    /**
-     * @return void
-     */
-    public function filterOutMerchandise(): void
-    {
-        $this->_order->lineItems = array_filter(
-            $this->_order->lineItems,
-            function ($item) {
-                $isMerchandise =
-                    !empty($item->purchasable) &&
-                    !empty($item->purchasable->product) &&
-                    !empty($item->purchasable->product->type) &&
-                    !empty($item->purchasable->product->type->handle) &&
-                    $item->purchasable->product->type->handle === 'merchandise';
-
-                return !$isMerchandise;
-            },
-        );
-    }
-
-    /**
-     * @return void
-     */
-    public function filterOutSampleProducts(): void
-    {
-        $this->_order->lineItems = array_filter(
-            $this->_order->lineItems,
-            function ($item) {
-                $isSample = isset($item->options['sample']);
-
-                return !$isSample;
-            },
-        );
-    }
-
-    /**
-     * @return void
-     */
-    public function filterOutStandardProducts(): void
-    {
-        $this->_order->lineItems = array_filter(
-            $this->_order->lineItems,
-            function ($item) {
-                $isSample = isset($item->options['sample']);
-                $isAddOn =
-                    !empty($item->purchasable) &&
-                    !empty($item->purchasable->product) &&
-                    !empty($item->purchasable->product->type) &&
-                    !empty($item->purchasable->product->type->handle) &&
-                    $item->purchasable->product->type->handle === 'addons';
-                $isMerchandise =
-                    !empty($item->purchasable) &&
-                    !empty($item->purchasable->product) &&
-                    !empty($item->purchasable->product->type) &&
-                    !empty($item->purchasable->product->type->handle) &&
-                    $item->purchasable->product->type->handle === 'merchandise';
-
-                return $isSample || $isAddOn || $isMerchandise;
-            },
-        );
-    }
-
-    /**
-     * Determines how many of each product type are in the order.
-     *
-     * @return void
-     */
-    public function countProductTypes(): void
-    {
-        $this->_logMessage(
-            __METHOD__,
-            'Order Contains Standard Products to FALSE',
-        );
-        $this->_logMessage(
-            __METHOD__,
-            'Order Contains Sample Products to FALSE',
-        );
-        $this->_logMessage(__METHOD__, 'Order Contains Merchandise to FALSE');
-
-        $this->setOrderContainsStandardProducts(false);
-        $this->setOrderContainsSampleProducts(false);
-        $this->setOrderContainsMerchandise(false);
-
-        $totalSample = 0;
-        $totalStandard = 0;
-        $totalMerchandise = 0;
-
-        foreach ($this->_order->lineItems as $item) {
-            $isSample = isset($item->options['sample']);
-            $isMerchandise =
-                !empty($item->purchasable) &&
-                !empty($item->purchasable->product) &&
-                !empty($item->purchasable->product->type) &&
-                !empty($item->purchasable->product->type->handle) &&
-                $item->purchasable->product->type->handle === 'merchandise';
-
-            if ($isSample) {
-                $totalSample++;
-            } elseif ($isMerchandise) {
-                $totalMerchandise++;
-            } else {
-                $totalStandard++;
-            }
-        }
-
-        if ($totalStandard > 0) {
-            $this->_logMessage(
-                __METHOD__,
-                'Order Contains Standard Products to TRUE',
-            );
-            $this->setOrderContainsStandardProducts(true);
-        }
-
-        if ($totalSample > 0) {
-            $this->_logMessage(
-                __METHOD__,
-                'Order Contains Sample Products to TRUE',
-            );
-            $this->setOrderContainsSampleProducts(true);
-        }
-
-        if ($totalMerchandise > 0) {
-            $this->_logMessage(
-                __METHOD__,
-                'Order Contains Merchandise to TRUE',
-            );
-            $this->setOrderContainsMerchandise(true);
-        }
-    }
-
-    /**
-     * Sets the _orderContainsStandardProducts property.
-     *
-     * @param bool $orderContainsStandardProducts
-     * @return void
-     */
-    public function setOrderContainsStandardProducts(
-        bool $orderContainsStandardProducts,
-    ): void {
-        $this->_orderContainsStandardProducts = $orderContainsStandardProducts;
-    }
-
-    /**
-     * Gets the _orderContainsStandardProducts property.
-     *
-     * @return bool
-     */
-    public function orderContainsStandardProducts(): bool
-    {
-        return $this->_orderContainsStandardProducts;
-    }
-
-    /**
-     * Sets the _orderContainsSampleProducts property.
-     *
-     * @param $orderContainsSampleProducts
-     * @return void
-     */
-    public function setOrderContainsSampleProducts(
-        $orderContainsSampleProducts,
-    ): void {
-        $this->_orderContainsSampleProducts = $orderContainsSampleProducts;
-    }
-
-    /**
-     * Gets the _orderContainsSampleProducts property.
-     *
-     * @return bool
-     */
-    public function orderContainsSampleProducts(): bool
-    {
-        return $this->_orderContainsSampleProducts;
-    }
-
-    /**
-     * Sets the _orderContainsMerchandise property.
-     *
-     * @param $orderContainsMerchandise
-     * @return void
-     */
-    public function setOrderContainsMerchandise($orderContainsMerchandise): void
-    {
-        $this->_orderContainsMerchandise = $orderContainsMerchandise;
-    }
-
-    /**
-     * Gets the _orderContainsMerchandise property.
-     *
-     * @return bool
-     */
-    public function orderContainsMerchandise(): bool
-    {
-        return $this->_orderContainsMerchandise;
-    }
-
-    /**
-     * Sets the _pieces property which is used to calculate total weight.
-     *
-     * @return void
-     */
-    public function setPieces(): void
-    {
-        $this->_pieces = [];
-
-        foreach ($this->_order->lineItems as $item) {
-            $weightPerSquareFoot = null;
-
-            /**
-             * We override the Craft Commerce/Postie quantity for each line item with the following formula to get current shipping cost calculation per square feet.
-             * EXAMPLE:
-             * - Weights: Tile is 4.5lbs, Brick is 5lbs, Glass is 3lbs.
-             * - (4.5 / 0.69) * 25 = 163 (breakdown equals weight per sq ft / variant weight) * sq ft = number of pieces
-             */
-            if (
-                !empty($item->purchasable) &&
-                !empty($item->purchasable->product) &&
-                !empty($item->purchasable->product->type) &&
-                !empty($item->purchasable->product->type->handle)
-            ) {
-                $colorProductLinesCategorySlug = '';
-
-                if (
-                    !empty(
-                        $item->purchasable->product->colorProductLinesCategory
-                    ) &&
-                    !empty(
-                        $item->purchasable->product
-                            ->colorProductLinesCategory[0]
-                    ) &&
-                    $item->purchasable->product->colorProductLinesCategory[0]
-                        ->slug
-                ) {
-                    $colorProductLinesCategorySlug =
-                        $item->purchasable->product
-                            ->colorProductLinesCategory[0]->slug;
-                }
-
-                $this->_logMessage(
-                    __METHOD__,
-                    'Product Category: ' . $colorProductLinesCategorySlug,
-                );
-                $this->_logMessage(
-                    __METHOD__,
-                    'Product Type: ' .
-                        $item->purchasable->product->type->handle,
-                );
-
-                $weightPerSquareFootPerProductTypes = $this->_getSetting(
-                    'weightPerSquareFoot',
-                );
-
-                foreach (
-                    $weightPerSquareFootPerProductTypes
-                    as $weightPerSquareFootPerProductType
-                ) {
-                    $productTypeHandle = $weightPerSquareFootPerProductType[0];
-                    $productLineSlug = $weightPerSquareFootPerProductType[1];
-                    $value = $weightPerSquareFootPerProductType[2];
-
-                    // Since we have a product line slug from the plugin settings, we need to check if our product line == x AND product type == y
-                    // Example: QuickShip Seconds - Tile
-                    if (
-                        !empty($productLineSlug) &&
-                        $colorProductLinesCategorySlug === $productLineSlug &&
-                        $item->purchasable->product->type->handle ===
-                            $productTypeHandle
-                    ) {
-                        $this->_logMessage(
-                            __METHOD__,
-                            'Found Product with Product Type, Product Line and Weight Per Square Feet',
-                        );
-
-                        $weightPerSquareFoot = $value;
-                        break;
-
-                        // Since we DONT have a product line slug from the plugin
-                        // settings, we are only checking if our product type == x
-                    } else {
-                        // But we also need to account for handpainted since
-                        // these are calculated per piece and not weight per
-                        // square foot.
-                        // Example: QuickShip Seconds - Handpainted
-                        if (
-                            $colorProductLinesCategorySlug === 'handpainted' &&
-                            $item->purchasable->product->type->handle ===
-                                $productTypeHandle
-                        ) {
-                            // Note we dont see $weightPerSquareFoot. Leave it
-                            // null so our "per piece" logic below is
-                            // triggered...but we do break out of the loop
-                            $this->_logMessage(
-                                __METHOD__,
-                                'Found Product with Product Type but Product Line is Handpainted',
-                            );
-
-                            break;
-
-                            // Since we DONT have a product line slug, we are only
-                            // checking if our product type == x
-                            // Example: Brick
-                        } elseif (
-                            $item->purchasable->product->type->handle ===
-                            $productTypeHandle
-                        ) {
-                            $this->_logMessage(
-                                __METHOD__,
-                                'Found Product with Product Type and Weight Per Square Feet',
-                            );
-
-                            $weightPerSquareFoot = $value;
-                            break;
-                        }
-                    }
-                }
-
-                if (!empty($weightPerSquareFoot)) {
-                    $this->_pieces[] = $this->calculatePieces(
-                        $weightPerSquareFoot,
-                        $item->weight,
-                        $item->qty,
-                    );
-
-                    $this->_logMessage(
-                        __METHOD__,
-                        'Weight Per Square Foot: ' .
-                            $weightPerSquareFoot .
-                            ' (' .
-                            floatval($weightPerSquareFoot) .
-                            ')',
-                    );
-                } else {
-                    $this->_pieces[] = intval($item->qty);
-                    $this->_logMessage(__METHOD__, 'No Weight Per Square Foot');
-                }
-
-                $this->_logMessage(
-                    __METHOD__,
-                    'Item Weight: ' .
-                        $item->weight .
-                        ' (' .
-                        floatval($item->weight) .
-                        ')',
-                );
-                $this->_logMessage(
-                    __METHOD__,
-                    'Item Qty: ' . $item->qty . ' (' . intval($item->qty) . ')',
-                );
-                $this->_logMessage(
-                    __METHOD__,
-                    'Item Pieces: ' . Json::encode($this->_pieces),
-                );
-            } else {
-                $this->_pieces[] = intval($item->qty);
-
-                $this->_logMessage(__METHOD__, 'No Purchase Item Found');
-                $this->_logMessage(
-                    __METHOD__,
-                    'Item Weight: ' .
-                        $item->weight .
-                        ' (' .
-                        floatval($item->weight) .
-                        ')',
-                );
-                $this->_logMessage(
-                    __METHOD__,
-                    'Item Qty: ' . $item->qty . ' (' . intval($item->qty) . ')',
-                );
-                $this->_logMessage(
-                    __METHOD__,
-                    'Item Pieces: ' . Json::encode($this->_pieces),
-                );
-            }
-        }
-    }
-
-    /**
-     * Calculates the number of pieces for a given line item based on qty (sq ft) and variant weight.
-     *
-     * Example: (4.5 / 0.69) * 25 = 163 (breakdown equals weight per sq ft / variant weight) * sq ft = number of pieces
-     *
-     * @param $weightPerSquareFoot
-     * @param $weight
-     * @param $qty
-     * @return false|float
-     */
-    public function calculatePieces($weightPerSquareFoot, $weight, $qty)
-    {
-        return ceil(
-            (floatval($weightPerSquareFoot) / floatval($weight)) * intval($qty),
-        );
-    }
-
-    /**
-     * Gets the _pieces property.
-     *
-     * @return array
-     */
-    public function getPieces(): array
-    {
-        return $this->_pieces;
-    }
-
-    /**
-     * Sets the _totalWeight property.
-     *
-     * @param float $totalWeight
-     * @return void
-     */
-    public function setTotalWeight(float $totalWeight = 0.0): void
-    {
-        $this->_totalWeight = 0.0;
-
-        if ($totalWeight > 0.0) {
-            $this->_totalWeight = $totalWeight;
-        } else {
-            $index = 0;
-
-            foreach ($this->_order->lineItems as $item) {
-                $this->_totalWeight +=
-                    floatval($item->weight) * $this->_pieces[$index];
-
-                $index++;
-            }
-        }
-
-        $this->_totalWeight = number_format($this->_totalWeight, 2, '.', '');
-
-        $this->_logMessage(__METHOD__, 'Total Weight: ' . $this->_totalWeight);
-        $this->_logMessage(
-            __METHOD__,
-            'Total Max Weight: ' . $this->_getSetting('totalMaxWeight'),
-        );
-    }
-
-    /**
-     * Checks to see if the total weight of the order is greater than zero. If
-     * it is, return true. If it is not, return false.
-     *
-     * @return bool
-     */
-    public function checkTotalWeight(): bool
-    {
-        if ($this->getTotalWeight() <= 0.0) {
-            $this->_logMessage(
-                __METHOD__,
-                'Total weight was zero, bailing out',
-            );
-
-            return false;
-        }
-
-        $this->_logMessage(__METHOD__, 'Total weight found. Continuing');
-
-        return true;
-    }
-
-    /**
-     * Gets the _totalWeight property.
-     *
-     * @return float
-     */
-    public function getTotalWeight(): float
-    {
-        return $this->_totalWeight;
-    }
-
-    /**
-     * Check to see if the total weight of the order exceeds the weight limit
-     * set in the plugin settings. If the weight is within the limit, return
-     * true. If the weight exceeds the limit, return false and add a notice to
-     * the order.
-     *
-     * @return bool
-     * @throws InvalidConfigException
-     */
-    public function checkWeightLimit(): bool
-    {
-        $this->_order->clearNotices(
-            'shippingMethodChanged',
-            'shippingWeightLimit',
-        );
-
-        if ($this->weightLimitReached()) {
-            $this->_logMessage(__METHOD__, 'Weight limit reached');
-
-            $notice = Craft::createObject([
-                'class' => OrderNotice::class,
-                'type' => 'shippingMethodChanged',
-                'attribute' => 'shippingWeightLimit',
-                'message' => $this->_getSetting('weightLimitMessage'),
-            ]);
-
-            $this->_order->addNotice($notice);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Calculates id the total weight of the order exceeds the weight limit.
-     * Returns true if it does, false if it does not.
-     *
-     * @return bool
-     */
-    public function weightLimitReached(): bool
-    {
-        return !empty($this->_getSetting('totalMaxWeight')) &&
-            $this->getTotalWeight() >
-                floatval($this->_getSetting('totalMaxWeight'));
     }
 
     /**
@@ -760,7 +187,7 @@ class Rates extends Component
      *
      * @return void
      */
-    public function setShippingRequest(): void
+    public function setShippingRequest(OrderMetaData $orderMetaData): void
     {
         $order = $this->getOrder();
 
@@ -777,7 +204,7 @@ class Rates extends Component
             );
         }
 
-        if ($this->orderContainsStandardProducts()) {
+        if ($orderMetaData->containsStandardProducts) {
             $this->_shippingRequest->orderType = 'Order';
         }
 
@@ -863,7 +290,7 @@ class Rates extends Component
      *
      * @return array
      */
-    public function responseRates(): array
+    public function responseRates(OrderMetaData $orderMetaData): array
     {
         $response = $this->getResponse();
         $allowedCarrierServices = $this->_getSetting('carrierClassOfServices');
@@ -913,7 +340,7 @@ class Rates extends Component
         // Shipping for samples only orders will differ from standard orders
         // The rates and carrienr handles are set in the plugin settings
         // (We set this on the lowest cost carrier which also overrides flat rate cost)
-        $this->_setSampleOnlyShippingRates($rates);
+        $this->_setSampleOnlyShippingRates($rates, $orderMetaData);
 
         return $this->_modifyRatesEvent($rates, $this->_order);
     }
@@ -1097,12 +524,14 @@ class Rates extends Component
      *
      * @param array $rates The shipping rates array.
      */
-    private function _setSampleOnlyShippingRates(array &$rates): void
-    {
+    private function _setSampleOnlyShippingRates(
+        array &$rates,
+        OrderMetaData $orderMetaData,
+    ): void {
         if (
-            !$this->orderContainsStandardProducts() &&
-            !$this->orderContainsMerchandise() &&
-            $this->orderContainsSampleProducts()
+            !$orderMetaData->containsStandardProducts &&
+            !$orderMetaData->containsMerchandise &&
+            $orderMetaData->containsSampleProducts
         ) {
             $firstCarrier = array_slice($rates, 0, 1);
             $firstServiceHandle = key($firstCarrier);
