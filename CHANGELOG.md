@@ -1,9 +1,10 @@
 # Flatworld Changelog
 
-## UNRELEASED
+## 1.3.0 - UNRELEASED
 
--   add ECS tool and run for pre-craft-4 cleanup
--   add craftcms/phpstan and run for pre-craft-4 cleanup
+-   Added ECS tool and run for pre-craft-4 cleanup
+-   Added craftcms/phpstan and run for pre-craft-4 cleanup
+-   Created `OrderValidator` service class and moved relevant code into it.
 
 ## 1.2.0 - 2023-11-06
 

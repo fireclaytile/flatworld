@@ -14,10 +14,12 @@
 namespace fireclaytile\flatworld\providers;
 
 use Craft;
+
 use craft\helpers\Json;
 use Exception;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
+use fireclaytile\flatworld\services\OrderValidator;
 use fireclaytile\flatworld\services\Rates as RatesService;
 use Throwable;
 use Twig\Error\LoaderError;
@@ -130,16 +132,17 @@ class Flatworld extends Provider
         }
 
         try {
-            $this->_logMessage(__METHOD__, 'Fetching new rates', $uniqueId);
-            $this->_logMessage(__METHOD__, 'CALL STARTED', $uniqueId);
+            $this->_logMessage(__METHOD__, 'Validating order', $uniqueId);
+            if (!$this->validateOrder($order)) {
+                return $this->modifyRatesEvent([], $order);
+            }
 
+            $this->_logMessage(__METHOD__, 'Fetching new rates', $uniqueId);
             $this->_ratesService = new RatesService(
                 $this->getSetting('displayDebugMessages'),
             );
 
             $this->_rates = $this->_ratesService->getRates($order);
-
-            $this->_logMessage(__METHOD__, 'CALL FINISHED', $uniqueId);
 
             if ($this->_rates) {
                 $rates = Json::encode($this->_rates);
@@ -148,7 +151,6 @@ class Flatworld extends Provider
             }
         } catch (Throwable $error) {
             $this->_throwError($uniqueId, $error);
-            $this->_logMessage(__METHOD__, 'CALL FINISHED', $uniqueId);
         }
 
         $this->_logMessage(__METHOD__, 'Rates were empty', $uniqueId);
@@ -202,6 +204,18 @@ class Flatworld extends Provider
             $this->getSetting('displayDebugMessages'),
         );
         return $this->_ratesService->testRatesConnection();
+    }
+
+    /**
+     * Validates the order.
+     *
+     * @param mixed $order
+     * @return boolean
+     */
+    private function validateOrder($order): bool
+    {
+        $orderValidator = new OrderValidator($order);
+        return $orderValidator->validate();
     }
 
     /**

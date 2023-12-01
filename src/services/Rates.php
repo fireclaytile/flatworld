@@ -15,6 +15,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use verbb\postie\helpers\PostieHelper;
 use verbb\postie\Postie;
 use yii\base\InvalidConfigException;
+use fireclaytile\flatworld\services\OrderValidator;
 
 /**
  * Service class Rates.
@@ -108,10 +109,6 @@ class Rates extends Component
     {
         $this->setOrder($order);
 
-        if (!$this->validateOrder($this->_order)) {
-            return $this->_modifyRatesEvent([], $this->_order);
-        }
-
         $this->filterOutAddons();
         $this->countProductTypes();
         $this->setPieces();
@@ -165,146 +162,6 @@ class Rates extends Component
     public function getOrder()
     {
         return $this->_order;
-    }
-
-    /**
-     * Validates the order.
-     *
-     * @param mixed $order
-     * @return boolean
-     */
-    public function validateOrder($order): bool
-    {
-        $this->setOrder($order);
-
-        if (!$this->checkLineItems()) {
-            return false;
-        }
-
-        if (!$this->checkLineItemRequiredFields()) {
-            return false;
-        }
-
-        if (!$this->checkShippingAddress()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks for presence of line items on the order.
-     *
-     * @return bool
-     */
-    public function checkLineItems(): bool
-    {
-        if (!$this->_order->hasLineItems()) {
-            $this->_logMessage(
-                __METHOD__,
-                'Has no line items yet, bailing out',
-            );
-
-            return false;
-        }
-
-        $this->_logMessage(__METHOD__, 'We have a line items, continuing');
-
-        return true;
-    }
-
-    /**
-     * Checks for presence of required fields on the line items. If any are missing, an email is sent to the admin.
-     *
-     * @return bool
-     */
-    public function checkLineItemRequiredFields(): bool
-    {
-        $problems = false;
-        $problemMessage = '';
-        $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
-
-        foreach ($this->_order->lineItems as $item) {
-            if (
-                !empty($item->purchasable) &&
-                !empty($item->purchasable->product) &&
-                !empty($item->purchasable->product->type) &&
-                !empty($item->purchasable->product->type->handle)
-            ) {
-                if (isset($item->options['sample'])) {
-                    // SKIP
-                } elseif (
-                    $item->purchasable->product->type->handle === 'addons'
-                ) {
-                    // SKIP
-                } elseif (
-                    $item->purchasable->product->type->handle === 'merchandise'
-                ) {
-                    // SKIP
-                } else {
-                    if (empty($item->weight) || empty($item->qty)) {
-                        $problems = true;
-
-                        $problemMessage .= "\nOrderID: {$this->_order->id}, Product URL: {$item->purchasable->url}, Issue: Missing dimensions and/or weight";
-
-                        $this->_logMessage(
-                            __METHOD__,
-                            "Required Fields Missing. Order ID: {$this->_order->id}, Product ID: {$item->purchasable->product->id}",
-                        );
-                    }
-                }
-            }
-        }
-
-        if ($problems && !empty($problemMessage)) {
-            $this->_logMessage(
-                __METHOD__,
-                'Invalid line items found, bailing out...',
-            );
-
-            if (!$devMode && $this->_getSetting('enableErrorEmailMessages')) {
-                $this->_logMessage(__METHOD__, 'Sending email with error.');
-                FlatworldPlugin::getInstance()->mailer->sendMail(
-                    $problemMessage,
-                );
-            }
-
-            return false;
-        }
-
-        $this->_logMessage(
-            __METHOD__,
-            'We have a valid line items, continuing',
-        );
-
-        return true;
-    }
-
-    /**
-     * Checks to see if the order has a shipping address.
-     *
-     * @return bool
-     */
-    public function checkShippingAddress(): bool
-    {
-        if (
-            empty($this->_order->shippingAddress) ||
-            empty($this->_order->shippingAddress->zipCode)
-        ) {
-            $this->_logMessage(
-                __METHOD__,
-                'Has no shipping address yet, bailing out',
-            );
-
-            return false;
-        }
-
-        $this->_logMessage(
-            __METHOD__,
-            'We have a shipping address, continuing',
-        );
-
-        return true;
     }
 
     /**
