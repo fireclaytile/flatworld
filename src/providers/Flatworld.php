@@ -287,14 +287,13 @@ class Flatworld extends Provider
     }
 
     /**
-     * Logs a thrown error and sends an email about it.
+     * Handles and logs errors, and optionally sends an email.
      *
-     * @param $uniqueId
-     * @param $error
+     * @param string $uniqueId Unique identifier for the current execution.
+     * @param Throwable $error The error that was thrown.
      * @return void
-     * @throws Exception
      */
-    private function _throwError($uniqueId, $error): void
+    private function _throwError(string $uniqueId, Throwable $error): void
     {
         $file = 'NA';
         $line = 'NA';
