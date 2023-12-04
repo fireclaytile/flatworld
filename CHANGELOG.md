@@ -1,9 +1,15 @@
 # Flatworld Changelog
 
-## UNRELEASED
+## 1.3.0 - 2023-12-4
 
--   add ECS tool and run for pre-craft-4 cleanup
--   add craftcms/phpstan and run for pre-craft-4 cleanup
+-   Added ECS tool and run for pre-craft-4 cleanup
+-   Added craftcms/phpstan and run for pre-craft-4 cleanup
+-   Created `OrderValidator` service class and moved relevant code into it.
+-   Created `OrderMetadata` service class and moved relevant code into it.
+-   Moved shipping request creation logic to model.
+-   Removed some invalid error handling code in `Flatworld` provider class.
+-   Improved code readability and error handling on `SalesforceRestConnection`
+-   Removed unnecessary property on `RestDetails`
 
 ## 1.2.0 - 2023-11-06
 

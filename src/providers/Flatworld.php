@@ -14,10 +14,14 @@
 namespace fireclaytile\flatworld\providers;
 
 use Craft;
+
 use craft\helpers\Json;
 use Exception;
+use fireclaytile\flatworld\models\OrderMetaData;
+use fireclaytile\flatworld\models\ShippingRequest;
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
+use fireclaytile\flatworld\services\OrderValidator;
 use fireclaytile\flatworld\services\Rates as RatesService;
 use Throwable;
 use Twig\Error\LoaderError;
@@ -52,6 +56,13 @@ class Flatworld extends Provider
      * @var RatesService
      */
     private RatesService $_ratesService;
+
+    /**
+     * ShippingRequest object.
+     *
+     * @var ShippingRequest
+     */
+    private ShippingRequest $shippingRequest;
 
     /**
      * Gets the plugin's display name.
@@ -130,16 +141,43 @@ class Flatworld extends Provider
         }
 
         try {
-            $this->_logMessage(__METHOD__, 'Fetching new rates', $uniqueId);
-            $this->_logMessage(__METHOD__, 'CALL STARTED', $uniqueId);
+            $this->_logMessage(__METHOD__, 'Validating order', $uniqueId);
 
+            $orderMetaData = $this->validateOrder($order);
+
+            if (!$orderMetaData) {
+                return $this->modifyRatesEvent([], $order);
+            }
+
+            $orderMetaDataJson = json_encode($orderMetaData);
+
+            $this->_logMessage(
+                __METHOD__,
+                "OrderMetaData: {$orderMetaDataJson}",
+                $uniqueId,
+            );
+
+            $this->_logMessage(
+                __METHOD__,
+                'Creating ShippingRequest',
+                $uniqueId,
+            );
+            $this->shippingRequest = new ShippingRequest(
+                $order,
+                $orderMetaData,
+                $this->getSetting('enableLiftGateRates'),
+            );
+
+            $this->_logMessage(__METHOD__, 'Fetching rates', $uniqueId);
             $this->_ratesService = new RatesService(
                 $this->getSetting('displayDebugMessages'),
             );
 
-            $this->_rates = $this->_ratesService->getRates($order);
-
-            $this->_logMessage(__METHOD__, 'CALL FINISHED', $uniqueId);
+            $this->_rates = $this->_ratesService->getRates(
+                $order,
+                $orderMetaData,
+                $this->shippingRequest,
+            );
 
             if ($this->_rates) {
                 $rates = Json::encode($this->_rates);
@@ -148,7 +186,6 @@ class Flatworld extends Provider
             }
         } catch (Throwable $error) {
             $this->_throwError($uniqueId, $error);
-            $this->_logMessage(__METHOD__, 'CALL FINISHED', $uniqueId);
         }
 
         $this->_logMessage(__METHOD__, 'Rates were empty', $uniqueId);
@@ -205,6 +242,25 @@ class Flatworld extends Provider
     }
 
     /**
+     * Validates an order.
+     *
+     * Creates an OrderValidator object and validates the order. The validation checks include weight per square foot, total max weight, and weight limit message.
+     *
+     * @param mixed $order The order to validate.
+     * @return OrderMetaData|false Returns an OrderMetaData object if the order is valid, false otherwise.
+     */
+    private function validateOrder($order): OrderMetaData|false
+    {
+        $orderValidator = new OrderValidator(
+            $order,
+            $this->getSetting('weightPerSquareFoot'),
+            $this->getSetting('totalMaxWeight'),
+            $this->getSetting('weightLimitMessage'),
+        );
+        return $orderValidator->validate();
+    }
+
+    /**
      * Logs a debug message to the log file if logging is enabled.
      *
      * @param string $method Method that called this function
@@ -231,57 +287,40 @@ class Flatworld extends Provider
     }
 
     /**
-     * Logs a thrown error and sends an email about it.
+     * Handles and logs errors, and optionally sends an email.
      *
-     * @param $uniqueId
-     * @param $error
+     * @param string $uniqueId Unique identifier for the current execution.
+     * @param Throwable $error The error that was thrown.
      * @return void
-     * @throws Exception
      */
-    private function _throwError($uniqueId, $error): void
+    private function _throwError(string $uniqueId, Throwable $error): void
     {
         $file = 'NA';
         $line = 'NA';
         $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
 
-        if (method_exists($error, 'hasResponse')) {
-            $data = Json::decode((string) $error->getResponse()->getBody());
+        $message = $error->getMessage();
+        $file = $error->getFile();
+        $line = $error->getLine();
 
-            if ($data['error']['errorMessage']) {
-                $message = $data['error']['errorMessage'];
-            } else {
-                $message = $error->getMessage();
-                $file = $error->getFile();
-                $line = $error->getLine();
-            }
-
-            Provider::error(
-                $this,
-                Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
-                    'message' => $message,
-                    'file' => $file,
-                    'line' => $line,
-                ]),
-            );
-        } else {
-            $message = $error->getMessage();
-            $file = $error->getFile();
-            $line = $error->getLine();
-
-            Provider::error(
-                $this,
-                Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
-                    'message' => $message,
-                    'file' => $file,
-                    'line' => $line,
-                ]),
-            );
-        }
+        Provider::error(
+            $this,
+            Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
+                'message' => $message,
+                'file' => $file,
+                'line' => $line,
+            ]),
+        );
 
         $order = $this->getOrder();
         $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}";
         if ($order) {
             $debugMessage .= ", ORDER ID: {$order->id}";
+        }
+
+        if ($this->shippingRequest) {
+            $requestJson = json_encode($this->shippingRequest);
+            $debugMessage .= ", SHIPPING REQUEST: {$requestJson}";
         }
 
         $this->_logMessage(__METHOD__, $debugMessage, $uniqueId);

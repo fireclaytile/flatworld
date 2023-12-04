@@ -27,13 +27,6 @@ class RestDetails
     public string $url;
 
     /**
-     * Reference ID.
-     *
-     * @var string|null
-     */
-    public ?string $referenceId;
-
-    /**
      * Request body.
      *
      * @var string|null
@@ -45,18 +38,15 @@ class RestDetails
      *
      * @param string $method HTTP method
      * @param string $url URL
-     * @param string|null $referenceId Reference ID
      * @param string|null $body Request body
      */
     public function __construct(
         string $method,
         string $url,
-        ?string $referenceId = null,
         ?string $body = null,
     ) {
         $this->method = $method;
         $this->url = $url;
         $this->body = $body;
-        $this->referenceId = $referenceId;
     }
 }
