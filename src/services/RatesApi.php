@@ -112,6 +112,8 @@ class RatesApi extends Component implements RatesApiInterface
                 $apiUrl,
             );
 
+            $this->_sf->connect();
+
             return true;
         } catch (Exception $e) {
             echo $e->getMessage();

@@ -22,32 +22,65 @@ class SalesforceRestConnection implements RatesRestConnectionInterface
      *
      * @var string
      */
-    private string $_accessToken;
+    private string $accessToken;
 
     /**
      * Salesforce instance URL.
      *
      * @var string
      */
-    private string $_instanceURL;
+    private string $instanceURL;
 
     /**
      * Salesforce base endpoint.
      *
      * @var string
      */
-    private string $_baseEndpoint = '/services/apexrest/';
+    private string $baseEndpoint = '/services/apexrest/';
 
     /**
-     * SalesforceRestConnection constructor.
+     * Salesforce API client ID.
      *
-     * Makes a connection to Salesforce and stores the access token and instance URL.
+     * @var string
+     */
+    private $clientId;
+
+    /**
+     * Salesforce API client secret.
      *
-     * @param string $clientId Salesforce API client ID
-     * @param string $clientSecret Salesforce API client secret
-     * @param string $username Salesforce API username
-     * @param string $password Salesforce API password
-     * @param string $loginURL Salesforce API login URL
+     * @var string
+     */
+    private $clientSecret;
+
+    /**
+     * Salesforce API username.
+     *
+     * @var string
+     */
+    private $username;
+
+    /**
+     * Salesforce API password.
+     *
+     * @var string
+     */
+    private $password;
+
+    /**
+     * Salesforce API login URL.
+     *
+     * @var string
+     */
+    private $loginURL;
+
+    /**
+     * Initializes a new SalesforceRestConnection object.
+     *
+     * @param string $clientId Salesforce app's client ID.
+     * @param string $clientSecret Salesforce app's client secret.
+     * @param string $username Salesforce account username.
+     * @param string $password Salesforce account password.
+     * @param string $loginURL Salesforce login endpoint URL. Defaults to 'https://login.salesforce.com/services/oauth2/token'.
      */
     public function __construct(
         $clientId,
@@ -56,18 +89,34 @@ class SalesforceRestConnection implements RatesRestConnectionInterface
         $password,
         $loginURL = 'https://login.salesforce.com/services/oauth2/token',
     ) {
-        $params =
-            'grant_type=password' .
-            '&client_id=' .
-            $clientId .
-            '&client_secret=' .
-            $clientSecret .
-            '&username=' .
-            $username .
-            '&password=' .
-            $password;
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
+        $this->username = $username;
+        $this->password = $password;
+        $this->loginURL = $loginURL;
+    }
 
-        $curl = curl_init($loginURL);
+    /**
+     * Establishes a connection to Salesforce using the REST API.
+     *
+     * This method sends a POST request to the Salesforce login URL with the client ID, client secret,
+     * username, and password. If the request is successful, it sets the access token and instance URL
+     * for the Salesforce connection.
+     *
+     * @throws Exception If there is an error with the cURL request, if the HTTP status code of the
+     * response is not 200, or if the response data does not include an access token and instance URL.
+     */
+    public function connect(): void
+    {
+        $params = http_build_query([
+            'grant_type' => 'password',
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'username' => $this->username,
+            'password' => $this->password,
+        ]);
+
+        $curl = curl_init($this->loginURL);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POST, true);
@@ -75,14 +124,20 @@ class SalesforceRestConnection implements RatesRestConnectionInterface
 
         $json_response = curl_exec($curl);
 
+        if ($json_response === false) {
+            throw new Exception('Failed to execute cURL: ' . curl_error($curl));
+        }
+
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if ($status != 200) {
-            die(
-                "Error: call to URL $loginURL failed with status $status, response $json_response, curl_error " .
-                    curl_error($curl) .
-                    ', curl_errno ' .
-                    curl_errno($curl)
+            throw new Exception(
+                $this->constructCurlErrorMessage(
+                    $this->loginURL,
+                    $status,
+                    $json_response,
+                    $curl,
+                ),
             );
         }
 
@@ -90,35 +145,41 @@ class SalesforceRestConnection implements RatesRestConnectionInterface
 
         $data = json_decode($json_response, true);
 
-        $this->_accessToken = $data['access_token'];
-        $this->_instanceURL = $data['instance_url'];
-    }
+        if (!isset($data['access_token'], $data['instance_url'])) {
+            throw new Exception('Invalid response from Salesforce');
+        }
 
-    /**
-     * SalesforceRestConnection destructor.
-     */
-    public function __destruct()
-    {
+        $this->accessToken = $data['access_token'];
+        $this->instanceURL = $data['instance_url'];
     }
 
     /**
      * Gets shipping rates from Salesforce.
      *
      * @param ShippingRequest $shippingRequest Shipping request object
-     * @return mixed
+     * @return array
+     * @throws Exception
      */
-    public function getRates(ShippingRequest $shippingRequest): mixed
+    public function getRates(ShippingRequest $shippingRequest): array
     {
-        $url = $this->_baseEndpoint . 'ShippingQuote';
-        $restDetails = new RestDetails('POST', $url);
+        $url = $this->baseEndpoint . 'ShippingQuote';
+        $restDetails = new RestDetails(
+            'POST',
+            $url,
+            json_encode($shippingRequest),
+        );
 
-        $restDetails->body = json_encode($shippingRequest);
-
-        return $this->_makeRequest(
-            $this->_accessToken,
-            $this->_instanceURL,
+        $response = $this->makeRequest(
+            $this->accessToken,
+            $this->instanceURL,
             $restDetails,
         );
+
+        if (!is_array($response)) {
+            throw new Exception('Invalid response from Salesforce');
+        }
+
+        return $response;
     }
 
     /**
@@ -127,60 +188,45 @@ class SalesforceRestConnection implements RatesRestConnectionInterface
      * @param string $accessToken Salesforce access token
      * @param string $instanceURL Salesforce instance URL
      * @param RestDetails $restDetails REST details object
-     * @return mixed
+     * @return array
+     * @throws Exception
      */
-    private function _makeRequest(
+    private function makeRequest(
         string $accessToken,
         string $instanceURL,
         RestDetails $restDetails,
-    ): mixed {
+    ): array {
         $curl = curl_init($instanceURL . $restDetails->url);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         $header = ["Authorization: OAuth $accessToken"];
-        $successStatus = 0;
-
-        switch ($restDetails->method) {
-            case 'POST':
-                if ($restDetails->body == null) {
-                    throw new Exception(
-                        'SalesforceRestConnection->makeRequest: Invalid POST without body',
-                    );
-                }
-
-                array_push($header, 'Content-type: application/json');
-                $successStatus = 200;
-
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $restDetails->body);
-                break;
-
-            case 'GET':
-                $successStatus = 200;
-                break;
-
-            default:
-                throw new Exception(
-                    'SalesforceRestConnection->makeRequest: Invalid REST API method-> ' .
-                        $restDetails->method,
-                );
-        }
+        $successStatus = match ($restDetails->method) {
+            'POST' => $this->handlePost($curl, $restDetails, $header),
+            'GET' => 200,
+            default => throw new Exception(
+                'Invalid REST API method: ' . $restDetails->method,
+            ),
+        };
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
         $json_response = curl_exec($curl);
 
+        if ($json_response === false) {
+            throw new Exception('Failed to execute cURL: ' . curl_error($curl));
+        }
+
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if ($status != $successStatus) {
             throw new Exception(
-                "SalesforceRestConnection->makeRequest: Call to URL $restDetails->url failed with status $status, response $json_response, curl_error " .
-                    curl_error($curl) .
-                    ', curl_errno ' .
-                    curl_errno($curl) .
-                    "\n" .
+                $this->constructCurlErrorMessage(
+                    $restDetails->url,
+                    $status,
                     $json_response,
+                    $curl,
+                ),
             );
         }
 
@@ -188,6 +234,61 @@ class SalesforceRestConnection implements RatesRestConnectionInterface
 
         $response = json_decode($json_response, true);
 
+        if (!is_array($response)) {
+            throw new Exception('Invalid response from Salesforce');
+        }
+
         return $response;
+    }
+
+    /**
+     * Handles a POST request.
+     *
+     * @param resource $curl The cURL handle
+     * @param RestDetails $restDetails REST details object
+     * @param array $header The request headers
+     * @return int The success status code
+     * @throws Exception
+     */
+    private function handlePost(
+        $curl,
+        RestDetails $restDetails,
+        array &$header,
+    ): int {
+        if ($restDetails->body === null) {
+            throw new Exception('Invalid POST without body');
+        }
+
+        $header[] = 'Content-type: application/json';
+
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $restDetails->body);
+
+        return 200;
+    }
+
+    /**
+     * Constructs an error message for a failed cURL request.
+     *
+     * @param string $url The URL of the request
+     * @param int $status The HTTP status code
+     * @param string $response The response from the server
+     * @param mixed $curl The cURL handle
+     * @return string The error message
+     */
+    private function constructCurlErrorMessage(
+        string $url,
+        int $status,
+        string $response,
+        mixed $curl,
+    ): string {
+        return sprintf(
+            'Call to URL %s failed with status %d, response: %s, curl_error: %s, curl_errno: %d',
+            $url,
+            $status,
+            $response,
+            curl_error($curl),
+            curl_errno($curl),
+        );
     }
 }
