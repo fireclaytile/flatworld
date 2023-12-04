@@ -300,39 +300,18 @@ class Flatworld extends Provider
         $line = 'NA';
         $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
 
-        if (method_exists($error, 'hasResponse')) {
-            $data = Json::decode((string) $error->getResponse()->getBody());
+        $message = $error->getMessage();
+        $file = $error->getFile();
+        $line = $error->getLine();
 
-            if ($data['error']['errorMessage']) {
-                $message = $data['error']['errorMessage'];
-            } else {
-                $message = $error->getMessage();
-                $file = $error->getFile();
-                $line = $error->getLine();
-            }
-
-            Provider::error(
-                $this,
-                Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
-                    'message' => $message,
-                    'file' => $file,
-                    'line' => $line,
-                ]),
-            );
-        } else {
-            $message = $error->getMessage();
-            $file = $error->getFile();
-            $line = $error->getLine();
-
-            Provider::error(
-                $this,
-                Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
-                    'message' => $message,
-                    'file' => $file,
-                    'line' => $line,
-                ]),
-            );
-        }
+        Provider::error(
+            $this,
+            Craft::t('flatworld', 'API error: "{message}" {file}:{line}', [
+                'message' => $message,
+                'file' => $file,
+                'line' => $line,
+            ]),
+        );
 
         $order = $this->getOrder();
         $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}";
