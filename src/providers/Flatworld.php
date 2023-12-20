@@ -99,10 +99,12 @@ class Flatworld extends Provider
      */
     public function getIconUrl(): string
     {
-        return Craft::$app->assetManager->getPublishedUrl(
-            '@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg',
-            true,
-        );
+        return Craft::$app
+            ->getAssetManager()
+            ->getPublishedUrl(
+                '@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg',
+                true,
+            );
     }
 
     /**
@@ -110,9 +112,10 @@ class Flatworld extends Provider
      *
      * @return array
      */
-    public function getServiceList(): array
+    public static function getServiceList(): array
     {
-        return $this->getSetting('carrierClassOfServices');
+        $instance = new self();
+        return $instance->getSetting('carrierClassOfServices');
     }
 
     /**
