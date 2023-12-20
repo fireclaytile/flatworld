@@ -3,12 +3,10 @@
 namespace fireclaytile\flatworld\services;
 
 use craft\helpers\Json;
-use putyourlightson\logtofile\LogToFile;
+use fireclaytile\flatworld\Flatworld;
 
 /**
  * Static service class for logging messages.
- *
- * TODO: Change this completely for Craft 4. Helpful reference: https://putyourlightson.com/articles/adding-logging-to-craft-plugins-with-monolog
  *
  * @author      Fireclay Tile
  * @since       0.9.0
@@ -34,7 +32,7 @@ class Logger
             return false;
         }
 
-        LogToFile::info($message, 'flatworld');
+        Flatworld::info($message);
         return true;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Flatworld plugin for Craft CMS 3.x
+ * Flatworld plugin for Craft CMS 4.x
  *
  * Craft Commerce plugin to provide Postie with an additional shipping provider.
  *
@@ -14,19 +14,21 @@ use Craft;
 use craft\base\Plugin;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
+use craft\log\MonologTarget;
 use craft\web\twig\variables\CraftVariable;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
-use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\Rates;
 use fireclaytile\flatworld\services\RatesApi;
 use fireclaytile\flatworld\variables\FlatworldVariable;
+use Monolog\Formatter\LineFormatter;
+use Psr\Log\LogLevel;
 use verbb\postie\controllers\PluginController;
-
 use verbb\postie\events\ModifyShippableVariantsEvent;
 use verbb\postie\events\RegisterProviderTypesEvent;
 use verbb\postie\services\Providers;
 use yii\base\Event;
+use yii\log\Logger;
 
 /**
  * Class Flatworld
@@ -61,6 +63,8 @@ class Flatworld extends Plugin
         parent::init();
 
         self::$plugin = $this;
+
+        $this->_registerLogTarget();
 
         $this->initServices();
 
@@ -117,6 +121,22 @@ class Flatworld extends Plugin
         );
     }
 
+    /**
+     * Logs an informational message to our custom log target.
+     */
+    public static function info(string $message): void
+    {
+        Craft::info($message, 'flatworld');
+    }
+
+    /**
+     * Logs an error message to our custom log target.
+     */
+    public static function error(string $message): void
+    {
+        Craft::error($message, 'flatworld');
+    }
+
     private function initServices()
     {
         $this->setComponents([
@@ -124,6 +144,24 @@ class Flatworld extends Plugin
             'mailer' => Mailer::class,
             'ratesService' => Rates::class,
             'ratesApi' => RatesApi::class,
+        ]);
+    }
+
+    /**
+     * Registers a custom log target, keeping the format as simple as possible.
+     */
+    private function _registerLogTarget(): void
+    {
+        Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+            'name' => 'flatworld',
+            'categories' => ['flatworld'],
+            'level' => LogLevel::INFO,
+            'logContext' => false,
+            'allowLineBreaks' => false,
+            'formatter' => new LineFormatter(
+                format: "%datetime% %message%\n",
+                dateFormat: 'Y-m-d H:i:s',
+            ),
         ]);
     }
 }
