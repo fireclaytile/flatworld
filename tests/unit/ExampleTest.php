@@ -1,6 +1,6 @@
 <?php
 /**
- * Flatworld plugin for Craft CMS 3.x
+ * Flatworld plugin for Craft CMS 4.x
  *
  * Craft Commerce plugin to provide Postie with an additional shipping provider.
  *
@@ -14,7 +14,8 @@ use Craft;
 use UnitTester;
 use Codeception\Test\Unit;
 
-class ExampleTest extends Unit {
+class ExampleTest extends Unit
+{
     /**
      * @var UnitTester
      */
@@ -23,7 +24,8 @@ class ExampleTest extends Unit {
     /**
      * @return void
      */
-    public function testExample() {
+    public function testExample()
+    {
         Craft::$app->setEdition(Craft::Pro);
 
         $this->assertSame(Craft::Pro, Craft::$app->getEdition());

@@ -1,5 +1,5 @@
 /**
- * Flatworld plugin for Craft CMS 3.x
+ * Flatworld plugin for Craft CMS 4.x
  *
  * Craft Commerce plugin to provide Postie with an additional shipping provider.
  *
