@@ -44,7 +44,7 @@ class Flatworld extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '1.1.1';
+    public string $schemaVersion = '2.0.0';
 
     /**
      * @var bool

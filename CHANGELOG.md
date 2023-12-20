@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 2.0.0 - 2023-12-20
+
+-   Updated to work with Craft 4 and Commerce 4
+
 ## 1.3.0 - 2023-12-4
 
 -   Added ECS tool and run for pre-craft-4 cleanup

@@ -1,10 +1,10 @@
-# Flatworld plugin for Craft CMS 3.x
+# Flatworld plugin for Craft CMS 4.x
 
 Craft Commerce plugin to provide Postie with an additional shipping provider for Flatworld rates.
 
 ## Requirements
 
-This plugin requires Craft CMS 3.x or later, Craft Commerce 3.x, and the Postie Craft CMS Plugin.
+This plugin requires Craft CMS 4.x or later, Craft Commerce 4.x, and the Postie Craft CMS Plugin.
 
 ## Installation
 
@@ -31,7 +31,7 @@ Please note: `GROUND` is a special class of service that is used for flat rate c
 ```
 <?php
 /**
- * Postie / Flatworld plugin for Craft CMS 3.x
+ * Postie / Flatworld plugin for Craft CMS 4.x
  *
  * Craft Commerce plugin to provide Postie with an additional shipping provider.
  *
@@ -54,6 +54,10 @@ return [
 
         'displayErrors' => false,
 
+        'manualFetchRates' => true,
+
+        'fetchRatesPostValue' => 'postie-fetch-rates',
+
         'providers' => [
             'flatworld' => [
                 'settings' => [
@@ -73,14 +77,6 @@ return [
                         'FEDEX_STANDARD_OVERNIGHT' => 'FedEx Standard Overnight',
                         'FEDEX_PRIORITY_OVERNIGHT' => 'FedEx Priority Overnight',
                         'FEDEX_FIRST_OVERNIGHT' => 'FedEx First Overnight',
-                        'UPS_2ND_DAY_AIR' => 'UPS 2nd Day Air',
-                        'UPS_SECOND_DAY_AIR_AM' => 'UPS Second Day Air AM',
-                        'UPS_3_DAY_SELECT' => 'UPS 3 Day Select',
-                        'UPS_GROUND' => 'UPS Ground',
-                        'UPS_NEXT_DAY_AIR' => 'UPS Next Day Air',
-                        'UPS_NEXT_DAY_AIR_SAVER' => 'UPS Next Day Air Saver',
-                        'UPS_NEXT_DAY_AIR_EARLY_AM' =>
-                            'UPS Next Day Air Early AM',
                         'USPS_FIRST_CLASS' => 'USPS First Class',
                         'USPS_GROUNDADVANTAGE' => 'USPS GroundAdvantage',
                         'USPS_PARCEL_SELECT' => 'USPS Parcel Select',
@@ -95,9 +91,7 @@ return [
     ],
 
     // Dev environment settings
-    'local' => [
-        'enableCaching' => false,
-    ],
+    'local' => [],
 
     // Staging environment settings
     'development' => [],
@@ -154,22 +148,5 @@ Array
 Notes:
 
 -   'type' will either be 'parcel' or 'ltl'.
-
-## Unit Testing
-
-Unit testing is mainly focused on testing functionality of the Provider.
-For best results, since this is a Craft CMS plugin, why not set up a ddev environment and run the tests there?
-Don't worry, the .ddev folder is set to be ignored by git within this project.
-
-```
-// Runs all tests
-ddev php vendor/bin/codecept run unit
-
-// Runs specific test
-ddev php vendor/bin/codecept run unit ./tests/unit/FlatworldTest.php
-
-// Runs specific test case
-ddev php vendor/bin/codecept run unit ./tests/unit/FlatworldTest.php:testResponseRates
-```
 
 Brought to you by [Fireclay Tile](https://github.com/fireclaytile)
