@@ -1,5 +1,16 @@
 # Flatworld Changelog
 
+## 1.3.0 - 2023-12-4
+
+-   Added ECS tool and run for pre-craft-4 cleanup
+-   Added craftcms/phpstan and run for pre-craft-4 cleanup
+-   Created `OrderValidator` service class and moved relevant code into it.
+-   Created `OrderMetadata` service class and moved relevant code into it.
+-   Moved shipping request creation logic to model.
+-   Removed some invalid error handling code in `Flatworld` provider class.
+-   Improved code readability and error handling on `SalesforceRestConnection`
+-   Removed unnecessary property on `RestDetails`
+
 ## 1.2.0 - 2023-11-06
 
 -   Rates now will be filtered based on whether or not they are using a Carrier Service that is enabled in the Postie settings. This way, getting Cheapest and Fastest rates don't return rates from carriers that are not enabled in the settings.

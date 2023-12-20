@@ -11,22 +11,22 @@
 namespace fireclaytile\flatworld;
 
 use Craft;
-use yii\base\Event;
 use craft\base\Plugin;
-use verbb\postie\services\Providers;
-use craft\commerce\elements\Variant;
 use craft\commerce\elements\Product;
+use craft\commerce\elements\Variant;
 use craft\web\twig\variables\CraftVariable;
-use verbb\postie\controllers\PluginController;
-use verbb\postie\events\RegisterProviderTypesEvent;
-use fireclaytile\flatworld\variables\FlatworldVariable;
-use verbb\postie\events\ModifyShippableVariantsEvent;
 use fireclaytile\flatworld\providers\Flatworld as FlatworldProvider;
-
 use fireclaytile\flatworld\services\Logger;
 use fireclaytile\flatworld\services\Mailer;
 use fireclaytile\flatworld\services\Rates;
 use fireclaytile\flatworld\services\RatesApi;
+use fireclaytile\flatworld\variables\FlatworldVariable;
+use verbb\postie\controllers\PluginController;
+
+use verbb\postie\events\ModifyShippableVariantsEvent;
+use verbb\postie\events\RegisterProviderTypesEvent;
+use verbb\postie\services\Providers;
+use yii\base\Event;
 
 /**
  * Class Flatworld

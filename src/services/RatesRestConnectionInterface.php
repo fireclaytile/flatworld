@@ -12,6 +12,13 @@ use fireclaytile\flatworld\models\ShippingRequest;
 interface RatesRestConnectionInterface
 {
     /**
+     * Connects to the REST API.
+     *
+     * @return void
+     */
+    public function connect(): void;
+
+    /**
      * Gets shipping rates.
      *
      * @param ShippingRequest $shippingRequest Shipping request object

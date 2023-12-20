@@ -10,10 +10,10 @@
 
 namespace fireclaytile\flatworld\variables;
 
-use craft\helpers\Json;
-use verbb\postie\Postie;
 use craft\commerce\elements\Order;
+use craft\helpers\Json;
 use fireclaytile\flatworld\services\Logger;
+use verbb\postie\Postie;
 
 /**
  * Class FlatworldVariable

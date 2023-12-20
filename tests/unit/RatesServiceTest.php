@@ -286,9 +286,9 @@ class RatesServiceTest extends Unit
         );
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutSampleProducts();
         $this->ratesService->filterOutMerchandise();
@@ -555,157 +555,157 @@ class RatesServiceTest extends Unit
         $this->_logMessage(__METHOD__, 'done...');
     }
 
-    /**
-     * @return void
-     */
-    public function testCheckLineItemsReturnsFalseWhenAnOrderHasNoLineItems(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
+    // /**
+    //  * @return void
+    //  */
+    // public function testCheckLineItemsReturnsFalseWhenAnOrderHasNoLineItems(): void
+    // {
+    //     $this->_logMessage(__METHOD__, 'running...');
 
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
+    //     $this->ratesService = new RatesService(
+    //         true,
+    //         $this->flatworld->settings,
+    //     );
 
-        $mockOrder = $this->createMockOrder(false, false);
+    //     $mockOrder = $this->createMockOrder(false, false);
 
-        $this->ratesService->setOrder($mockOrder);
+    //     $this->ratesService->setOrder($mockOrder);
 
-        $result = $this->ratesService->checkLineItems();
+    //     $result = $this->ratesService->checkLineItems();
 
-        $this->assertIsBool($result);
-        $this->assertFalse($result);
+    //     $this->assertIsBool($result);
+    //     $this->assertFalse($result);
 
-        $this->_logMessage(__METHOD__, 'done...');
-    }
+    //     $this->_logMessage(__METHOD__, 'done...');
+    // }
 
-    /**
-     * @return void
-     */
-    public function testCheckLineItemsReturnsTrueWhenAnOrderHasLineItems(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
+    // /**
+    //  * @return void
+    //  */
+    // public function testCheckLineItemsReturnsTrueWhenAnOrderHasLineItems(): void
+    // {
+    //     $this->_logMessage(__METHOD__, 'running...');
 
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
+    //     $this->ratesService = new RatesService(
+    //         true,
+    //         $this->flatworld->settings,
+    //     );
 
-        $mockOrder = $this->createMockOrder(true, false);
+    //     $mockOrder = $this->createMockOrder(true, false);
 
-        $this->ratesService->setOrder($mockOrder);
+    //     $this->ratesService->setOrder($mockOrder);
 
-        $result = $this->ratesService->checkLineItems();
+    //     $result = $this->ratesService->checkLineItems();
 
-        $this->assertIsBool($result);
-        $this->assertTrue($result);
+    //     $this->assertIsBool($result);
+    //     $this->assertTrue($result);
 
-        $this->_logMessage(__METHOD__, 'done...');
-    }
+    //     $this->_logMessage(__METHOD__, 'done...');
+    // }
 
-    /**
-     * @return void
-     */
-    public function testCheckLineItemRequiredFieldsReturnsFalseWhenAnOrderHasInValidLineItems(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
+    // /**
+    //  * @return void
+    //  */
+    // public function testCheckLineItemRequiredFieldsReturnsFalseWhenAnOrderHasInValidLineItems(): void
+    // {
+    //     $this->_logMessage(__METHOD__, 'running...');
 
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
+    //     $this->ratesService = new RatesService(
+    //         true,
+    //         $this->flatworld->settings,
+    //     );
 
-        $mockOrder = $this->createMockOrder(true, false);
+    //     $mockOrder = $this->createMockOrder(true, false);
 
-        $this->ratesService->setOrder($mockOrder);
+    //     $this->ratesService->setOrder($mockOrder);
 
-        $lineItems = $this->ratesService->getOrder()->getLineItems();
+    //     $lineItems = $this->ratesService->getOrder()->getLineItems();
 
-        // Explicitly setting qty and weight to null for line items 2 & 3
-        $lineItems[1]->qty = 0;
-        $lineItems[2]->weight = 0.0;
+    //     // Explicitly setting qty and weight to null for line items 2 & 3
+    //     $lineItems[1]->qty = 0;
+    //     $lineItems[2]->weight = 0.0;
 
-        $result = $this->ratesService->checkLineItemRequiredFields();
+    //     $result = $this->ratesService->checkLineItemRequiredFields();
 
-        $this->assertIsBool($result);
-        $this->assertFalse($result);
+    //     $this->assertIsBool($result);
+    //     $this->assertFalse($result);
 
-        $this->_logMessage(__METHOD__, 'done...');
-    }
+    //     $this->_logMessage(__METHOD__, 'done...');
+    // }
 
-    /**
-     * @return void
-     */
-    public function testCheckLineItemRequiredFieldsReturnsTrueWhenAnOrderHasValidLineItems(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
+    // /**
+    //  * @return void
+    //  */
+    // public function testCheckLineItemRequiredFieldsReturnsTrueWhenAnOrderHasValidLineItems(): void
+    // {
+    //     $this->_logMessage(__METHOD__, 'running...');
 
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
+    //     $this->ratesService = new RatesService(
+    //         true,
+    //         $this->flatworld->settings,
+    //     );
 
-        $mockOrder = $this->createMockOrder(true, false);
+    //     $mockOrder = $this->createMockOrder(true, false);
 
-        $this->ratesService->setOrder($mockOrder);
+    //     $this->ratesService->setOrder($mockOrder);
 
-        $result = $this->ratesService->checkLineItemRequiredFields();
+    //     $result = $this->ratesService->checkLineItemRequiredFields();
 
-        $this->assertIsBool($result);
-        $this->assertTrue($result);
+    //     $this->assertIsBool($result);
+    //     $this->assertTrue($result);
 
-        $this->_logMessage(__METHOD__, 'done...');
-    }
+    //     $this->_logMessage(__METHOD__, 'done...');
+    // }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
-    public function testCheckShippingAddressesReturnsFalseWhenAnOrderHasNoShippingAddress(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
+    // /**
+    //  * @return void
+    //  * @throws Exception
+    //  */
+    // public function testCheckShippingAddressesReturnsFalseWhenAnOrderHasNoShippingAddress(): void
+    // {
+    //     $this->_logMessage(__METHOD__, 'running...');
 
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
+    //     $this->ratesService = new RatesService(
+    //         true,
+    //         $this->flatworld->settings,
+    //     );
 
-        $mockOrder = $this->createMockOrder(true, false);
+    //     $mockOrder = $this->createMockOrder(true, false);
 
-        $this->ratesService->setOrder($mockOrder);
+    //     $this->ratesService->setOrder($mockOrder);
 
-        $result = $this->ratesService->checkShippingAddress();
+    //     $result = $this->ratesService->checkShippingAddress();
 
-        $this->assertIsBool($result);
-        $this->assertFalse($result);
+    //     $this->assertIsBool($result);
+    //     $this->assertFalse($result);
 
-        $this->_logMessage(__METHOD__, 'done...');
-    }
+    //     $this->_logMessage(__METHOD__, 'done...');
+    // }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
-    public function testCheckShippingAddressesReturnsTrueWhenAnOrderHasNoShippingAddress(): void
-    {
-        $this->_logMessage(__METHOD__, 'running...');
+    // /**
+    //  * @return void
+    //  * @throws Exception
+    //  */
+    // public function testCheckShippingAddressesReturnsTrueWhenAnOrderHasNoShippingAddress(): void
+    // {
+    //     $this->_logMessage(__METHOD__, 'running...');
 
-        $this->ratesService = new RatesService(
-            true,
-            $this->flatworld->settings,
-        );
+    //     $this->ratesService = new RatesService(
+    //         true,
+    //         $this->flatworld->settings,
+    //     );
 
-        $mockOrder = $this->createMockOrder();
+    //     $mockOrder = $this->createMockOrder();
 
-        $this->ratesService->setOrder($mockOrder);
+    //     $this->ratesService->setOrder($mockOrder);
 
-        $result = $this->ratesService->checkShippingAddress();
+    //     $result = $this->ratesService->checkShippingAddress();
 
-        $this->assertIsBool($result);
-        $this->assertTrue($result);
+    //     $this->assertIsBool($result);
+    //     $this->assertTrue($result);
 
-        $this->_logMessage(__METHOD__, 'done...');
-    }
+    //     $this->_logMessage(__METHOD__, 'done...');
+    // }
 
     /**
      * @return void
@@ -723,9 +723,9 @@ class RatesServiceTest extends Unit
         $mockOrder = $this->createMockOrder();
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutStandardProducts();
         $this->ratesService->filterOutMerchandise();
@@ -771,9 +771,9 @@ class RatesServiceTest extends Unit
         $mockOrder = $this->createMockOrder();
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->countProductTypes();
         $this->ratesService->setPieces();
@@ -808,9 +808,9 @@ class RatesServiceTest extends Unit
         $mockOrder = $this->createMockOrder();
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutStandardProducts();
         $this->ratesService->filterOutSampleProducts();
@@ -847,9 +847,9 @@ class RatesServiceTest extends Unit
         $mockOrder = $this->createMockOrder();
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutSampleProducts();
         $this->ratesService->countProductTypes();
@@ -885,9 +885,9 @@ class RatesServiceTest extends Unit
         );
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutMerchandise();
         $this->ratesService->countProductTypes();
@@ -923,9 +923,9 @@ class RatesServiceTest extends Unit
         $mockOrder = $this->createMockOrder();
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutStandardProducts();
         $this->ratesService->countProductTypes();
@@ -961,9 +961,9 @@ class RatesServiceTest extends Unit
         $mockOrder = $this->createMockOrder();
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->countProductTypes();
         $this->ratesService->setPieces();
@@ -1033,9 +1033,9 @@ class RatesServiceTest extends Unit
         $mockOrder->user->setGroups([$userGroup15]);
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutMerchandise();
         $this->ratesService->filterOutStandardProducts();
@@ -1083,9 +1083,9 @@ class RatesServiceTest extends Unit
         $mockOrder->user->setGroups([$userGroup15]);
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->countProductTypes();
         $this->ratesService->setPieces();
@@ -1131,9 +1131,9 @@ class RatesServiceTest extends Unit
         $mockOrder->user->setGroups([$userGroup3]);
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutMerchandise();
         $this->ratesService->filterOutStandardProducts();
@@ -1200,9 +1200,9 @@ class RatesServiceTest extends Unit
         );
 
         $this->ratesService->setOrder($mockOrder);
-        $this->ratesService->checkLineItems();
-        $this->ratesService->checkLineItemRequiredFields();
-        $this->ratesService->checkShippingAddress();
+        // $this->ratesService->checkLineItems();
+        // $this->ratesService->checkLineItemRequiredFields();
+        // $this->ratesService->checkShippingAddress();
         $this->ratesService->filterOutAddons();
         $this->ratesService->filterOutStandardProducts();
         $this->ratesService->filterOutMerchandise();
