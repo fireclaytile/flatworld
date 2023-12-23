@@ -213,10 +213,8 @@ class OrderValidator
      */
     private function checkShippingAddress(): bool
     {
-        if (
-            empty($this->order->shippingAddress) ||
-            empty($this->order->shippingAddress->zipCode)
-        ) {
+        $shippingAddress = $this->order->getShippingAddress();
+        if (empty($shippingAddress) || empty($shippingAddress->postalCode)) {
             $this->logMessage(
                 __METHOD__,
                 'Has no shipping address yet, bailing out',
