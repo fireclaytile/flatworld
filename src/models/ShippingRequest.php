@@ -20,7 +20,7 @@ class ShippingRequest
      *
      * @var string
      */
-    public string $postalCode;
+    public string $zipCode;
 
     /**
      * Lift gate?
@@ -61,7 +61,7 @@ class ShippingRequest
         OrderMetaData $orderMetaData,
         bool $enableLiftGateRates = false,
     ) {
-        $this->postalCode = $order->shippingAddress->postalCode;
+        $this->zipCode = $order->shippingAddress->postalCode;
         $this->liftGate = false;
         $this->orderType = 'Sample';
         $this->lineItems = [];

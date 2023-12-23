@@ -480,7 +480,7 @@ class Rates extends Component
 
         $shippingRequest = $this->getShippingRequest();
 
-        if (!$shippingRequest || !$shippingRequest->postalCode) {
+        if (!$shippingRequest || !$shippingRequest->zipCode) {
             $this->_logMessage(__METHOD__, 'Shipping Request was null');
             return false;
         }
