@@ -410,8 +410,8 @@ class Rates extends Component
     private function _getSamplesOnlyShippingRateAmount(): float
     {
         if (
-            !empty($this->_order->user) &&
-            $this->_order->user->isInGroup('customersTrade15')
+            !empty($this->_order->customer) &&
+            $this->_order->customer->isInGroup('customersTrade15')
         ) {
             $amount = $this->getTradeFlatRateAmount();
 
