@@ -329,7 +329,7 @@ class Rates extends Component
     }
 
     /**
-     * Creates a rates cache and sets it to expire in 5 minutes.
+     * Creates a rates cache and sets it to expire in 10 minutes.
      *
      * @param array $rates
      * @return void
@@ -337,13 +337,13 @@ class Rates extends Component
     public function setRatesCache(array $rates): void
     {
         // Duration in minutes * seconds
-        $duration = 5 * 60;
+        $duration = 10 * 60;
 
         $cacheKey = $this->_getCacheKey();
 
         Craft::$app->cache->set($cacheKey, $rates, $duration);
 
-        $this->_logMessage(__METHOD__, 'Set rates cache to expire in 5 mins');
+        $this->_logMessage(__METHOD__, 'Set rates cache to expire in 10 mins');
     }
 
     /**
