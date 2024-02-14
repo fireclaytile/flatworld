@@ -186,7 +186,7 @@ class Flatworld extends Provider
                 return $this->_rates;
             }
         } catch (Throwable $error) {
-            $this->_throwError($uniqueId, $error);
+            $this->_throwError($uniqueId, $order, $error);
         }
 
         $this->_logMessage(__METHOD__, 'Rates were empty', $uniqueId);
@@ -291,11 +291,15 @@ class Flatworld extends Provider
      * Handles and logs errors, and optionally sends an email.
      *
      * @param string $uniqueId Unique identifier for the current execution.
+     * @param mixed $order The order that was being processed.
      * @param Throwable $error The error that was thrown.
      * @return void
      */
-    private function _throwError(string $uniqueId, Throwable $error): void
-    {
+    private function _throwError(
+        string $uniqueId,
+        mixed $order,
+        Throwable $error,
+    ): void {
         $file = 'NA';
         $line = 'NA';
         $devMode = Craft::$app->getConfig()->getGeneral()->devMode;
@@ -313,10 +317,13 @@ class Flatworld extends Provider
             ]),
         );
 
-        $order = $this->getOrder();
         $debugMessage = "MESSAGE: {$message}, FILE: {$file}, LINE: {$line}";
         if ($order) {
             $debugMessage .= ", ORDER ID: {$order->id}";
+            $orderRef = $order->getRef();
+            if ($orderRef) {
+                $debugMessage .= ", Order Reference: {$orderRef}";
+            }
         }
 
         if ($this->shippingRequest) {
