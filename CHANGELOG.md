@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 2.0.1 - 2024-02-14
+
+-   Added order ID to error messages.
+
 ## 2.0.0 - 2023-12-20
 
 -   Updated to work with Craft 4 and Commerce 4

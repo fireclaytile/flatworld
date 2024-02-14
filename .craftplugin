@@ -1,7 +1,7 @@
 {
     "pluginName": "Flatworld",
     "pluginDescription": "Craft Commerce plugin to provide Postie with an additional shipping provider for Flatworld rates.",
-    "pluginVersion": "2.0.0",
+    "pluginVersion": "2.0.1",
     "pluginAuthorName": "Fireclay Tile",
     "pluginVendorName": "fireclaytile",
     "pluginAuthorUrl": "https://github.com/fireclaytile",
