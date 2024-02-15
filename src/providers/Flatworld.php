@@ -100,7 +100,7 @@ class Flatworld extends Provider
     public function getIconUrl(): string
     {
         return Craft::$app
-            ->getAssetManager()
+            ->assetManager()
             ->getPublishedUrl(
                 '@fireclaytile/flatworld/assetbundles/flatworld/dist/img/Flatworld.svg',
                 true,
