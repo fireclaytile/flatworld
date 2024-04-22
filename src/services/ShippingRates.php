@@ -145,10 +145,13 @@ class ShippingRates
                     return in_array(
                         $rate['ServiceLevel'],
                         $allowedCarrierServices,
-                    );
+                    ) && isset($rate['Total']);
                 }
                 // ltl rates
-                return in_array($rate['CarrierName'], $allowedCarrierServices);
+                return in_array(
+                    $rate['CarrierName'],
+                    $allowedCarrierServices,
+                ) && isset($rate['Total']);
             });
         }
 
