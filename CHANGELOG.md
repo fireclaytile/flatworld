@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 2.0.2 - 2024-04-22
+
+-   Filter out rates that have a null Total value that were returned by the API.
+
 ## 2.0.1 - 2024-02-14
 
 -   Added order ID to error messages.
