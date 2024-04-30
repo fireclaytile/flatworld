@@ -1,5 +1,9 @@
 # Flatworld Changelog
 
+## 2.0.3 - 2024-04-30
+
+-   Fix AssetManager method call in provider class.
+
 ## 2.0.2 - 2024-04-22
 
 -   Filter out rates that have a null Total value that were returned by the API.
